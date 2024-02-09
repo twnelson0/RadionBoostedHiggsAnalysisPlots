@@ -80,6 +80,11 @@ class FourTauPlotting(processor.ProcessorABC):
 
 	def process(self, events):
 		dataset = events.metadata['dataset']
+		tau_reco = ak.zip(
+			{
+				"trigger": events.HLTJet,
+			}
+		)
 		tau = ak.zip( 
 			{
 				"pt": events.boostedTauPt,
@@ -99,6 +104,44 @@ class FourTauPlotting(processor.ProcessorABC):
 			},
 			with_name="TauArray",
 			behavior=candidate.behavior,
+		)
+		electron = ak.zip(
+			{
+				"pt": events.elePt,
+				"E": events.eleEn,
+				"eta": events.eleEta,
+				"phi": events.elePhi,
+				"charge": events.eleCharge,
+				"Px": events.elePt*np.cos(events.elePhi),
+				"Py": events.elePt*np.sin(events.elePhi),
+				#"Pz": events.elePt/np.sin(2*np.arctan(np.exp(-events.eleEta)))*np.cos(2*np.arctan(np.exp(-events.eleEta))),
+				"Pz": events.elePt*np.tan(2*np.arctan(np.exp(-events.eleEta)))**-1,
+				#"mass": events.eleMass,
+				"trigger": events.HLTJet,
+					
+			},
+			with_name="ElectronArray",
+			behavior=candidate.behavior,
+			
+		)
+		muon = ak.zip(
+			{
+				"pt": events.muPt,
+				"E": events.muEn,
+				"eta": events.muEta,
+				"phi": events.muPhi,
+				"charge": events.muCharge,
+				"Px": events.muPt*np.cos(events.muPhi),
+				"Py": events.muPt*np.sin(events.muPhi),
+				#"Pz": events.muPt/np.sin(2*np.arctan(np.exp(-events.muEta)))*np.cos(2*np.arctan(np.exp(-events.muEta))),
+				"Pz": events.muPt*np.tan(2*np.arctan(np.exp(-events.muEta)))**-1,
+				#"mass": events.muMass,
+				"trigger": events.HLTJet,
+					
+			},
+			with_name="ElectronArray",
+			behavior=candidate.behavior,
+			
 		)
 
 		AK8Jet = ak.zip(
@@ -303,8 +346,8 @@ class FourTauPlotting(processor.ProcessorABC):
 				
 
 		trigger_mask = bit_mask([self.trigger_bit])		
-		tau = tau[tau.pt > 30] #pT
-		tau = tau[tau.eta < 2.3] #eta
+		tau = tau[tau.pt > 20] #pT
+		tau = tau[np.abs(tau.eta) < 2.3] #eta
 		
 		#Loose isolation
 		tau = tau[tau.decay >= 0.5]	
@@ -323,7 +366,11 @@ class FourTauPlotting(processor.ProcessorABC):
 		JetUp_HT = JetUp_HT[(ak.sum(tau.charge,axis=1) == 0)]
 		JetDown_HT = JetDown_HT[(ak.sum(tau.charge,axis=1) == 0)]
 		Jet_MHT = Jet_MHT[(ak.sum(tau.charge,axis=1) == 0)]
+		electron = electron[(ak.sum(tau.charge,axis=1) == 0)]
+		muon = muon[(ak.sum(tau.charge,axis=1) == 0)]
+		tau_reco = tau_reco[(ak.sum(tau.charge,axis=1) == 0)] #Charge conservation
 		tau = tau[(ak.sum(tau.charge,axis=1) == 0)] #Charge conservation
+
 		
 		#Investegate entries with more than 4 taus
 		# n_more = len(tau[ak.num(tau) > 4])
@@ -347,9 +394,74 @@ class FourTauPlotting(processor.ProcessorABC):
 		JetUp_HT = JetUp_HT[ak.num(tau) >= 4]
 		JetDown_HT = JetDown_HT[ak.num(tau) >= 4]
 		Jet = Jet[ak.num(tau) >= 4]
+		electron = electron[ak.num(tau) >= 4] 
+		muon = muon[ak.num(tau) >= 4] 
+		tau_reco = tau_reco[ak.num(tau) >= 4] 
 		tau = tau[ak.num(tau) >= 4] #4 tau events
 
 		tau["FourMass"] = four_mass([tau[:,0],tau[:,1],tau[:,2],tau[:,3]])
+
+		#Add momenta to tau_reco
+		#electron_dR = deltaR(tau,electron) 
+		#muon_dR = deltaR(tau,muon)
+			
+		#Reco variables
+		reco_pt = []
+		reco_E = []
+		reco_eta = []
+		reco_phi = []
+		
+		#Loop over all events
+		for (ele_event,mu_event,tau_event) in zip(electron,muon,tau):
+			#Reco variables
+			event_pt = []
+			event_E = []
+			event_eta = []
+			event_phi = []
+			
+			#Find where a tau should be a lepton of a different flavor
+			for tau_temp in tau_event:
+				ele_dR = deltaR(tau_temp,ele_event)
+				mu_dR = deltaR(tau_temp,mu_event)
+				ele_event = ele_event[ele_dR < 0.05]
+				ele_dR = ele_dR[ele_dR < 0.05]
+				mu_event = mu_event[mu_dR < 0.05]
+				mu_dR = mu_dR[mu_dR < 0.05]
+				if (ak.num(ele_event.pt,axis=0) >= 1):
+					print("Electron Used")
+					ele_event = ele_event[ele_dR <= min(ele_dR)]
+					event_pt.append(ele_event.pt[0])
+					event_E.append(ele_event.E[0])
+					event_eta.append(ele_event.eta[0])
+					event_phi.append(ele_event.phi[0])
+					continue
+				if (ak.num(mu_event.pt,axis=0) >= 1):
+					print("Muon Used")
+					print(mu_dR)
+					mu_event = mu_event[mu_dR <= min(mu_dR)]
+					event_pt.append(mu_event.pt[0])
+					event_E.append(mu_event.E[0])
+					event_eta.append(mu_event.eta[0])
+					event_phi.append(mu_event.phi[0])
+					continue
+				if (ak.num(mu_event.pt,axis=0) == 0 and ak.num(ele_event.pt,axis=0) == 0):
+					event_pt.append(tau_temp.pt)
+					event_E.append(tau_temp.E)
+					event_eta.append(tau_temp.eta)
+					event_phi.append(tau_temp.phi)
+			
+			#Add to reco arrays
+			reco_pt.append(event_pt)
+			reco_E.append(event_E)
+			reco_eta.append(event_eta)
+			reco_phi.append(event_phi)
+				
+			
+		
+		#for dRArr in electron_dR:
+		#	ptArr = np.array([])
+		#	for dR in dRArr:
+		#		if (dR < 0.05)
 		
 		if (self.OrTrigger): #Select for both triggers
 			Jet["HT"] = ak.sum(Jet_HT.Pt, axis = 1, keepdims=False) + ak.sum(JetUp_HT.PtTotUncUp,axis = 1,keepdims=False) + ak.sum(JetDown_HT.PtTotUncDown,axis=1,keepdims=False)
