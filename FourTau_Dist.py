@@ -455,6 +455,7 @@ class FourTauPlotting(processor.ProcessorABC):
 		#Apply selections
 		trigger_mask = bit_mask([self.trigger_bit])	
 		tau = tau[tau.pt > 20] #pT selection
+		
 		#Remove events with fewer than 4 taus
 		AK8Jet = AK8Jet[ak.num(tau) >= 4]
 		event_level = event_level[ak.num(tau) >= 4]
@@ -465,6 +466,7 @@ class FourTauPlotting(processor.ProcessorABC):
 		if (self.isData or not(self.isData)):
 			print("# of events after pT cut (dropping empty arrays): %d"%ak.num(tau[ak.num(tau,axis=1) > 0],axis=0))
 		tau = tau[np.abs(tau.eta) < 2.3] #eta selection
+		
 		#Remove events with fewer than 4 taus	
 		AK8Jet = AK8Jet[ak.num(tau) >= 4]
 		event_level = event_level[ak.num(tau) >= 4]
@@ -478,6 +480,7 @@ class FourTauPlotting(processor.ProcessorABC):
 		
 		#Isolation and decay selections
 		tau = tau[tau.decay >= 0.5]
+		
 		#Remove events with fewer than 4 taus	
 		AK8Jet = AK8Jet[ak.num(tau) >= 4]
 		event_level = event_level[ak.num(tau) >= 4]
@@ -672,7 +675,7 @@ class FourTauPlotting(processor.ProcessorABC):
 			pair2_charge = charge_Arr
 
 			#Determine what is signal and what is faking signal (if sum and product of total charge of both pairs are 0 than it's signal otherwise it's a fake)
-			signal_cond = np.bitwise_and(ak.all(pair1_charge + pair2_charge,axis=1) == 0, ak.all(pair1_charge + pair2_charge,axis=1) == 0)
+			signal_cond = np.bitwise_and(ak.all(pair1_charge + pair2_charge,axis=1) == 0, ak.all(pair1_charge * pair2_charge,axis=1) == 0)
     
 			#Drop all but signal
 			tau_rem = tau_rem[signal_cond]
@@ -1265,10 +1268,10 @@ class FourTauPlotting(processor.ProcessorABC):
 				"subleading_dR_Arr": ak.to_list(subleading_dR_Arr),
 				"radionPT_Arr" : ak.to_list(radionPT_Arr),
 				"tau_pt_Arr": ak.to_list(ak.ravel(tau.pt)),
-                "tau_lead_pt_Arr": ak.to_list(ak.ravel(tau[ak.argsort(tau.pt,axis=1)][:,0].pt)),
-                "tau_sublead_pt_Arr": ak.to_list(ak.ravel(tau[ak.argsort(tau.pt,axis=1)][:,1].pt)),
-                "tau_3rdlead_pt_Arr": ak.to_list(ak.ravel(tau[ak.argsort(tau.pt,axis=1)][:,2].pt)),
-                "tau_4thlead_pt_Arr": ak.to_list(ak.ravel(tau[ak.argsort(tau.pt,axis=1)][:,3].pt)),
+				"tau_lead_pt_Arr": ak.to_list(ak.ravel(tau[ak.argsort(tau.pt,axis=1)][:,0].pt)),
+				"tau_sublead_pt_Arr": ak.to_list(ak.ravel(tau[ak.argsort(tau.pt,axis=1)][:,1].pt)),
+				"tau_3rdlead_pt_Arr": ak.to_list(ak.ravel(tau[ak.argsort(tau.pt,axis=1)][:,2].pt)),
+				"tau_4thlead_pt_Arr": ak.to_list(ak.ravel(tau[ak.argsort(tau.pt,axis=1)][:,3].pt)),
 				"tau_eta_Arr": ak.to_list(ak.ravel(tau.eta)),
 				"ZMult_Arr": ak.to_list(ak.ravel(event_level.ZMult)),
 				#"ZMult_Arr": ak.to_list(ak.ravel(tau_ZMult)),
@@ -1394,11 +1397,11 @@ if __name__ == "__main__":
 			"ZMult_ele_Arr": hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name="background").Reg(6,0,6, label = r"Z Boson Multiplicity (electrons only)").Double(),
 			"ZMult_mu_Arr": hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name="background").Reg(6,0,6, label = r"Z Boson Multiplicity (muons only)").Double(),
 			"ZMult_tau_Arr": hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name="background").Reg(6,0,6, label = r"Z Boson Multiplicity (from taus)").Double(),
-            "BJet_Arr": hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name="background").Reg(6,0,6, label = r"B Jet Multiplicity").Double(),
-            "tau_lead_pt_Arr": hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name="background").Reg(20,0,200, label=r"Leading $\tau $$p_T$ (GeV)").Double(),
-            "tau_sublead_pt_Arr": hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name="background").Reg(20,0,200, label=r"Leading $\tau $$p_T$ (GeV)").Double(),
-            "tau_3rdlead_pt_Arr": hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name="background").Reg(20,0,200, label=r"Leading $\tau $$p_T$ (GeV)").Double(),
-            "tau_4thlead_pt_Arr": hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name="background").Reg(20,0,200, label=r"Leading $\tau $$p_T$ (GeV)").Double(),
+			"BJet_Arr": hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name="background").Reg(6,0,6, label = r"B Jet Multiplicity").Double(),
+			"tau_lead_pt_Arr": hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name="background").Reg(20,0,200, label=r"Leading $\tau $$p_T$ (GeV)").Double(),
+			"tau_sublead_pt_Arr": hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name="background").Reg(20,0,200, label=r"Leading $\tau $$p_T$ (GeV)").Double(),
+			"tau_3rdlead_pt_Arr": hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name="background").Reg(20,0,200, label=r"Leading $\tau $$p_T$ (GeV)").Double(),
+			"tau_4thlead_pt_Arr": hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name="background").Reg(20,0,200, label=r"Leading $\tau $$p_T$ (GeV)").Double(),
  
 
 		}
@@ -1419,10 +1422,10 @@ if __name__ == "__main__":
 			"ZMult_mu_Arr": hist.Hist.new.StrCat(["Signal"],name="signal").Reg(6,0,6, label = r"Z Boson Multiplicity (muons only)").Double(),
 			"ZMult_tau_Arr": hist.Hist.new.StrCat(["Signal"],name="signal").Reg(6,0,6, label = r"Z Boson Multiplicity (from taus)").Double(),
 			"BJet_Arr": hist.Hist.new.StrCat(["Signal"],name="signal").Reg(6,0,6, label = r"B Jet Multiplicity").Double(),
-            "tau_lead_pt_Arr": hist.Hist.new.StrCat(["Signal"],name="signal").Reg(20,0,200, label=r"Leading $\tau$ $p_T$ (GeV)").Double(),
-            "tau_sublead_pt_Arr": hist.Hist.new.StrCat(["Signal"],name="signal").Reg(20,0,200, label=r"Subleading $\tau$ $p_T$ (GeV)").Double(),
-            "tau_3rdlead_pt_Arr": hist.Hist.new.StrCat(["Signal"],name="signal").Reg(20,0,200, label=r"Third leading $\tau$ $p_T$ (GeV)").Double(),
-            "tau_4thlead_pt_Arr": hist.Hist.new.StrCat(["Signal"],name="signal").Reg(20,0,200, label=r"Fourth leading $\tau$ $p_T$ (GeV)").Double(),
+			"tau_lead_pt_Arr": hist.Hist.new.StrCat(["Signal"],name="signal").Reg(20,0,200, label=r"Leading $\tau$ $p_T$ (GeV)").Double(),
+			"tau_sublead_pt_Arr": hist.Hist.new.StrCat(["Signal"],name="signal").Reg(20,0,200, label=r"Subleading $\tau$ $p_T$ (GeV)").Double(),
+			"tau_3rdlead_pt_Arr": hist.Hist.new.StrCat(["Signal"],name="signal").Reg(20,0,200, label=r"Third leading $\tau$ $p_T$ (GeV)").Double(),
+			"tau_4thlead_pt_Arr": hist.Hist.new.StrCat(["Signal"],name="signal").Reg(20,0,200, label=r"Fourth leading $\tau$ $p_T$ (GeV)").Double(),
 		}
 		hist_dict_data = {
 			"FourTau_Mass_Arr": hist.Hist.new.StrCat(["Data"],name="data").Regular(20,0,3000, label = r"$m_{4\tau}$ [GeV]").Double(),
@@ -1440,10 +1443,10 @@ if __name__ == "__main__":
 			"ZMult_mu_Arr": hist.Hist.new.StrCat(["Data"],name="data").Reg(6,0,6, label = r"Z Boson Multiplicity (muons only)").Double,
 			"ZMult_tau_Arr": hist.Hist.new.StrCat(["Data"],name="data").Reg(6,0,6, label = r"Z Boson Multiplicity (from taus)").Double,
 			"BJet_Arr": hist.Hist.new.StrCat(["Data"],name="data").Reg(6,0,6, label = r"B Jet Multiplicity").Double,
-            "tau_lead_pt_Arr": hist.Hist.new.StrCat(["Data"],name="data").Reg(20,0,200, label=r"Leading $\tau$ $p_T$ (GeV)").Double(),
-            "tau_sublead_pt_Arr": hist.Hist.new.StrCat(["Data"],name="data").Reg(20,0,200, label=r"Subleading $\tau$ $p_T$ (GeV)").Double(),
-            "tau_3rdlead_pt_Arr": hist.Hist.new.StrCat(["Data"],name="data").Reg(20,0,200, label=r"Third leading $\tau$ $p_T$ (GeV)").Double(),
-            "tau_4thlead_pt_Arr": hist.Hist.new.StrCat(["Data"],name="data").Reg(20,0,200, label=r"Fourth leading $\tau$ $p_T$ (GeV)").Double(),
+			"tau_lead_pt_Arr": hist.Hist.new.StrCat(["Data"],name="data").Reg(20,0,200, label=r"Leading $\tau$ $p_T$ (GeV)").Double(),
+			"tau_sublead_pt_Arr": hist.Hist.new.StrCat(["Data"],name="data").Reg(20,0,200, label=r"Subleading $\tau$ $p_T$ (GeV)").Double(),
+			"tau_3rdlead_pt_Arr": hist.Hist.new.StrCat(["Data"],name="data").Reg(20,0,200, label=r"Third leading $\tau$ $p_T$ (GeV)").Double(),
+			"tau_4thlead_pt_Arr": hist.Hist.new.StrCat(["Data"],name="data").Reg(20,0,200, label=r"Fourth leading $\tau$ $p_T$ (GeV)").Double(),
 		}
 		
 		background_list = [r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"]
@@ -1466,9 +1469,9 @@ if __name__ == "__main__":
 				"SubLeadingHiggs_mass" : "SubLeadingHiggs_Mass_" + mass + "-" + trigger_name, "radionPT_Arr": "radion_pT_Mass_" + mass + "-" + trigger_name,
 				"tau_pt_Arr": "TaupT_Mass_" + mass + "-" + trigger_name, "tau_eta_Arr": "Taueta_Mass_" + mass + "-" + trigger_name, "ZMult_Arr": "ZMult_Mass_" + mass + "-" + trigger_name, 
 				"ZMult_ele_Arr": "ele_ZMult_Mass_" + mass + "-" + trigger_name, "ZMult_mu_Arr": "mu_ZMult_Mass_" + mass + "-" + trigger_name, 
-                "ZMult_tau_Arr": "tau_ZMult_Mass_" + mass + "-" + trigger_name, "BJet_Arr": "BJetMult_Mass_" + mass + "-" + trigger_name, 
-                "tau_lead_pt_Arr": r"LeadTau_pT_Mass_" + mass + "-" + trigger_name, "tau_sublead_pt_Arr": r"SubleadTau_pT_Mass_" + mass + "-" + trigger_name, 
-                "tau_3rdlead_pt_Arr": r"ThirdleadTau_pT_Mass_" + mass + "-" + trigger_name,"tau_4thlead_pt_Arr": r"FourthleadTau_pT_Mass_" + mass + "-" + trigger_name,
+				"ZMult_tau_Arr": "tau_ZMult_Mass_" + mass + "-" + trigger_name, "BJet_Arr": "BJetMult_Mass_" + mass + "-" + trigger_name, 
+				"tau_lead_pt_Arr": r"LeadTau_pT_Mass_" + mass + "-" + trigger_name, "tau_sublead_pt_Arr": r"SubleadTau_pT_Mass_" + mass + "-" + trigger_name, 
+				"tau_3rdlead_pt_Arr": r"ThirdleadTau_pT_Mass_" + mass + "-" + trigger_name,"tau_4thlead_pt_Arr": r"FourthleadTau_pT_Mass_" + mass + "-" + trigger_name,
 			}
 			
 			fourtau_out = iterative_runner(file_dict, treename="4tau_tree", processor_instance=FourTauPlotting(trigger_bit=trigger_pair[0], or_trigger=trigger_pair[1]))
@@ -1491,7 +1494,7 @@ if __name__ == "__main__":
 						"ZMult_ele_Arr": hist.Hist.new.Regular(6,0,6, label = r"Z Boson Multiplicity (electrons only)").Double(),
 						"ZMult_mu_Arr": hist.Hist.new.Regular(6,0,6, label = r"Z Boson Multiplicity (muons only)").Double(),
 						"ZMult_tau_Arr": hist.Hist.new.Regular(6,0,6, label = r"Z Boson Multiplicity (from taus)").Double(),
-                        "BJet_Arr": hist.Hist.new.Regular(6,0,6, label = r"BJet Multiplicity").Double()
+						"BJet_Arr": hist.Hist.new.Regular(6,0,6, label = r"BJet Multiplicity").Double()
 						"tau_lead_pt_Arr" : hist.Hist.new.Regular(20,0,200, label=r"Leading $\tau$ $p_T$ (GeV)").Double(),
 						"tau_sublead_pt_Arr" : hist.Hist.new.Regular(20,0,200, label=r"Subleading $\tau$ $p_T$ (GeV)").Double(),
 						"tau_3rdlead_pt_Arr" : hist.Hist.new.Regular(20,0,200, label=r"Third leading $\tau$ $p_T$ (GeV)").Double(),
@@ -1520,7 +1523,7 @@ if __name__ == "__main__":
 							"ZMult_ele_Arr": hist.Hist.new.Regular(6,0,6, label = r"Z Boson Multiplicity (electrons only)").Double(),
 							"ZMult_mu_Arr": hist.Hist.new.Regular(6,0,6, label = r"Z Boson Multiplicity (muons only)").Double(),
 							"ZMult_tau_Arr": hist.Hist.new.Regular(6,0,6, label = r"Z Boson Multiplicity (from taus)").Double(),
-                            "BJet_Arr": hist.Hist.new.Regular(6,0,6, label = r"BJet Multiplicity").Double()
+							"BJet_Arr": hist.Hist.new.Regular(6,0,6, label = r"BJet Multiplicity").Double()
 							"tau_lead_pt_Arr" : hist.Hist.new.Regular(20,0,200, label=r"Leading $\tau$ $p_T$ (GeV)").Double(),
 							"tau_sublead_pt_Arr" : hist.Hist.new.Regular(20,0,200, label=r"Subleading $\tau$ $p_T$ (GeV)").Double(),
 							"tau_3rdlead_pt_Arr" : hist.Hist.new.Regular(20,0,200, label=r"Third leading $\tau$ $p_T$ (GeV)").Double(),
@@ -1561,16 +1564,16 @@ if __name__ == "__main__":
 					#print("Total amount of data = %d"%(len(fourtau_out["Data_SingleMuon"][hist_name]) + len(fourtau_out["Data_JetHT"][hist_name])))
 					#print("Total amount of data = %d"%(len(fourtau_out["Data_SingleMuon"][hist_name])))
 					#print("Total amount of data = %d"%(len(fourtau_out["Data_JetHT"][hist_name])))
-					#hist_dict_data[hist_name].fill("Data",fourtau_out["Data_SingleMuon"][hist_name]) 
-					#hist_dict_data[hist_name].fill("Data",fourtau_out["Data_JetHT"][hist_name]) 
+					hist_dict_data[hist_name].fill("Data",fourtau_out["Data_SingleMuon"][hist_name]) 
+					hist_dict_data[hist_name].fill("Data",fourtau_out["Data_JetHT"][hist_name]) 
 					#print("Number of Jet HT entries: %d"%len(fourtau_out["Data_JetHT"][hist_name]))
 					
 					#Put histograms into stacks and arrays for plotting purposes
 					background_stack = hist_dict_background[hist_name].stack("background")
 					signal_stack = hist_dict_signal[hist_name].stack("signal")
-					#data_stack = hist_dict_data[hist_name].stack("data")
+					data_stack = hist_dict_data[hist_name].stack("data")
 					signal_array = [signal_stack["Signal"]]
-					#data_array = [data_stack["Data"]]
+					data_array = [data_stack["Data"]]
 					for background in background_list:
 						background_array.append(background_stack[background])
 					
@@ -1578,7 +1581,7 @@ if __name__ == "__main__":
 					fig,ax = plt.subplots()
 					hep.histplot(background_array,ax=ax,stack=True,histtype="fill",label=background_list)
 					hep.histplot(signal_array,ax=ax,stack=True,histtype="step",label=signal_list)
-					#hep.histplot(data_array,ax=ax,stack=False,histtype="errorbar", yerr=False,label=["Data"],marker="o")
+					hep.histplot(data_array,ax=ax,stack=False,histtype="errorbar", yerr=False,label=["Data"],marker="o")
 					hep.cms.text("Preliminary",loc=0,fontsize=13)
 					ax.set_title(hist_name_dict[hist_name],loc = "right")
 					ax.legend(fontsize=10, loc='upper right')
