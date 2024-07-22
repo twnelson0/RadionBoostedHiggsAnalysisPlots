@@ -7,9 +7,13 @@ import numpy as np
 import mplhep as hep
 from coffea import processor, nanoevents
 from coffea.nanoevents import NanoEventsFactory, NanoAODSchema, BaseSchema
-from coffea.nanoevents.methods import candidate
+from coffea.nanoevents.methods import candidate, vector
 from math import pi
 import numba 
+import pandas as pd
+from matplotlib.backends.backend_pdf import PdfPages
+import vector
+vector.register_awkward()
 
 hep.style.use(hep.style.CMS)
 TABLEAU_COLORS = ['blue','orange','green','red','purple','brown','pink','gray','olive','cyan']
@@ -21,7 +25,8 @@ TT_FullLep_BR = 0.1061
 TT_SemiLep_BR = 0.4392
 TT_Had_BR = 0.4544
 
-
+#Functions and variables for Luminosity weights
+lumi_table_data = {"MC Sample":[], "Luminosity":[], "Cross Section (pb)":[], "Number of Events":[], "Calculated Weight":[]}
 
 #Count the number of Z-Bosons from a set of leptons with a total number of lepton pairs given by num_pairs within a certain range of the Z-peak
 def Z_Count(leptons, num_pairs, Z_lower = 80, Z_upper = 100):
@@ -47,6 +52,9 @@ def Z_Count(leptons, num_pairs, Z_lower = 80, Z_upper = 100):
 
 def delta_phi(vec1,vec2):
 	return (vec1.phi - vec2.phi + pi) % (2*pi) - pi	
+
+def MET_delta_phi(part1,MET_obj):
+	return (part1.phi - MET_obj.pfMETPhi + pi) % (2*pi) - pi
 
 def deltaR(part1, part2):
 	return np.sqrt((part2.eta - part1.eta)**2 + (delta_phi(part1,part2))**2)
@@ -78,7 +86,7 @@ def bit_or(data):
 	return np.bitwise_or(cond_1, np.bitwise_or(cond_2,cond_3))
 
 #Dictionary of cross sections 
-xSection_Dictionary = {"Signal": 0.001, #Chosen to make plots readable
+xSection_Dictionary = {"Signal": 0.01, #Chosen to make plots readable
 						#TTBar Background
 						"TTTo2L2Nu": 831.76*TT_FullLep_BR, "TTToSemiLeptonic": 831.76*TT_SemiLep_BR, "TTToHadronic": 831.76*TT_Had_BR,
 						#DiBoson Background
@@ -104,7 +112,7 @@ Lumi_2018 = 59830
 #Dictionary of number of events (values specified in main loop)
 numEvents_Dict = {}
 
-def weight_calc(sample,events,numEvents=1):
+def weight_calc(sample,numEvents=1):
 	return Lumi_2018*xSection_Dictionary[sample]/numEvents
 
 def pairing_list(maxN):
@@ -138,52 +146,6 @@ def Z_Mult_Fun_Tau(taus):
 	lower_limit = 80
 	upper_limit = 100
 
-	#Construct all di-tau pairings
-	#pair_list = []
-	#for i in range(max_pairs):
-	#	print(i)
-	#	if (i == 0): #Construct first possible pair
-	#		lead_tau = ak.firsts(tau_minus)
-	#		tau1,tau2 = ak.unzip(ak.cartesian([lead_tau,tau_plus], axis=1, nested = False))
-	#		Pair_Mass = di_mass(tau1,tau2) #Get leading tau other tau invariant masses
-	#		Pair_Mass = ak.fill_none(Pair_Mass,-10)
-	#		tau_plus[pair_names[i]] = Pair_Mass
-	#		Z_Lower = Pair_Mass > 80
-	#		Z_Upper = Pair_Mass < 100
-	#		Z_Candidates = ak.mask(Pair_Mass,np.bitwise_and(Z_Lower,Z_Upper))
-	#		Z_Candidates = ak.fill_none(Z_Candidates,-10,axis=1)
-	#		tau_pair = ak.mask(tau_plus,tau_plus[pair_names[i]] == ak.firsts(Z_Candidates))
-	#		pair_list.append(tau_pair)
-	#		tau_plus = tau_plus[tau_plus.pt != ak.all(tau_pair.pt,axis=1)] #Reusing this variable is causing problems (I think...)
-	#	else: #Consruct all other pairs
-	#		tau_minus = tau_minus[tau_minus.pt != ak.firsts(tau_minus.pt)] #Remove leading tau from consideration
-	#		sublead_tau = ak.firsts(tau_minus)
-	#		tau1,tau2 = ak.unzip(ak.cartesian([sublead_tau,tau_plus], axis=1, nested = False))
-	#		Pair_Mass = di_mass(tau1,tau2) #Get leading tau other tau invariant masses
-	#		Pair_Mass = ak.fill_none(Pair_Mass,-10)
-	#		tau_plus[pair_names[i]] = Pair_Mass
-	#		Z_Lower = Pair_Mass > 80
-	#		Z_Upper = Pair_Mass < 100
-	#		Z_Candidates = ak.mask(Pair_Mass,np.bitwise_and(Z_Lower,Z_Upper))
-	#		Z_Candidates = ak.fill_none(Z_Candidates,-10,axis=1)
-	#		tau_pair = ak.mask(tau_plus,tau_plus[pair_names[i]] == ak.firsts(Z_Candidates))
-	#		pair_list.append(tau_pair)
-	#		tau_plus = tau_plus[tau_plus.pt != ak.all(tau_pair.pt,axis=1)]
-
-	#ZMult = [] #Initialize ZMult array to be returend
-	#print("Event cleaning")
-	#for i in range(max_pairs):
-	#	pair_list[i][pair_names[i]] = ak.fill_none(pair_list[i][pair_names[i]],-10,axis=1)
-	#	pair_list[i][pair_names[i]] = ak.fill_none(pair_list[i][pair_names[i]],[-10],axis=0)
-	#	pair_list[i][pair_names[i]] = pair_list[i][pair_names[i]][pair_list[i][pair_names[i]] != -10]
-	#	print(i)
-	#	if (i == 0):
-	#		ZMult = ak.num(pair_list[i][pair_names[i]],axis=1)
-	#		print(ZMult)
-	#	else:
-	#		ZMult = ZMult + ak.num(pair_list[i][pair_names[i]],axis=1)
-	#		print(ZMult)
-
 	
 	#Obtain the masses
 	lead_tau = ak.firsts(tau_minus)
@@ -209,7 +171,7 @@ def Z_Mult_Fun_Tau(taus):
 	firstPairPy = tau_pair.Py
 	firstPairPz = tau_pair.Pz
 	#tau_plus = tau_plus[tau_plus.pt != ak.all(tau_pair.pt,axis=1)] #This line is causing problems
-	tau_plus = tau_plus[tau_plus.E != ak.all(ak.fill_none(tau_pair.E,[-10],axis=0),axis=1)] #This line is an attempted fix (but it's not goddamn working)
+	tau_plus = tau_plus[tau_plus.E != ak.all(ak.fill_none(tau_pair.E,[-10],axis=0),axis=1)] #This line is an attempted fix 
 
 	#Get second possible pair
 	sublead_tau = tau_minus[tau_minus.pt != ak.firsts(tau_minus.pt)] #Remove leading tau from consideration
@@ -332,7 +294,8 @@ class FourTauPlotting(processor.ProcessorABC):
 			{
 				"jet_trigger": events.HLTJet,
 				"mu_trigger": events.HLTEleMuX,
-				"pfMET": events.pfMET
+				"pfMET": events.pfMET,
+				"pfMETPhi": events.pfMETPhi,
 			},
 			with_name="EventArray",
 			behavior=candidate.behavior,
@@ -441,9 +404,10 @@ class FourTauPlotting(processor.ProcessorABC):
 		Jet_MHT = Jet_MHT[np.abs(Jet_MHT.eta) < 5]
 		Jet_MHT = Jet_MHT[Jet_MHT.PFLooseId > 0.5]
 		event_level["MHT_x"] = ak.sum(Jet_MHT.Pt*np.cos(Jet_MHT.phi),axis=1,keepdims=False)
-		event_level["MHT_y"] = ak.sum(Jet_MHT.Pt*np.sin(Jet_MHT.phi),axis=1,keepdims=False)
+		#event_level["MHT_y"] = ak.sum(Jet_MHT.Pt*np.sin(Jet_MHT.phi),axis=1,keepdims=False) #Broken/wrong implementation
+		event_level["MHT_y"] = ak.sum(Jet.Pt*np.sin(Jet.phi),axis=1,keepdims=False) #Fixed implementation (I think)
 		#Jet_MHT["MHT"] = np.sqrt(Jet_MHT.MHT_x**2 + Jet_MHT.MHT_y**2)
-		event_level["MHT"] = np.sqrt(event_level.MHT_x**2 + event_level.MHT_y**2) #Will this work?
+		event_level["MHT"] = np.sqrt(event_level.MHT_x**2 + event_level.MHT_y**2) 
 		
 		#HT Seleciton (new)
 		#tau_temp1,HT_Jet_Cand = ak.unzip(ak.cartesian([tau,Jet_MHT], axis = 1, nested = True))
@@ -451,9 +415,259 @@ class FourTauPlotting(processor.ProcessorABC):
 		Jet_HT = Jet_HT[np.abs(Jet_HT.eta) < 3]
 		Jet_HT = Jet_HT[Jet_HT.PFLooseId > 0.5]
 		event_level["HT"] = ak.sum(Jet_HT.Pt, axis = 1, keepdims=False)
+		
+		#Triggering logic
+		trigger_mask = bit_mask([self.trigger_bit])
+		if (not(self.isData)):	#MC trigger logic
+			if (self.OrTrigger): # and np.pi == np.exp(1)): #Select for both triggers
+				print("Both Triggers")
+				event_level_21 = event_level[np.bitwise_and(event_level.mu_trigger,bit_mask([21])) == bit_mask([21])]
+				event_level_fail = event_level[np.bitwise_and(event_level.mu_trigger,bit_mask([21])) != bit_mask([21])]
+				event_level_27 = event_level_fail[np.bitwise_and(event_level_fail.jet_trigger,bit_mask([27])) == bit_mask([27])]
+				event_level_39 = event_level_fail[np.bitwise_and(event_level_fail.jet_trigger,bit_mask([39])) == bit_mask([39])]
+			
+				#Single Muon Trigger	
+				tau_21 = tau[np.bitwise_and(event_level.mu_trigger,bit_mask([21])) == bit_mask([21])]
+				tau_fail = tau[np.bitwise_and(event_level.mu_trigger,bit_mask([21])) != bit_mask([21])]
+				AK8Jet_21 = AK8Jet[np.bitwise_and(event_level.mu_trigger,bit_mask([21])) == bit_mask([21])]
+				AK8Jet_fail = AK8Jet[np.bitwise_and(event_level.mu_trigger,bit_mask([21])) != bit_mask([21])]
+				Jet_21 = Jet[np.bitwise_and(event_level.mu_trigger,bit_mask([21])) == bit_mask([21])]
+				Jet_fail = Jet[np.bitwise_and(event_level.mu_trigger,bit_mask([21])) != bit_mask([21])]
+				muon_21 = muon[np.bitwise_and(event_level.mu_trigger,bit_mask([21])) == bit_mask([21])]
+				muon_fail = muon[np.bitwise_and(event_level.mu_trigger,bit_mask([21])) != bit_mask([21])]
+
+				#Apply offline Single Muon Cut
+				tau = tau[ak.any(muon.nMu > 0, axis = 1)]
+				AK8Jet = AK8Jet[ak.any(muon.nMu > 0, axis = 1)]
+				Jet = Jet[ak.any(muon.nMu > 0, axis = 1)]
+				muon = muon[ak.any(muon.nMu > 0, axis = 1)]
+				
+				#pT
+				tau_21 = tau_21[ak.any(muon_21.pt > 52, axis = 1)]
+				AK8Jet_21 = AK8Jet_21[ak.any(muon_21.pt > 52, axis = 1)]
+				Jet_21 = Jet_21[ak.any(muon_21.pt > 52, axis = 1)]
+				event_level_21 = event_level_21[ak.any(muon_21.pt > 52, axis = 1)]
+				muon_21 = muon_21[ak.any(muon_21.pt > 52, axis = 1)]
+				
+				#Apply JetHT_MHT_MET Trigger
+				tau_39 = tau_fail[np.bitwise_and(event_level_fail.jet_trigger,bit_mask([39])) == bit_mask([39])]
+				AK8Jet_39 = AK8Jet_fail[np.bitwise_and(event_level_fail.jet_trigger,bit_mask([39])) == bit_mask([39])]
+				Jet_39 = Jet_fail[np.bitwise_and(event_level_fail.jet_trigger,bit_mask([39])) == bit_mask([39])]
+				muon_39 = muon_fail[np.bitwise_and(event_level_fail.jet_trigger,bit_mask([39])) == bit_mask([39])]
+		
+				#HT Cut
+				tau_39 = tau_39[event_level_39.HT > 550]	
+				AK8Jet_39 = AK8Jet_39[event_level_39.HT > 550]	
+				Jet_39 = Jet_39[event_level_39.HT > 550]
+				event_level_39 = event_level_39[event_level_39.HT > 550]
+
+				#MHT Cut
+				tau_39 = tau_39[event_level_39.MHT > 110]	
+				AK8Jet_39 = AK8Jet_39[event_level_39.MHT > 110]	
+				Jet_39 = Jet_39[event_level_39.MHT > 110]
+				event_level_39 = event_level_39[event_level_39.MHT > 110]
+
+				#MET Cut	
+				tau_39 = tau_39[event_level_39.pfMET > 110]	
+				AK8Jet_39 = AK8Jet_39[event_level_39.pfMET > 110]	
+				Jet_39 = Jet_39[event_level_39.pfMET > 110]
+				event_level_39 = event_level_39[event_level_39.pfMET > 110]
+			
+				#Apply JetMHT_MET cut	
+				#tau_27 = tau_fail[np.bitwise_and(event_level_fail.jet_trigger,bit_mask([27])) == bit_mask([27])]
+				#AK8Jet_27 = AK8Jet_fail[np.bitwise_and(event_level_fail.jet_trigger,bit_mask([27])) == bit_mask([27])]
+				#Jet_27 = Jet_fail[np.bitwise_and(event_level_fail.jet_trigger,bit_mask([27])) == bit_mask([27])]
+				#muon_27 = muon_fail[np.bitwise_and(event_level_fail.jet_trigger,bit_mask([27])) == bit_mask([27])]
+		
+				#Apply offline JetHT Cut
+				#MET
+				#tau_27 = tau_27[event_level_27.pfMET > 130]	
+				#AK8Jet_27 = AK8Jet_27[event_level_27.pfMET > 130]	
+				#Jet_27 = Jet_27[event_level_27.pfMET > 130]
+				#event_level_27 = event_level_27[event_level_27.pfMET > 130]
+			
+				#MHT
+				#tau_27 = tau_27[event_level_27.MHT > 130]	
+				#AK8Jet_27 = AK8Jet_27[event_level_27.MHT > 130]	
+				#Jet_27 = Jet_27[event_level_27.MHT > 130]
+				#event_level_27 = event_level_27[event_level_27.MHT > 130]
+				
+				#PFLoose ID
+				#tau_27 = tau_27[ak.any(Jet_27.PFLooseId, axis=1)]	
+				#AK8Jet_27 = AK8Jet_27[ak.any(Jet_27.PFLooseId, axis=1)]	
+				#Jet_27 = Jet_27[ak.any(Jet_27.PFLooseId, axis=1)]
+
+				#Recombine 
+				#tau = ak.concatenate((tau_21,tau_27))
+				#AK8Jet = ak.concatenate((AK8Jet_21, AK8Jet_27))
+				#Jet = ak.concatenate((Jet_21,Jet_27))
+				#muon = ak.concatenate((muon_21,muon_27))
+				tau = ak.concatenate((tau_21,tau_39))
+				AK8Jet = ak.concatenate((AK8Jet_21, AK8Jet_39))
+				Jet = ak.concatenate((Jet_21,Jet_39))
+				muon = ak.concatenate((muon_21,muon_39))
+				event_level = ak.concatenate((event_level_21, event_level_39))
+				
+			else: #Single Trigger
+				#print("Single Trigger (in theory)")
+				if (self.trigger_bit != None and self.OrTrigger == False):
+					if (self.trigger_bit == 21): #Single Mu
+						print("Single Trigger: Mu Trigger (21)")
+						tau = tau[np.bitwise_and(event_level.mu_trigger,trigger_mask) == trigger_mask]
+						AK8Jet = AK8Jet[np.bitwise_and(event_level.mu_trigger,trigger_mask) == trigger_mask]
+						Jet = Jet[np.bitwise_and(event_level.mu_trigger,trigger_mask) == trigger_mask]
+						muon = muon[np.bitwise_and(event_level.mu_trigger,trigger_mask) == trigger_mask]
+						event_level = event_level[np.bitwise_and(event_level.mu_trigger,trigger_mask) == trigger_mask]
+						
+						#Apply offline Single Muon Cut
+						if (np.exp(1) != np.pi):
+							tau = tau[ak.any(muon.nMu > 0, axis = 1)]
+							AK8Jet = AK8Jet[ak.any(muon.nMu > 0, axis = 1)]
+							Jet = Jet[ak.any(muon.nMu > 0, axis = 1)]
+							muon = muon[ak.any(muon.nMu > 0, axis = 1)]
+								
+							#pT
+							tau = tau[ak.any(muon.pt > 52, axis = 1)]
+							AK8Jet = AK8Jet[ak.any(muon.pt > 52, axis = 1)]
+							Jet = Jet[ak.any(muon.pt > 52, axis = 1)]
+							event_level = event_level[ak.any(muon.pt > 52, axis = 1)]
+							muon = muon[ak.any(muon.pt > 52, axis = 1)]
+					
+					if (self.trigger_bit == 27): #Jet HT
+						print("Single Trigger: Jet Trigger (27)")
+					#	tau = tau[np.bitwise_and(event_level.jet_trigger,trigger_mask) == trigger_mask]
+					#	AK8Jet = AK8Jet[np.bitwise_and(event_level.jet_trigger,trigger_mask) == trigger_mask]
+					#	Jet = Jet[np.bitwise_and(event_level.jet_trigger,trigger_mask) == trigger_mask]
+					#	muon = muon[np.bitwise_and(event_level.jet_trigger,trigger_mask) == trigger_mask]
+					#	event_level = event_level[np.bitwise_and(event_level.jet_trigger,trigger_mask) == trigger_mask]
+						
+						#pfMET	
+					#	tau = tau[event_level.pfMET > 130]	
+					#	AK8Jet = AK8Jet[event_level.pfMET > 130]	
+					#	Jet = Jet[event_level.pfMET > 130]
+					#	event_level = event_level[event_level.pfMET > 130]
+					
+						#MHT
+					#	tau = tau[event_level.MHT > 130]	
+					#	AK8Jet = AK8Jet[event_level.MHT > 130]	
+					#	Jet = Jet[event_level.MHT > 130]
+					#	event_level = event_level[event_level.MHT > 130]
+						
+						#PFLoose ID
+					#	tau = tau[ak.any(Jet.PFLooseId, axis=1)]	
+					#	AK8Jet = AK8Jet[ak.any(Jet.PFLooseId, axis=1)]	
+					#	Jet = Jet[ak.any(Jet.PFLooseId, axis=1)]
+					
+					if (self.trigger_bit == 39): #Jet HT
+						print("Single Trigger: Jet Trigger (39)")
+						tau = tau[np.bitwise_and(event_level.jet_trigger,trigger_mask) == trigger_mask]
+						AK8Jet = AK8Jet[np.bitwise_and(event_level.jet_trigger,trigger_mask) == trigger_mask]
+						Jet = Jet[np.bitwise_and(event_level.jet_trigger,trigger_mask) == trigger_mask]
+						muon = muon[np.bitwise_and(event_level.jet_trigger,trigger_mask) == trigger_mask]
+						event_level = event_level[np.bitwise_and(event_level.jet_trigger,trigger_mask) == trigger_mask]
+						print("Number of events after Online Trigger(dropping empty arrays): %d"%ak.num(tau[ak.num(tau,axis=1) > 0],axis=0))
+				
+						#Offline Cuts
+						#HT Cut
+						tau = tau[event_level.HT > 550]
+						AK8Jet = AK8Jet[event_level.HT > 550]
+						Jet = Jet[event_level.HT > 550]
+						event_level = event_level[event_level.HT > 550]
+
+						#pfMET	
+						tau = tau[event_level.pfMET > 110]	
+						AK8Jet = AK8Jet[event_level.pfMET > 110]	
+						Jet = Jet[event_level.pfMET > 110]
+						event_level = event_level[event_level.pfMET > 110]
+			
+						#MHT
+						tau = tau[event_level.MHT > 110]	
+						AK8Jet = AK8Jet[event_level.MHT > 110]	
+						Jet = Jet[event_level.MHT > 110]
+						event_level = event_level[event_level.MHT > 110]
+
+			print("Number of events after selection + Trigger: %d"%ak.num(tau,axis=0))
+			print("Number of events after Trigger + Selection (dropping empty arrays): %d"%ak.num(tau[ak.num(tau,axis=1) > 0],axis=0))
+		else:
+			if ("SingleMuon" in dataset): #Single Mu
+				print("Single Muon Trigger")
+				tau = tau[np.bitwise_and(event_level.mu_trigger,bit_mask([21])) == bit_mask([21])]	
+				AK8Jet = AK8Jet[np.bitwise_and(event_level.mu_trigger,bit_mask([21])) == bit_mask([21])]	
+				Jet = Jet[np.bitwise_and(event_level.mu_trigger,bit_mask([21])) == bit_mask([21])]	
+				muon = muon[np.bitwise_and(event_level.mu_trigger,bit_mask([21])) == bit_mask([21])]	
+				event_level = event_level[np.bitwise_and(event_level.mu_trigger,bit_mask([21])) == bit_mask([21])]
+
+				#pT
+				if (np.exp(1) != np.pi):
+					tau = tau[ak.any(muon.nMu > 0, axis = 1)]
+					AK8Jet = AK8Jet[ak.any(muon.nMu > 0, axis = 1)]
+					Jet = Jet[ak.any(muon.nMu > 0, axis = 1)]
+					muon = muon[ak.any(muon.nMu > 0, axis = 1)]
+					
+					tau = tau[ak.any(muon.pt > 52, axis = 1)]
+					AK8Jet = AK8Jet[ak.any(muon.pt > 52, axis = 1)]
+					Jet = Jet[ak.any(muon.pt > 52, axis = 1)]
+					event_level = event_level[ak.any(muon.pt > 52, axis = 1)]
+					muon = muon[ak.any(muon.pt > 52, axis = 1)]
+				
+			if ("JetHT" in dataset): #HT 
+				print("Jet Trigger")
+				tau = tau[np.bitwise_and(event_level.jet_trigger,bit_mask([39])) == bit_mask([39])]	
+				AK8Jet = AK8Jet[np.bitwise_and(event_level.jet_trigger,bit_mask([39])) == bit_mask([39])]	
+				Jet = Jet[np.bitwise_and(event_level.jet_trigger,bit_mask([39])) == bit_mask([39])]	
+				muon = muon[np.bitwise_and(event_level.jet_trigger,bit_mask([39])) == bit_mask([39])]	
+				event_level = event_level[np.bitwise_and(event_level.jet_trigger,bit_mask([39])) == bit_mask([39])]
+				print("Number of events after Online Trigger(dropping empty arrays): %d"%ak.num(tau[ak.num(tau,axis=1) > 0],axis=0))
+
+				#Offline Cuts
+				#HT Cut
+				tau = tau[event_level.HT > 550]
+				AK8Jet = AK8Jet[event_level.HT > 550]
+				Jet = Jet[event_level.HT > 550]
+				event_level = event_level[event_level.HT > 550]
+
+				#pfMET	
+				tau = tau[event_level.pfMET > 110]	
+				AK8Jet = AK8Jet[event_level.pfMET > 110]	
+				Jet = Jet[event_level.pfMET > 110]
+				event_level = event_level[event_level.pfMET > 110]
+			
+				#MHT
+				tau = tau[event_level.MHT > 110]	
+				AK8Jet = AK8Jet[event_level.MHT > 110]	
+				Jet = Jet[event_level.MHT > 110]
+				event_level = event_level[event_level.MHT > 110]
+				
+				#print("Jet HT Trigger")
+				#tau = tau[np.bitwise_and(event_level.jet_trigger,bit_mask([27])) == bit_mask([27])]	
+				#AK8Jet = AK8Jet[np.bitwise_and(event_level.jet_trigger,bit_mask([27])) == bit_mask([27])]	
+				#Jet = Jet[np.bitwise_and(event_level.jet_trigger,bit_mask([27])) == bit_mask([27])]	
+				#muon = muon[np.bitwise_and(event_level.jet_trigger,bit_mask([27])) == bit_mask([27])]	
+				#event_level = event_level[np.bitwise_and(event_level.jet_trigger,bit_mask([27])) == bit_mask([27])]
+
+				#Offline Cuts
+				#pfMET	
+				#tau = tau[event_level.pfMET > 130]	
+				#AK8Jet = AK8Jet[event_level.pfMET > 130]	
+				#Jet = Jet[event_level.pfMET > 130]
+				#event_level = event_level[event_level.pfMET > 130]
+			
+				#MHT
+				#tau = tau[event_level.MHT > 130]	
+				#AK8Jet = AK8Jet[event_level.MHT > 130]	
+				#Jet = Jet[event_level.MHT > 130]
+				#event_level = event_level[event_level.MHT > 130]
+				
+				#PFLoose ID
+				#tau = tau[ak.any(Jet.PFLooseId, axis=1)]	
+				#AK8Jet = AK8Jet[ak.any(Jet.PFLooseId, axis=1)]	
+				#Jet = Jet[ak.any(Jet.PFLooseId, axis=1)]
+			
+			print("# of events after Trigger + Selection: %d"%ak.num(tau,axis=0))
+			print("# of events after Trigger + Selection (dropping empty arrays): %d"%ak.num(tau[ak.num(tau,axis=1) > 0],axis=0))
 				
 		#Apply selections
-		trigger_mask = bit_mask([self.trigger_bit])	
+
 		tau = tau[tau.pt > 20] #pT selection
 		
 		#Remove events with fewer than 4 taus
@@ -537,7 +751,7 @@ class FourTauPlotting(processor.ProcessorABC):
 		#if (self.isData or not(self.isData)):
 		#	print("# of events after 4-tau cut (dropping empty arrays): %d"%ak.num(tau[ak.num(tau,axis=1) > 0],axis=0))
 	
-		print("tau length = %d\nevent_level length = %d"%(ak.num(tau,axis=0),ak.num(event_level,axis=0)))	
+		#print("tau length = %d\nevent_level length = %d"%(ak.num(tau,axis=0),ak.num(event_level,axis=0)))	
 		#tau = tau[ak.num(tau) > 0] #Handle empty arrays left over
 		
 		#Z Mutliplticity of taus
@@ -567,10 +781,27 @@ class FourTauPlotting(processor.ProcessorABC):
 			#electron = electron[good_events]
 			#charge_Arr = charge_Arr[good_events]	
 	
-			#Obtain leading pair	
-			tau_lead,tau_other = ak.unzip(ak.cartesian([tau[:,0],tau], axis = 1, nested = False))
-			deltaR_Arr = deltaR(tau_lead,tau) #Delta R Between leading tau and all other taus in event
-			deltaphi_Arr = delta_phi(tau_lead,tau) #Debugg the delta phi values
+			#Obtain leading pair
+			tau_4vec = ak.zip({"t": tau.E, "x": tau.Px, "y": tau.Py, "z": tau.Pz},with_name="Momentum4D")
+			tau_lead,tau_other = ak.unzip(ak.cartesian([tau_4vec[:,0],tau_4vec], axis = 1, nested = False))
+			#deltaR_Arr = deltaR(tau_lead,tau) #Delta R Between leading tau and all other taus in event
+			deltaR_Arr = tau_lead.deltaR(tau_4vec)
+			#deltaphi_Arr = delta_phi(tau_lead,tau) #Debugg the delta phi values
+
+			#Construct all delta Rs from all possible pairings
+			#tau_plus,tau_minus = ak.unzip(ak.cartesian(tau[tau.charge > 0],tau[tau.charge < 0]))
+			#tau1,tau2 = ak.unzip(ak.cartesian([tau,tau],axis = 1, nested = False))
+			#deltaR_Full = deltaR(tau1,tau2)
+			#deltaR_Full = deltaR_Full[deltaR_Full != 0] #Remove 0s
+			#dummyIndx = 10
+			#if (len(deltaR_Full) < 10):
+			#	test_range = len(deltaR_Full)
+			#else:
+			#	test_range = 10
+				#test_range = len(deltaR_Full)
+			#print("Delta R of all possible pairings")
+			#for i in range(test_range):
+			#	print(deltaR_Full[i])
 			
 			#Select only taus with oposite charge
 			#leadingTau_Pair = tau[charge_Arr == 0]
@@ -579,7 +810,7 @@ class FourTauPlotting(processor.ProcessorABC):
 
 			#Remove leading tau from consideration
 			leadingTau_Pair = tau[deltaR_Arr != 0]
-			deltaphi_Arr = deltaphi_Arr[deltaR_Arr != 0]
+			#deltaphi_Arr = deltaphi_Arr[deltaR_Arr != 0]
 			charge_Arr = charge_Arr[deltaR_Arr != 0]
 			deltaR_Arr = deltaR_Arr[deltaR_Arr != 0]
 
@@ -592,13 +823,36 @@ class FourTauPlotting(processor.ProcessorABC):
 			#			print(dphi)
 			#			print(tau[:,0][i].phi)
 			#			print(leadingTau_Pair[i].phi)
+
+			#print("Charges of all possible pairings")
+			#for i in range(test_range):
+			#	print(charge_Arr[i])
 		
 			#Select OS tau that minimizes delta R	
 			leadingTau_Pair = leadingTau_Pair[deltaR_Arr == ak.min(deltaR_Arr,axis=1)] #Paired tau is selected as the one that minimized deltaR with leading tau
-			deltaphi_Arr = deltaphi_Arr[deltaR_Arr == ak.min(deltaR_Arr,axis=1)]
+			#deltaphi_Arr = deltaphi_Arr[deltaR_Arr == ak.min(deltaR_Arr,axis=1)]
 			charge_Arr = charge_Arr[deltaR_Arr == ak.min(deltaR_Arr,axis=1)]
 			deltaR_Arr = ak.min(deltaR_Arr,axis=1)
 			pair1_charge = charge_Arr
+	
+			#print("Leading pair Minimized delta R:")
+			#for i in range(test_range):
+			#	print(deltaR_Arr[i])
+
+			#print("Charge of leading Piar")
+			#for i in range(test_range):
+			#	print(pair1_charge[i])
+			
+			zerocharge = pair1_charge[pair1_charge == 0]
+			zerocharge = zerocharge[ak.num(zerocharge,axis=1) > 0]
+			nonZerocharge = pair1_charge[pair1_charge != 0]
+			nonZerocharge = nonZerocharge[ak.num(nonZerocharge,axis=1) > 0]
+
+			numZeroCharge_lead = ak.num(zerocharge,axis=0)
+			numNonZeroCharge_lead = ak.num(nonZerocharge,axis=0)
+
+			#print("There are %d leading pairs with an electric charge of 0"%numZeroCharge_lead)
+			#print("There are %d leading pairs with an electric charge of +/- 2"%numNonZeroCharge_lead)
 
 			#Remove any empty/invalid pairings
 			tau = tau[ak.num(leadingTau_Pair) > 0]
@@ -623,18 +877,18 @@ class FourTauPlotting(processor.ProcessorABC):
 			#	print("Delta phi %.3f"%deltaphi_Arr[i][0])
 			#	print("Delta R %.3f"%deltaR_Arr[i])
 
-			for i in range(len(deltaphi_Arr)):
-				if (np.abs(deltaphi_Arr[i][0]) > np.pi):
-					print("!!Delta phi outisde expected range!!")
-					print(deltaphi_Arr[i][0])
-					print(delta_phi(tau_lead[i].leadingTau_Pair))
-					print(tau_lead[i].phi)
-					print(leadingTau_Pair[i].phi)
+			#for i in range(len(deltaphi_Arr)):
+			#	if (np.abs(deltaphi_Arr[i][0]) > np.pi):
+			#		print("!!Delta phi outisde expected range!!")
+			#		print(deltaphi_Arr[i][0])
+			#		print(delta_phi(tau_lead[i].leadingTau_Pair))
+			#		print(tau_lead[i].phi)
+			#		print(leadingTau_Pair[i].phi)
 			
-			for x in leadingTau_Pair.pt:
-				if len(x) != 1:
-					print("!!Multi-tau paired to leading tau!!")
-					print(x)
+			#for x in leadingTau_Pair.pt:
+			#	if len(x) != 1:
+			#		print("!!Multi-tau paired to leading tau!!")
+			#		print(x)
 
 			leadingPairpT = leadingTau_Pair.pt
 			tau_rem = tau[tau.pt != leadingpT]
@@ -642,65 +896,84 @@ class FourTauPlotting(processor.ProcessorABC):
 
 			#Drop events with no oposite signs
 			charge_Arr = totalCharge(tau_rem[:,0],tau_rem)
-			#good_events = ak.any(charge_Arr == 0,axis = 1) #This has to be dropped
-			#for x in good_events:
-			#	if (not(x)):
-			#		print("Bad Event")
-			#tau_rem = tau_rem[good_events]
-			#tau_lead = tau_lead[good_events]
-			#leadingTau_Pair = leadingTau_Pair[good_events]
-			#charge_Arr = charge_Arr[good_events]
-			#tau = tau[good_events]
-			#Jet = Jet[good_events]
-			#AK8Jet = AK8Jet[good_events]
-			#event_level = event_level[good_events]
-			#muon = muon[good_events]
-			#electron = electron[good_events]
 		
-			tau_nextlead,tau_rem_other = ak.unzip(ak.cartesian([tau_rem[:,0],tau_rem], axis = 1, nested = False))
-			deltaR_Arr = deltaR(tau_nextlead,tau_rem)
-		
-			#Impose Opposite sign pairing
-			#leadingTau_NextPair = tau_rem[charge_Arr == 0]
-			#deltaR_temp = deltaR_Arr[charge_Arr == 0]
+			tau_rem_4vec = ak.zip({"t": tau_rem.E, "x": tau_rem.Px, "y": tau_rem.Py, "z": tau_rem.Pz},with_name="Momentum4D")
+			tau_nextlead,tau_rem_other = ak.unzip(ak.cartesian([tau_rem_4vec[:,0],tau_rem_4vec], axis = 1, nested = False))
+			#deltaR_Arr = deltaR(tau_nextlead,tau_rem)
+			deltaR_Arr = tau_nextlead.deltaR(tau_rem_4vec)
+
+			#Look at all pairings left
+			#tau3,tau4 = ak.unzip(ak.cartesian([tau_rem,tau_rem], axis=1, nested = False))
+			#deltaR_rem_Full = deltaR(tau3,tau4)
+			#deltaR_rem_Full = deltaR_rem_Full[deltaR_rem_Full != 0]
+			
+			#print("Remaining pairings")
+			#for i in range(test_range):
+			#	print(deltaR_rem_Full[i])
 
 			#Remove leading tau
 			leadingTau_NextPair = tau_rem[deltaR_Arr != 0]
 			deltaR_temp = deltaR_Arr[deltaR_Arr != 0]
 			charge_Arr = charge_Arr[deltaR_Arr != 0]
 			
+			#print("Charges of all possible pairings")
+			#for i in range(test_range):
+			#	print(charge_Arr[i])
+			
 			#Select pair that minimizes delta R	
 			leadingTau_NextPair = leadingTau_NextPair[deltaR_temp == ak.min(deltaR_temp,axis=1)]
 			charge_Arr = charge_Arr[deltaR_temp == ak.min(deltaR_temp,axis=1)]
 			pair2_charge = charge_Arr
+			deltaR_temp = deltaR_temp[deltaR_temp == ak.min(deltaR_temp,axis=1)]
+			
+			#print("Subleading Pair minimized delta R:")
+			#for i in range(test_range):
+			#	print(deltaR_temp[i])
+			
+			#print("Charge of subleading Piar")
+			#for i in range(test_range):
+			#	print(pair2_charge[i])
+
+			zerocharge = pair2_charge[pair2_charge == 0]
+			zerocharge = zerocharge[ak.num(zerocharge,axis=1) > 0]
+			nonZerocharge = pair2_charge[pair2_charge != 0]
+			nonZerocharge = nonZerocharge[ak.num(nonZerocharge,axis=1) > 0]
+			
+			numZeroCharge_sublead = ak.num(zerocharge,axis=0)
+			numNonZeroCharge_sublead = ak.num(nonZerocharge,axis=0)
+
+			#print("There are %d subleading pairs with an electric charge of 0"%numZeroCharge_sublead)
+			#print("There are %d subleading pairs with an electric charge of +/- 2"%numNonZeroCharge_sublead)
 
 			#Determine what is signal and what is faking signal (if sum and product of total charge of both pairs are 0 than it's signal otherwise it's a fake)
-			print("Tau length for debugging (pre signal condition)")
-			print(len(tau))
+			#print("Tau length for debugging (pre signal condition)")
+			#print(len(tau))
 			signal_cond = np.bitwise_and(ak.all(pair1_charge + pair2_charge,axis=1) == 0, ak.all(pair1_charge * pair2_charge,axis=1) == 0)
     
-			#Drop all but signal
-			tau_rem = tau_rem[signal_cond]
-			tau_lead = tau_lead[signal_cond]
-			leadingTau_Pair = leadingTau_Pair[signal_cond]
-			leadingTau_NextPair = leadingTau_NextPair[signal_cond]
-			charge_Arr = charge_Arr[signal_cond]
-			tau = tau[signal_cond]
-			Jet = Jet[signal_cond]
-			AK8Jet = AK8Jet[signal_cond]
-			event_level = event_level[signal_cond]
-			muon = muon[signal_cond]
-			electron = electron[signal_cond]
+			#Drop all but signal (OSOS Higgs)
+			#tau_rem = tau_rem[signal_cond]
+			#tau_lead = tau_lead[signal_cond]
+			#leadingTau_Pair = leadingTau_Pair[signal_cond]
+			#leadingTau_NextPair = leadingTau_NextPair[signal_cond]
+			#charge_Arr = charge_Arr[signal_cond]
+			#tau = tau[signal_cond]
+			#Jet = Jet[signal_cond]
+			#AK8Jet = AK8Jet[signal_cond]
+			#event_level = event_level[signal_cond]
+			#muon = muon[signal_cond]
+			#electron = electron[signal_cond]
             
-			print("Tau length for debugging (post signal condition)")
-			print(len(tau))
+			#print("Tau length for debugging (post signal condition)")
+			#print(len(tau))
 			
-			#Remove any empty/invalid pairings
+			#Remove any empty/invalid pairings (this may be vegistal at best but I'm not sure)
 			tau_lead = tau_lead[ak.num(leadingTau_NextPair) != 0]
 			leadingTau_Pair = leadingTau_Pair[ak.num(leadingTau_NextPair) != 0]
 			tau_rem = tau_rem[ak.num(leadingTau_NextPair) != 0]
 			tau = tau[ak.num(leadingTau_NextPair) != 0]
 			leadingTau_NextPair = leadingTau_NextPair[ak.num(leadingTau_NextPair) != 0]
+			
+			#Obtain next/remaining leading tau
 			tau_nextlead = tau_rem[tau_rem.pt == tau_rem[:,0].pt]
 
 			#Check size of taus
@@ -713,7 +986,7 @@ class FourTauPlotting(processor.ProcessorABC):
 			#print("Next Leading Tau Pair %d"%len(leadingTau_NextPair))
 			#print(leadingTau_NextPair.pt)
 
-			#Reconstruct tau object 
+			#Reconstruct tau object in order of pairings 
 			tau = ak.concatenate((tau_lead,leadingTau_Pair),axis=1)
 			tau = ak.concatenate((tau,tau_nextlead),axis=1)
 			tau = ak.concatenate((tau,leadingTau_NextPair),axis=1)
@@ -739,44 +1012,74 @@ class FourTauPlotting(processor.ProcessorABC):
 				tau3 = tau[tau.pt == tau[:,2].pt]
 				tau4 = tau[tau.pt == tau[:,3].pt]
 	
-				print("Tau length for debugging")
-				print(len(tau))
-				for t in tau:
-					if len(t) != 4:
-						print("Event does not have 4 events")
+				#print("Tau length for debugging")
+				#print(len(tau))
+				#for t in tau:
+				#	if len(t) != 4:
+				#		print("Event does not have 4 events")
 				
 				leading_deltaR = deltaR(tau1,tau2)
 				next_deltaR = deltaR(tau3,tau4)
 				leading_higgs = ak.zip({
-						"Px": tau1.Px + tau2.Px,
-						"Py": tau1.Py + tau2.Py,
-						"Pz": tau1.Pz + tau2.Pz,
-						"E": tau1.E + tau2.E
-					}
+						"x": tau1.Px + tau2.Px,
+						"y": tau1.Py + tau2.Py,
+						"z": tau1.Pz + tau2.Pz,
+						"t": tau1.E + tau2.E
+					},with_name="Momentum4D"
 				)
-				leading_higgs["phi"] = ak.from_iter(np.arctan2(leading_higgs.Py,leading_higgs.Px))
-				leading_higgs["eta"] = ak.from_iter(np.arcsinh(leading_higgs.Pz)/np.sqrt(leading_higgs.Px**2 + leading_higgs.Py**2 + leading_higgs.Pz**2))
+				#leading_higgs["phi"] = ak.from_iter(np.arctan2(leading_higgs.Py,leading_higgs.Px))
+				#leading_higgs["eta"] = ak.from_iter(np.arcsinh(leading_higgs.Pz)/np.sqrt(leading_higgs.Px**2 + leading_higgs.Py**2 + leading_higgs.Pz**2))
 				
 				nextleading_higgs = ak.zip({
-						"Px": tau3.Px + tau4.Px,
-						"Py": tau3.Py + tau4.Py,
-						"Pz": tau3.Pz + tau4.Pz,
-						"E": tau3.E + tau4.E
-					}
+						"x": tau3.Px + tau4.Px,
+						"y": tau3.Py + tau4.Py,
+						"z": tau3.Pz + tau4.Pz,
+						"t": tau3.E + tau4.E
+					},with_name="Momentum4D"
 				)
-				nextleading_higgs["phi"] = ak.from_iter(np.arctan2(nextleading_higgs.Py,nextleading_higgs.Px))
-				nextleading_higgs["eta"] = ak.from_iter(np.arcsinh(nextleading_higgs.Pz)/np.sqrt(nextleading_higgs.Px**2 + nextleading_higgs.Py**2 + nextleading_higgs.Pz**2))
+				#nextleading_higgs["phi"] = ak.from_iter(np.arctan2(nextleading_higgs.Py,nextleading_higgs.Px))
+				#nextleading_higgs["eta"] = ak.from_iter(np.arcsinh(nextleading_higgs.Pz)/np.sqrt(nextleading_higgs.Px**2 + nextleading_higgs.Py**2 + nextleading_higgs.Pz**2))
 
 				#Why has the delta R thing broken now that I have stopped checking charge??
-				print(leading_higgs.phi)
-				print(nextleading_higgs.eta)
+				#print(leading_higgs.phi)
+				#print(nextleading_higgs.eta)
+		
+				#Visiable Mass selection
+				if (ak.num(event_level.MHT,axis=0) > 0):
+					#vis_mass1 = ak.concatenate((single_mass(higgs_11),single_mass(higgs_12)),axis=1)
+					#for x in range(3):
+						#print(vis_mass1[x])
+					#vis_mass2 = ak.concatenate((single_mass(higgs_22),single_mass(higgs_21)),axis=1)
+					#for x in range(3):
+						#print(vis_mass2[x])
+					#vis_mass1 = single_mass(leading_higgs)
+					#vis_mass2 = single_mass(nextleading_higgs)
+					vis_mass1 = leading_higgs.mass
+					vis_mass2 = nextleading_higgs.mass
+					vis_cond1 = ak.any(vis_mass1 >= 10,axis=1)
+					vis_cond2 = ak.any(vis_mass2 >= 10,axis=1)
+					vis_cond = np.bitwise_and(vis_cond1, vis_cond2)
+					
+					tau = tau[vis_cond]
+					Jet = Jet[vis_cond]
+					AK8Jet = AK8Jet[vis_cond]
+					muon = muon[vis_cond]
+					electron = electron[vis_cond]
+					leading_higgs = leading_higgs[vis_cond]
+					nextleading_higgs = nextleading_higgs[vis_cond]
+					event_level = event_level[vis_cond]
+					if (self.isData or not(self.isData)):
+						print("# of events after visible mass cut (dropping empty arrays): %d"%ak.num(tau[ak.num(tau,axis=1) > 0],axis=0))
 
-				higgs_dR = deltaR(leading_higgs, nextleading_higgs) 
-				ditau_dR = ak.concatenate((leading_deltaR, next_deltaR),axis=1)
+
+				#higgs_dR = deltaR(leading_higgs, nextleading_higgs) 
+				higgs_dR = leading_higgs.deltaR(nextleading_higgs) #Use vector library for delta R calculations
+				#ditau_dR = ak.concatenate((leading_deltaR, next_deltaR),axis=1)
 
 				higgs_cond = ak.all(higgs_dR >= 2.0, axis = 1)
-				tau_cond = ak.all(ditau_dR < 0.8,axis = 1)
-				topo_cond = np.bitwise_and(tau_cond, higgs_cond) 
+				#tau_cond = ak.all(ditau_dR < 0.8,axis = 1)
+				#topo_cond = np.bitwise_and(tau_cond, higgs_cond) 
+				topo_cond = higgs_cond
 		
 				#Apply Higgs Topological Condition	
 				tau = tau[higgs_cond]
@@ -787,7 +1090,7 @@ class FourTauPlotting(processor.ProcessorABC):
 				event_level = event_level[higgs_cond]
 				leading_higgs = leading_higgs[higgs_cond]
 				nextleading_higgs = nextleading_higgs[higgs_cond]
-				tau_cond = tau_cond[higgs_cond]
+				#tau_cond = tau_cond[higgs_cond]
 				if (self.isData or not(self.isData)):
 					print("# of events after Higgs cut (dropping empty arrays): %d"%ak.num(tau[ak.num(tau,axis=1) > 0],axis=0))
 	
@@ -812,28 +1115,6 @@ class FourTauPlotting(processor.ProcessorABC):
 			if (self.isData or not(self.isData)):
 				print("# of events after topology cut (dropping empty arrays): %d"%ak.num(tau[ak.num(tau,axis=1) > 0],axis=0))
 
-		#Visiable Mass selection
-		if (ak.num(event_level.MHT,axis=0) < 0):
-			#vis_mass1 = ak.concatenate((single_mass(higgs_11),single_mass(higgs_12)),axis=1)
-			#for x in range(3):
-				#print(vis_mass1[x])
-			#vis_mass2 = ak.concatenate((single_mass(higgs_22),single_mass(higgs_21)),axis=1)
-			#for x in range(3):
-				#print(vis_mass2[x])
-			vis_mass1 = single_mass(leading_higgs)
-			vis_mass2 = single_mass(nextleading_higgs)
-			vis_cond1 = ak.any(vis_mass1 >= 10,axis=1)
-			vis_cond2 = ak.any(vis_mass2 >= 10,axis=1)
-			vis_cond = np.bitwise_and(vis_cond1, vis_cond2)
-			
-			tau = tau[vis_cond]
-			Jet = Jet[vis_cond]
-			AK8Jet = AK8Jet[vis_cond]
-			muon = muon[vis_cond]
-			electron = electron[vis_cond]
-			event_level = event_level[vis_cond]
-			if (self.isData or not(self.isData)):
-				print("# of events after visible mass cut (dropping empty arrays): %d"%ak.num(tau[ak.num(tau,axis=1) > 0],axis=0))
 
 		#Apply BJet multiplicity selection
 		#Apply pt, eta, loose ID, and deep csv tag cut
@@ -887,192 +1168,8 @@ class FourTauPlotting(processor.ProcessorABC):
 		#event_level["ZMult"] = event_level["ZMult_tau"]
 		event_level["ZMult_e"] = electron_ZMult
 		event_level["ZMult_mu"] = muon_ZMult
-	
-		if (not(self.isData)):	#MC trigger logic
-			if (self.OrTrigger): # and np.pi == np.exp(1)): #Select for both triggers
-				print("Both Triggers")
-				event_level_21 = event_level[np.bitwise_and(event_level.mu_trigger,bit_mask([21])) == bit_mask([21])]
-				event_level_fail = event_level[np.bitwise_and(event_level.mu_trigger,bit_mask([21])) != bit_mask([21])]
-				event_level_27 = event_level_fail[np.bitwise_and(event_level_fail.jet_trigger,bit_mask([27])) == bit_mask([27])]
-				event_level_39 = event_level_fail[np.bitwise_and(event_level_fail.jet_trigger,bit_mask([39])) == bit_mask([39])]
-			
-				#Single Muon Trigger	
-				tau_21 = tau[np.bitwise_and(event_level.mu_trigger,bit_mask([21])) == bit_mask([21])]
-				tau_fail = tau[np.bitwise_and(event_level.mu_trigger,bit_mask([21])) != bit_mask([21])]
-				AK8Jet_21 = AK8Jet[np.bitwise_and(event_level.mu_trigger,bit_mask([21])) == bit_mask([21])]
-				AK8Jet_fail = AK8Jet[np.bitwise_and(event_level.mu_trigger,bit_mask([21])) != bit_mask([21])]
-				Jet_21 = Jet[np.bitwise_and(event_level.mu_trigger,bit_mask([21])) == bit_mask([21])]
-				Jet_fail = Jet[np.bitwise_and(event_level.mu_trigger,bit_mask([21])) != bit_mask([21])]
-				muon_21 = muon[np.bitwise_and(event_level.mu_trigger,bit_mask([21])) == bit_mask([21])]
-				muon_fail = muon[np.bitwise_and(event_level.mu_trigger,bit_mask([21])) != bit_mask([21])]
 
-				#Apply offline Single Muon Cut
-				#tau = tau[ak.any(muon.nMu > 0, axis = 1)]
-				#AK8Jet = AK8Jet[ak.any(muon.nMu > 0, axis = 1)]
-				#Jet = Jet[ak.any(muon.nMu > 0, axis = 1)]
-				#muon = muon[ak.any(muon.nMu > 0, axis = 1)]
-				
-				#pT
-				tau_21 = tau_21[ak.any(muon_21.pt > 52, axis = 1)]
-				AK8Jet_21 = AK8Jet_21[ak.any(muon_21.pt > 52, axis = 1)]
-				Jet_21 = Jet_21[ak.any(muon_21.pt > 52, axis = 1)]
-				muon_21 = muon_21[ak.any(muon_21.pt > 52, axis = 1)]
-				
-				#Apply JetHT_MHT_MET Trigger
-				tau_39 = tau_fail[np.bitwise_and(event_level_fail.jet_trigger,bit_mask([39])) == bit_mask([39])]
-				AK8Jet_39 = AK8Jet_fail[np.bitwise_and(event_level_fail.jet_trigger,bit_mask([39])) == bit_mask([39])]
-				Jet_39 = Jet_fail[np.bitwise_and(event_level_fail.jet_trigger,bit_mask([39])) == bit_mask([39])]
-				muon_39 = muon_fail[np.bitwise_and(event_level_fail.jet_trigger,bit_mask([39])) == bit_mask([39])]
-			
-				#HT Cut
-				tau_39 = tau_39[event_level_39.HT > 550]	
-				AK8Jet_39 = AK8Jet_39[event_level_39.HT > 550]	
-				Jet_39 = Jet_39[event_level_39.HT > 550]
-				event_level_39 = event_level_39[event_level_39.HT > 550]
 
-				#MHT Cut
-				tau_39 = tau_39[event_level_39.MHT > 120]	
-				AK8Jet_39 = AK8Jet_39[event_level_39.MHT > 120]	
-				Jet_39 = Jet_39[event_level_39.MHT > 120]
-				event_level_39 = event_level_39[event_level_39.MHT > 120]
-
-				#MET Cut	
-				tau_39 = tau_39[event_level_39.pfMET > 120]	
-				AK8Jet_39 = AK8Jet_39[event_level_39.pfMET > 120]	
-				Jet_39 = Jet_39[event_level_39.pfMET > 120]
-				event_level_39 = event_level_39[event_level_39.pfMET > 120]
-				
-				#Apply JetMHT_MET cut	
-				#tau_27 = tau_fail[np.bitwise_and(event_level_fail.jet_trigger,bit_mask([27])) == bit_mask([27])]
-				#AK8Jet_27 = AK8Jet_fail[np.bitwise_and(event_level_fail.jet_trigger,bit_mask([27])) == bit_mask([27])]
-				#Jet_27 = Jet_fail[np.bitwise_and(event_level_fail.jet_trigger,bit_mask([27])) == bit_mask([27])]
-				#muon_27 = muon_fail[np.bitwise_and(event_level_fail.jet_trigger,bit_mask([27])) == bit_mask([27])]
-		
-				#Apply offline JetHT Cut
-				#MET
-				#tau_27 = tau_27[event_level_27.pfMET > 130]	
-				#AK8Jet_27 = AK8Jet_27[event_level_27.pfMET > 130]	
-				#Jet_27 = Jet_27[event_level_27.pfMET > 130]
-				#event_level_27 = event_level_27[event_level_27.pfMET > 130]
-			
-				#MHT
-				#tau_27 = tau_27[event_level_27.MHT > 130]	
-				#AK8Jet_27 = AK8Jet_27[event_level_27.MHT > 130]	
-				#Jet_27 = Jet_27[event_level_27.MHT > 130]
-				#event_level_27 = event_level_27[event_level_27.MHT > 130]
-				
-				#PFLoose ID
-				#tau_27 = tau_27[ak.any(Jet_27.PFLooseId, axis=1)]	
-				#AK8Jet_27 = AK8Jet_27[ak.any(Jet_27.PFLooseId, axis=1)]	
-				#Jet_27 = Jet_27[ak.any(Jet_27.PFLooseId, axis=1)]
-
-				#Recombine 
-				#tau = ak.concatenate((tau_21,tau_27))
-				#AK8Jet = ak.concatenate((AK8Jet_21, AK8Jet_27))
-				#Jet = ak.concatenate((Jet_21,Jet_27))
-				#muon = ak.concatenate((muon_21,muon_27))
-				tau = ak.concatenate((tau_21,tau_39))
-				AK8Jet = ak.concatenate((AK8Jet_21, AK8Jet_39))
-				Jet = ak.concatenate((Jet_21,Jet_39))
-				muon = ak.concatenate((muon_21,muon_39))
-				
-			else: #Single Trigger
-				#print("Single Trigger (in theory)")
-				if (self.trigger_bit != None and self.OrTrigger == False):
-					if (self.trigger_bit == 21): #Single Mu
-						print("Single Trigger: Mu Trigger")
-						tau = tau[np.bitwise_and(event_level.mu_trigger,trigger_mask) == trigger_mask]
-						AK8Jet = AK8Jet[np.bitwise_and(event_level.mu_trigger,trigger_mask) == trigger_mask]
-						Jet = Jet[np.bitwise_and(event_level.mu_trigger,trigger_mask) == trigger_mask]
-						muon = muon[np.bitwise_and(event_level.mu_trigger,trigger_mask) == trigger_mask]
-						
-						#Apply offline Single Muon Cut
-						tau = tau[ak.any(muon.nMu > 0, axis = 1)]
-						AK8Jet = AK8Jet[ak.any(muon.nMu > 0, axis = 1)]
-						Jet = Jet[ak.any(muon.nMu > 0, axis = 1)]
-						muon = muon[ak.any(muon.nMu > 0, axis = 1)]
-						
-						#pT
-						tau = tau[ak.any(muon.pt > 52, axis = 1)]
-						AK8Jet = AK8Jet[ak.any(muon.pt > 52, axis = 1)]
-						Jet = Jet[ak.any(muon.pt > 52, axis = 1)]
-						muon = muon[ak.any(muon.pt > 52, axis = 1)]
-					
-					if (self.trigger_bit == 27): #Jet HT
-						print("Single Trigger: Jet Trigger")
-						tau = tau[np.bitwise_and(event_level.jet_trigger,trigger_mask) == trigger_mask]
-						AK8Jet = AK8Jet[np.bitwise_and(event_level.jet_trigger,trigger_mask) == trigger_mask]
-						Jet = Jet[np.bitwise_and(event_level.jet_trigger,trigger_mask) == trigger_mask]
-						muon = muon[np.bitwise_and(event_level.jet_trigger,trigger_mask) == trigger_mask]
-						event_level = event_level[np.bitwise_and(event_level.jet_trigger,trigger_mask) == trigger_mask]
-						
-						#pfMET	
-						tau = tau[event_level.pfMET > 130]	
-						AK8Jet = AK8Jet[event_level.pfMET > 130]	
-						Jet = Jet[event_level.pfMET > 130]
-						event_level = event_level[event_level.pfMET > 130]
-					
-						#MHT
-						tau = tau[event_level.MHT > 130]	
-						AK8Jet = AK8Jet[event_level.MHT > 130]	
-						Jet = Jet[event_level.MHT > 130]
-						event_level = event_level[event_level.MHT > 130]
-						
-						#PFLoose ID
-						tau = tau[ak.any(Jet.PFLooseId, axis=1)]	
-						AK8Jet = AK8Jet[ak.any(Jet.PFLooseId, axis=1)]	
-						Jet = Jet[ak.any(Jet.PFLooseId, axis=1)]
-
-			print("Number of events after selection + Trigger: %d"%ak.num(tau,axis=0))
-			print("Number of events after Trigger + Selection (dropping empty arrays): %d"%ak.num(tau[ak.num(tau,axis=1) > 0],axis=0))
-		else:
-			if ("SingleMuon" in dataset): # and np.pi == np.exp(1)): #Single Mu
-				print("Single Muon Trigger")
-				tau = tau[np.bitwise_and(event_level.mu_trigger,bit_mask([21])) == bit_mask([21])]	
-				AK8Jet = AK8Jet[np.bitwise_and(event_level.mu_trigger,bit_mask([21])) == bit_mask([21])]	
-				Jet = Jet[np.bitwise_and(event_level.mu_trigger,bit_mask([21])) == bit_mask([21])]	
-				muon = muon[np.bitwise_and(event_level.mu_trigger,bit_mask([21])) == bit_mask([21])]	
-
-				#Offline cuts
-				#tau = tau[ak.any(muon.nMu > 0, axis = 1)]
-				#AK8Jet = AK8Jet[ak.any(muon.nMu > 0, axis = 1)]
-				#Jet = Jet[ak.any(muon.nMu > 0, axis = 1)]
-				#muon = muon[ak.any(muon.nMu > 0, axis = 1)]
-				
-				#pT
-				tau = tau[ak.all(muon.pt > 52, axis = 1)]
-				AK8Jet = AK8Jet[ak.all(muon.pt > 52, axis = 1)]
-				Jet = Jet[ak.all(muon.pt > 52, axis = 1)]
-				muon = muon[ak.all(muon.pt > 52, axis = 1)]
-				
-			if ("JetHT" in dataset): #HT 
-				print("Jet HT Trigger")
-				tau = tau[np.bitwise_and(event_level.jet_trigger,bit_mask([27])) == bit_mask([27])]	
-				AK8Jet = AK8Jet[np.bitwise_and(event_level.jet_trigger,bit_mask([27])) == bit_mask([27])]	
-				Jet = Jet[np.bitwise_and(event_level.jet_trigger,bit_mask([27])) == bit_mask([27])]	
-				muon = muon[np.bitwise_and(event_level.jet_trigger,bit_mask([27])) == bit_mask([27])]	
-				event_level = event_level[np.bitwise_and(event_level.jet_trigger,bit_mask([27])) == bit_mask([27])]
-
-				#Offline Cuts
-				#pfMET	
-				tau = tau[event_level.pfMET > 130]	
-				AK8Jet = AK8Jet[event_level.pfMET > 130]	
-				Jet = Jet[event_level.pfMET > 130]
-				event_level = event_level[event_level.pfMET > 130]
-			
-				#MHT
-				tau = tau[event_level.MHT > 130]	
-				AK8Jet = AK8Jet[event_level.MHT > 130]	
-				Jet = Jet[event_level.MHT > 130]
-				event_level = event_level[event_level.MHT > 130]
-				
-				#PFLoose ID
-				tau = tau[ak.any(Jet.PFLooseId, axis=1)]	
-				AK8Jet = AK8Jet[ak.any(Jet.PFLooseId, axis=1)]	
-				Jet = Jet[ak.any(Jet.PFLooseId, axis=1)]
-			
-			print("# of events after Trigger + Selection: %d"%ak.num(tau,axis=0))
-			print("# of events after Trigger + Selection (dropping empty arrays): %d"%ak.num(tau[ak.num(tau,axis=1) > 0],axis=0))
 		
 		#Construct all possible valid ditau pairs
 		tau = tau[ak.num(tau,axis=1) > 0] #Handle empty arrays left by the trigger
@@ -1127,47 +1224,13 @@ class FourTauPlotting(processor.ProcessorABC):
 		PzSubLeading = tau[:,2].Pz + tau[:,3].Pz
 		ESubLeading = tau[:,2].E + tau[:,3].E
 
-		#Get pair delta R Distriboutsions
+		#Get pair delta R and delta phi Distributions
 		leading_dR_Arr = ak.ravel(deltaR(tau[:,0],tau[:,1]))
+		leading_dPhi_Arr = ak.ravel(delta_phi(tau[:,0],tau[:,1]))
 		subleading_dR_Arr = ak.ravel(deltaR(tau[:,2],tau[:,3]))
+		subleading_dPhi_Arr = ak.ravel(delta_phi(tau[:,2],tau[:,3]))
 			
-		#PyLeading = np.append(ak.ravel(tau_plus1[lead_cond1].Py + tau_minus1[lead_cond1].Py),ak.ravel(tau_plus1[lead_cond2].Py + tau_minus2[lead_cond2].Py))
-		#PyLeading = np.append(PyLeading,ak.ravel(tau_plus1[lead_cond3].Py + tau_minus1[lead_cond3].Py))
-		#PyLeading = np.append(PyLeading,ak.ravel(tau_plus2[lead_cond4].Py + tau_minus1[lead_cond4].Py))
-		
-		#PzLeading = np.append(ak.ravel(tau_plus1[lead_cond1].Pz + tau_minus1[lead_cond1].Pz),ak.ravel(tau_plus1[lead_cond2].Pz + tau_minus2[lead_cond2].Pz))
-		#PzLeading = np.append(PzLeading,ak.ravel(tau_plus1[lead_cond3].Pz + tau_minus1[lead_cond3].Pz))
-		#PzLeading = np.append(PzLeading,ak.ravel(tau_plus2[lead_cond4].Pz + tau_minus1[lead_cond4].Pz))
-		
-		#ELeading = np.append(ak.ravel(tau_plus1[lead_cond1].E + tau_minus1[lead_cond1].E),ak.ravel(tau_plus1[lead_cond2].E + tau_minus2[lead_cond2].E))
-		#ELeading = np.append(ELeading,ak.ravel(tau_plus1[lead_cond3].E + tau_minus1[lead_cond3].E))
-		#ELeading = np.append(ELeading,ak.ravel(tau_plus2[lead_cond4].E + tau_minus1[lead_cond4].E))
-
-		#PxSubLeading = np.append(ak.ravel(tau_plus2[lead_cond1].Px + tau_minus2[lead_cond1].Px),ak.ravel(tau_plus2[lead_cond2].Px + tau_minus1[lead_cond2].Px))
-		#PxSubLeading = np.append(PxSubLeading,ak.ravel(tau_plus2[lead_cond3].Px + tau_minus2[lead_cond3].Px))
-		#PxSubLeading = np.append(PxSubLeading,ak.ravel(tau_plus1[lead_cond4].Px + tau_minus2[lead_cond4].Px))
-			
-		#PySubLeading = np.append(ak.ravel(tau_plus2[lead_cond1].Py + tau_minus2[lead_cond1].Py),ak.ravel(tau_plus2[lead_cond2].Py + tau_minus1[lead_cond2].Py))
-		#PySubLeading = np.append(PySubLeading,ak.ravel(tau_plus2[lead_cond3].Py + tau_minus2[lead_cond3].Py))
-		#PySubLeading = np.append(PySubLeading,ak.ravel(tau_plus1[lead_cond4].Py + tau_minus2[lead_cond4].Py))
-		
-		#PzSubLeading = np.append(ak.ravel(tau_plus2[lead_cond1].Pz + tau_minus2[lead_cond1].Pz),ak.ravel(tau_plus2[lead_cond2].Pz + tau_minus1[lead_cond2].Pz))
-		#PzSubLeading = np.append(PzSubLeading,ak.ravel(tau_plus2[lead_cond3].Pz + tau_minus2[lead_cond3].Pz))
-		#PzSubLeading = np.append(PzSubLeading,ak.ravel(tau_plus1[lead_cond4].Pz + tau_minus2[lead_cond4].Pz))
-		
-		#ESubLeading = np.append(ak.ravel(tau_plus2[lead_cond1].E + tau_minus2[lead_cond1].E),ak.ravel(tau_plus2[lead_cond2].E + tau_minus1[lead_cond2].E))
-		#ESubLeading = np.append(ESubLeading,ak.ravel(tau_plus2[lead_cond3].E + tau_minus2[lead_cond3].E))
-		#ESubLeading = np.append(ESubLeading,ak.ravel(tau_plus1[lead_cond4].E + tau_minus2[lead_cond4].E))
-		
-		#Get pair delta R distributions
-		#leading_dR_Arr = np.append(ak.ravel(deltaR(tau_plus1[lead_cond1], tau_minus1[lead_cond1])), ak.ravel(deltaR(tau_plus1[lead_cond2],tau_minus2[lead_cond2])))	
-		#leading_dR_Arr = np.append(leading_dR_Arr,ak.ravel(deltaR(tau_plus1[lead_cond3], tau_minus1[lead_cond3])))
-		#leading_dR_Arr = np.append(leading_dR_Arr,ak.ravel(deltaR(tau_plus2[lead_cond4], tau_minus1[lead_cond4])))
-
-		#subleading_dR_Arr = np.append(ak.ravel(deltaR(tau_plus2[lead_cond1], tau_minus2[lead_cond1])),ak.ravel(deltaR(tau_plus2[lead_cond2], tau_minus1[lead_cond2])))	
-		#subleading_dR_Arr = np.append(subleading_dR_Arr,ak.ravel(deltaR(tau_plus2[lead_cond3], tau_minus2[lead_cond3])))		
-		#subleading_dR_Arr = np.append(subleading_dR_Arr,ak.ravel(deltaR(tau_plus1[lead_cond4], tau_minus2[lead_cond4])))		
-	
+		#Reconstructed Higgs Objects
 		Higgs_Leading = ak.zip(
 			{
 				"Px" : ak.from_iter(PxLeading),
@@ -1188,20 +1251,46 @@ class FourTauPlotting(processor.ProcessorABC):
 		)
 		Higgs_SubLeading["phi"] = ak.from_iter(np.arctan2(Higgs_SubLeading.Py,Higgs_SubLeading.Px))
 		Higgs_SubLeading["eta"] = ak.from_iter(np.arcsinh(Higgs_SubLeading.Pz)/np.sqrt(Higgs_SubLeading.Px**2 + Higgs_SubLeading.Py**2 + Higgs_SubLeading.Pz**2))
+
+
+		#Reconstructed Radion
+		Radion_Reco = ak.zip(
+				{
+					"Px": Higgs_Leading.Px + Higgs_SubLeading.Px,
+					"Py": Higgs_Leading.Py + Higgs_SubLeading.Py,
+					"Pz": Higgs_Leading.Pz + Higgs_SubLeading.Pz,
+					"E": Higgs_Leading.E + Higgs_SubLeading.E,
+				}
+		)
+		#Radion_4Vec = vector.LorentzVectov(ak.zip({"t": Radion_Reco.E,"x": Radion_Reco.Px,"y": Radion_Reco.Py,"z": Radion_Reco.Pz},with_name="LorentzVector"))
+		Radion_4Vec = ak.zip({"t": Radion_Reco.E,"x": Radion_Reco.Px,"y": Radion_Reco.Py,"z": Radion_Reco.Pz},with_name="Momentum4D")
+		Radion_Reco["phi"] = ak.from_iter(np.arctan2(Radion_Reco.Py,Radion_Reco.Px))
+		Radion_Reco["eta"] = Radion_4Vec.eta #ak.from_iter(np.arcsinh(Radion_Reco.Pz)/np.sqrt(Radion_Reco.Px**2 + Radion_Reco.Py**2 + Radion_Reco.Pz**2))
+		event_level["Radion_Charge"] = tau[:,0].charge + tau[:,1].charge + tau[:,2].charge + tau[:,3].charge
 		
 		if (len(Higgs_Leading.eta) != 0):
-			#if (self.isData):
-			print("Mass Reconstructed")
+			#print("Mass Reconstructed")
 			diHiggs_dR_Arr = ak.ravel(deltaR(Higgs_Leading,Higgs_SubLeading))
-			#print(len(diHiggs_dR_Arr))
 			LeadingHiggs_mass_Arr = ak.ravel(single_mass(Higgs_Leading))	
 			SubLeadingHiggs_mass_Arr = ak.ravel(single_mass(Higgs_SubLeading))
+		
+			#Obtain delta R between each Higgs and the radion
+			leadingHiggs_Rad_dR = ak.ravel(deltaR(Higgs_Leading,Radion_Reco))
+			subleadingHiggs_Rad_dR = ak.ravel(deltaR(Higgs_SubLeading,Radion_Reco))
+		
+			#Obtain Delta phi between MET and Each Higgs
+			leadingHiggs_MET_dPhi_Arr = ak.ravel(MET_delta_phi(Higgs_Leading,event_level))
+			subleadingHiggs_MET_dPhi_Arr = ak.ravel(MET_delta_phi(Higgs_SubLeading,event_level))
 		else:
 			#if (self.isData):
-			print("Mass Not Reconstructed")
+			#print("Mass Not Reconstructed")
 			diHiggs_dR_Arr = np.array([])
 			LeadingHiggs_mass_Arr = np.array([])
 			SubLeadingHiggs_mass_Arr = np.array([])
+			leadingHiggs_Rad_dR = np.array([])
+			subleadingHiggs_Rad_dR = np.array([])
+			leadingHiggs_MET_dPhi_Arr = np.array([])
+			subleadingHiggs_MET_dPhi_Arr = np.array([])
 
 		#Look at individual pair delta Phi
 		#TauDeltaPhi_all_hist.fill("Leading pair", ak.ravel((tau_plus1[lead_cond1].phi - tau_minus1[lead_cond1].phi + np.pi) % (2 * np.pi) - np.pi))	
@@ -1220,7 +1309,10 @@ class FourTauPlotting(processor.ProcessorABC):
 		Higgs_DeltaPhi_Arr = ak.ravel((phi_leading - phi_subleading + np.pi) % (2 * np.pi) - np.pi)
 		radionPT_HiggsReco = np.sqrt((PxLeading + PxSubLeading)**2 + (PyLeading + PySubLeading)**2)
 		radionPT_Arr = ak.ravel(radionPT_HiggsReco)
-		
+
+		#Obtain delat Phi between MET and Radion
+		radionMET_dPhi = ak.ravel(MET_delta_phi(Radion_Reco,event_level))
+
 		#print(len(tau))
 		FourTau_Mass_Arr =four_mass([tau[:,0],tau[:,1],tau[:,2],tau[:,3]]) #ak.ravel(tau.FourMass)
 	
@@ -1228,14 +1320,19 @@ class FourTauPlotting(processor.ProcessorABC):
 		if (self.isData):
 			weight_Val = 1 
 		else:
-			weight_Val = weight_calc(dataset,tau,numEvents_Dict[dataset])
-			weight_Val = 1 
+			weight_Val = weight_calc(dataset,numEvents_Dict[dataset])
 			print("=========!!!Weight Debugging!!!=========")
 			print(dataset)
+			print("Luminosity Weight = %f"%weight_Val)
+			print("Luminosity = %f"%Lumi_2018)
 			print("Cross section = %f"%xSection_Dictionary[dataset])
 			print("Number of events Processed: %d"%numEvents_Dict[dataset])
 		
 		#Efficiency Histograms
+		if (self.isData):
+			crossSecVal = 1
+		else:
+			crossSecVal = xSection_Dictionary[dataset]
 		
 		return{
 			dataset: {
@@ -1247,19 +1344,33 @@ class FourTauPlotting(processor.ProcessorABC):
 				"Higgs_DeltaR_Arr": ak.to_list(diHiggs_dR_Arr),
 				"leading_dR_Arr": ak.to_list(leading_dR_Arr),
 				"subleading_dR_Arr": ak.to_list(subleading_dR_Arr),
+				
+				"leading_dPhi_Arr": ak.to_list(leading_dPhi_Arr),
+				"subleading_dPhi_Arr": ak.to_list(subleading_dPhi_Arr),
+				"radionMET_dPhi_Arr": ak.to_list(radionMET_dPhi),
+				"leadingHiggs_Rad_dR_Arr":ak.to_list(leadingHiggs_Rad_dR),
+				"subleadingHiggs_Rad_dR_Arr": ak.to_list(subleadingHiggs_Rad_dR),
+				"leadingHiggs_MET_dPhi_Arr": ak.to_list(leadingHiggs_MET_dPhi_Arr),
+				"subleadingHiggs_MET_dPhi_Arr": ak.to_list(subleadingHiggs_MET_dPhi_Arr),
+				"Radion_eta_Arr": ak.to_list(ak.ravel(Radion_Reco.eta)),
+				"Radion_Charge_Arr": ak.to_list(event_level.Radion_Charge),
+				
 				"radionPT_Arr" : ak.to_list(radionPT_Arr),
 				"tau_pt_Arr": ak.to_list(ak.ravel(tau.pt)),
-				"tau_lead_pt_Arr": ak.to_list(ak.ravel(tau[ak.argsort(tau.pt,axis=1)][:,0].pt)),
-				"tau_sublead_pt_Arr": ak.to_list(ak.ravel(tau[ak.argsort(tau.pt,axis=1)][:,1].pt)),
-				"tau_3rdlead_pt_Arr": ak.to_list(ak.ravel(tau[ak.argsort(tau.pt,axis=1)][:,2].pt)),
-				"tau_4thlead_pt_Arr": ak.to_list(ak.ravel(tau[ak.argsort(tau.pt,axis=1)][:,3].pt)),
+				"tau_lead_pt_Arr": ak.to_list(ak.ravel(tau[ak.argsort(tau.pt,axis=-1)][:,0].pt)),
+				"tau_sublead_pt_Arr": ak.to_list(ak.ravel(tau[ak.argsort(tau.pt,axis=-1)][:,1].pt)),
+				"tau_3rdlead_pt_Arr": ak.to_list(ak.ravel(tau[ak.argsort(tau.pt,axis=-1)][:,2].pt)),
+				"tau_4thlead_pt_Arr": ak.to_list(ak.ravel(tau[ak.argsort(tau.pt,axis=-1)][:,3].pt)),
 				"tau_eta_Arr": ak.to_list(ak.ravel(tau.eta)),
 				"ZMult_Arr": ak.to_list(ak.ravel(event_level.ZMult)),
-				#"ZMult_Arr": ak.to_list(ak.ravel(tau_ZMult)),
 				"ZMult_ele_Arr": ak.to_list(ak.ravel(event_level.ZMult_e)),
 				"ZMult_mu_Arr": ak.to_list(ak.ravel(event_level.ZMult_mu)),
 				"ZMult_tau_Arr": ak.to_list(ak.ravel(event_level.ZMult_tau)),
-                "BJet_Arr": ak.to_list(ak.ravel(event_level.nBJets))
+                "BJet_Arr": ak.to_list(ak.ravel(event_level.nBJets)),
+				"Lumi_Val": Lumi_2018,
+				"CrossSec_Val": crossSecVal,
+				"NEvent_Val": numEvents_Dict[dataset],
+				"Weight_Val": weight_Val,
 			}
 		}
 	
@@ -1270,10 +1381,18 @@ if __name__ == "__main__":
 	#mass_str_arr = ["1000","2000","3000"]
 	mass_str_arr = ["2000"]
 	
+	#Functions and variables for Luminosity weights
+	lumi_table_data = {"MC Sample":[], "Luminosity":[], "Cross Section (pb)":[], "Number of Events":[], "Calculated Weight":[]}
+	
 	#Trigger dictionaries
 	#trigger_dict = {"Mu50": (21,False), "PFMET120_PFMHT120_IDTight": (27,False), "EitherOr_Trigger": (41,True)}
 	#trigger_dict = {"Mu50": (21,False), "PFMET120_PFMHT120_IDTight": (27,False), "EitherOr_Trigger": (41,True)}
-	trigger_dict = {"EitherOr_Trigger": (41,True)}
+	#trigger_dict = {"EitherOr_Trigger": (41,True)}
+	trigger_dict = {"Mu50": (21,False)}
+	#trigger_dict = {"PFHT500_PFMET100_PFMHT100_IDTight": (39,False)} #,"EitherOr_Trigger": (41,True)}
+	#trigger_dict = {"Mu50": (21,False), "EitherOr_Trigger": (41,True)}
+	#trigger_dict = {"Mu50": (21,False), "PFHT500_PFMET100_PFMHT100_IDTight": (39,False), "EitherOr_Trigger": (41,True)}
+	#trigger_dict = {"Mu50": (21,False), "PFHT500_PFMET100_PFMHT100_IDTight": (39,False)} #,"EitherOr_Trigger": (41,True)}
 	#trigger_dict = {"No_Trigger": (0,False)}
 	#trigger_dict = {"PFHT500_PFMET100_PFMHT100_IDTight": (39,False), "AK8PFJet400_TrimMass30": (40,False), "EitherOr_Trigger": (41,True)}
 	
@@ -1281,6 +1400,10 @@ if __name__ == "__main__":
 	signal_base = "root://cmseos.fnal.gov//store/user/abdollah/SkimBoostedHH4t/2018/4t/v2_Hadd/GluGluToRadionToHHTo4T_M-"
 	background_base = "root://cmseos.fnal.gov//store/user/abdollah/SkimBoostedHH4t/2018/4t/v2_Hadd/"	
 	data_loc = "root://cmseos.fnal.gov//store/user/abdollah/SkimBoostedHH4t/2018/4t/v2_Hadd/"
+	
+	#signal_base = "hdfs/store/user/abdollah/SkimBoostedHH4t/2018/4t/v2_Hadd/GluGluToRadionToHHTo4T_M-"
+	#background_base = "hdfs/store/user/abdollah/SkimBoostedHH4t/2018/4t/v2_Hadd/"	
+	#data_loc = "hdfs/store/user/abdollah/SkimBoostedHH4t/2018/4t/v2_Hadd/"
 	
 	#signal_base = "root://cmseos.fnal.gov//store/user/abdollah/SkimBoostedHH4t/2018/4t/v2/GluGluToRadionToHHTo4T_M-"
 	#background_base = "root://cmseos.fnal.gov//store/user/abdollah/SkimBoostedHH4t/2018/4t/v2/"	
@@ -1291,7 +1414,9 @@ if __name__ == "__main__":
 		executor = processor.IterativeExecutor(compression=None),
 		schema=BaseSchema
 	)
-	four_tau_hist_list = ["FourTau_Mass_Arr","HiggsDeltaPhi_Arr", "Higgs_DeltaR_Arr","leading_dR_Arr","subleading_dR_Arr","LeadingHiggs_mass","SubLeadingHiggs_mass", "radionPT_Arr", "tau_pt_Arr", "tau_eta_Arr","ZMult_Arr", "BJet_Arr", "tau_lead_pt_Arr", "tau_sublead_pt_Arr", "tau_3rdlead_pt_Arr", "tau_4thlead_pt_Arr"]
+	four_tau_hist_list = ["FourTau_Mass_Arr","HiggsDeltaPhi_Arr", "Higgs_DeltaR_Arr","leading_dR_Arr","subleading_dR_Arr","LeadingHiggs_mass","SubLeadingHiggs_mass", "radionPT_Arr", "tau_pt_Arr", 
+			"tau_eta_Arr","ZMult_Arr", "BJet_Arr", "tau_lead_pt_Arr", "tau_sublead_pt_Arr", "tau_3rdlead_pt_Arr", "tau_4thlead_pt_Arr", "leading_dPhi_Arr", "subleading_dPhi_Arr", 
+			"radionMET_dPhi_Arr","leadingHiggs_Rad_dR_Arr","subleadingHiggs_Rad_dR_Arr","leadingHiggs_MET_dPhi_Arr","subleadingHiggs_MET_dPhi_Arr","Radion_eta_Arr", "Radion_Charge_Arr"]
 	#four_tau_hist_list = ["ZMult_Arr","ZMult_ele_Arr","ZMult_mu_Arr", "ZMult_tau_Arr"]
 	#four_tau_hist_list = ["LeadingHiggs_mass"] #Only make 1 histogram for brevity/debugging purposes
 	hist_name_dict = {"FourTau_Mass_Arr": r"Reconstructed 4-$\tau$ invariant mass", "HiggsDeltaPhi_Arr": r"Reconstructed Higgs $\Delta \phi$", "Higgs_DeltaR_Arr": r"Reconstructed Higgs $\Delta R$",
@@ -1300,7 +1425,10 @@ if __name__ == "__main__":
 					"tau_pt_Arr": r"$\tau$ $p_T$", "tau_eta_Arr": r"$\tau \ \eta$", "ZMult_Arr": r"Z Boson Multiplicity", "ZMult_mu_Arr": r"Z Boson Multiplicity (muons only)", 
                     "ZMult_ele_Arr": r"Z Boson Multiplicity (electrons only)", "ZMult_tau_Arr" : r"Z Boson Multiplicity (from taus)", "BJet_Arr": r"B-Jet Multiplicity", 
                     "tau_lead_pt_Arr": r"Leadng $\tau$ $p_T$", "tau_sublead_pt_Arr": r"Subleading $\tau$ $p_T$", "tau_3rdlead_pt_Arr": r"Third leading $\tau$ $p_T$", 
-                    "tau_4thlead_pt_Arr": r"Fourth leading $\tau$ $p_T$"}
+					"tau_4thlead_pt_Arr": r"Fourth leading $\tau$ $p_T$", "leading_dPhi_Arr": r"Leading di-$\tau$ $\Delta \phi$", "subleading_dPhi_Arr": r"Subleading di-$\tau$ $\Delta \phi$",
+					"radionMET_dPhi_Arr": r"Radion MET $\Delta \phi$", "leadingHiggs_Rad_dR_Arr": r"Leading Higgs Radion $\Delta$R", 
+					"subleadingHiggs_Rad_dR_Arr": r"Subleading Higgs Radion $\Delta$R", "leadingHiggs_MET_dPhi_Arr": r"Leading Higgs MET $\Delta \phi$", 
+					"subleadingHiggs_MET_dPhi_Arr": r"Subleading Higgs MET $\Delta \phi$", "Radion_eta_Arr": r"Radion $\eta$", "Radion_Charge_Arr": r"Radion Charge"}
 	#four_tau_hist_list = ["HiggsDeltaPhi_Arr","Pair_DeltaPhi_Hist"]
 
 
@@ -1310,10 +1438,17 @@ if __name__ == "__main__":
 		file_dict_test = { #Reduced files to run over
 			"ZZ4l": [background_base + "ZZ4l.root"],
 			"Signal": [signal_base + mass + ".root"],
-			"Data_SingleMuon": [data_loc + "SingleMu_Run2018A.root", data_loc + "SingleMu_Run2018B.root", data_loc + "SingleMu_Run2018C.root", data_loc + "SingleMu_Run2018D.root"],
-			"Data_JetHT": [data_loc + "JetHT_Run2018A-17Sep2018-v1.root", data_loc + "JetHT_Run2018B-17Sep2018-v1.root", data_loc + "JetHT_Run2018C-17Sep2018-v1.root",data_loc + "JetHT_Run2018D-PromptReco-v2.root"]
+			#"Data_SingleMuon": [data_loc + "SingleMu_Run2018A.root"] #, data_loc + "SingleMu_Run2018B.root", data_loc + "SingleMu_Run2018C.root", data_loc + "SingleMu_Run2018D.root"],
+			"Data_JetHT": [data_loc + "JetHT_Run2018A-17Sep2018-v1.root"] #, data_loc + "JetHT_Run2018B-17Sep2018-v1.root", data_loc + "JetHT_Run2018C-17Sep2018-v1.root",data_loc + "JetHT_Run2018D-PromptReco-v2.root"]
+			#"Data_SingleMuon": [data_loc + "SingleMu_Run2018A.root", data_loc + "SingleMu_Run2018B.root", data_loc + "SingleMu_Run2018C.root", data_loc + "SingleMu_Run2018D.root"],
+			#"Data_JetHT": [data_loc + "JetHT_Run2018A-17Sep2018-v1.root", data_loc + "JetHT_Run2018B-17Sep2018-v1.root", data_loc + "JetHT_Run2018C-17Sep2018-v1.root",data_loc + "JetHT_Run2018D-PromptReco-v2.root"]
   
         }
+
+		file_dict_signal_only = {
+		#file_dict = {
+			"Signal": [signal_base + mass + ".root"]
+		}
 		
 		#Grand Unified Background + Signal + Data Dictionary links file name to location of root file
 		file_dict = {
@@ -1342,14 +1477,6 @@ if __name__ == "__main__":
 			"WJetsToLNu_HT-1200To2500" : [background_base + "WJetsToLNu_HT-1200To2500.root"],
 			"WJetsToLNu_HT-2500ToInf" : [background_base + "WJetsToLNu_HT-2500ToInf.root"],
 			"Signal": [signal_base + mass + ".root"],
-			#"Data_SingleMuon": [data_loc + "SingleMuon_Run2018A-17Sep2018-v2_220117_194427_000" + str(np.floor(i/10))[0] + "_" + str(i % 10) + ".root" for i in range(20)] + 
-			#					[data_loc + "SingleMuon_Run2018B-17Sep2018-v1_220120_131752_0000_" + str(i) + ".root" for i in range(10)] + 
-			#					[data_loc + "SingleMuon_Run2018C-17Sep2018-v1_220117_194517_0000_" + str(i) + ".root" for i in range(10)] + 
-			#					[data_loc + "SingleMuon_Run2018D-22Jan2019-v2_220117_173256_000" + str(np.floor(i/10))[0] + "_" + str(i % 10) + ".root" for i in range(50) if (i != 4 and i != 10 and i != 16)],
-			#"Data_JetHT": [data_loc + "JetHT_Run2018A-17Sep2018-v1_220120_131700_000" + str(np.floor(i/10))[0] + "_" + str(i % 10) + ".root" for i in range(40)] + 
-			#				[data_loc + "JetHT_Run2018B-17Sep2018-v1_220120_131726_000" + str(np.floor(i / 10))[0] + "_" + str(i % 10) + ".root" for i in range(40)] +
-			#				[data_loc + "JetHT_Run2018C-17Sep2018-v1_220117_194402_0000_" + str(i % 10) + ".root" for i in range(10)] + 
-			#				[data_loc + "JetHT_Run2018D-PromptReco-v2_220123_233624_000" + str(np.floor(i/10))[0] + "_" + str(i % 10) + ".root" for i in range(70)],
 			"Data_SingleMuon": [data_loc + "SingleMu_Run2018A.root", data_loc + "SingleMu_Run2018B.root", data_loc + "SingleMu_Run2018C.root", data_loc + "SingleMu_Run2018D.root"],
 			"Data_JetHT": [data_loc + "JetHT_Run2018A-17Sep2018-v1.root", data_loc + "JetHT_Run2018B-17Sep2018-v1.root", data_loc + "JetHT_Run2018C-17Sep2018-v1.root",data_loc + "JetHT_Run2018D-PromptReco-v2.root"]
 		}
@@ -1361,73 +1488,106 @@ if __name__ == "__main__":
 				numEvents_Dict[key_name] = tempFile['hEvents'].member('fEntries')/2
 			else: #Ignore data files
 				continue
-
+		
+		#Histogram bins
+		N1 = 20 #20 for Single Mu and 6 for Jet METMHTHT Trigger
+		N2 = 12 #12 for Single Mu and 6 for Jet MEHTMHT Trigger
 		#Dictionaries of histograms for background, signal and data
+		
 		hist_dict_background = {
-			"FourTau_Mass_Arr": hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name="background").Regular(20,0,3000, label = r"$m_{4\tau}$ [GeV]").Double(),
-			"HiggsDeltaPhi_Arr": hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name="background").Reg(20,-pi,pi, label = r"Higgs $\Delta \phi$").Double(), 
-			"Higgs_DeltaR_Arr": hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name="background").Reg(20,0,5, label = r"Higgs $\Delta$R").Double(),
-			"leading_dR_Arr": hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name="background").Reg(20,0,5, label = r"Leading di-$\tau$ $\Delta$R").Double(),
-			"subleading_dR_Arr": hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name="background").Reg(20,0,5, label = r"Sub-leading di-$\tau$ $\Delta$R").Double(),
-			"LeadingHiggs_mass" : hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name="background").Reg(12,0,120, label=r"Leading di-$\tau$ Mass (GeV)").Double(),
-			"SubLeadingHiggs_mass" : hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name="background").Reg(12,0,120, label=r"Sub-Leading di-$\tau$ Mass (GeV)").Double(),
-			"radionPT_Arr" : hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name="background").Reg(20,0,500, label=r"Radion $p_T$ (GeV)").Double(),
-			"tau_pt_Arr": hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name="background").Reg(20,0,400, label=r"$\tau$ $p_T$ (GeV)").Double(),
-			"tau_eta_Arr": hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name="background").Reg(20,-5,5, label = r"$\tau \ \eta$").Double(),
+				"FourTau_Mass_Arr": hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name="background").Regular(N1,0,3000, label = r"$m_{4\tau}$ [GeV]").Double(), 
+				"HiggsDeltaPhi_Arr": hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name="background").Reg(N1,-pi,pi, label = r"Higgs $\Delta \phi$").Double(), 
+			"Higgs_DeltaR_Arr": hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name="background").Reg(N1,0,5, label = r"Higgs $\Delta$R").Double(), 
+			"leading_dR_Arr": hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name="background").Reg(N1,0,5, label = r"Leading di-$\tau$ $\Delta$R").Double(), 
+			"subleading_dR_Arr": hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name="background").Reg(N1,0,5, label = r"Sub-leading di-$\tau$ $\Delta$R").Double(), 
+			"LeadingHiggs_mass" : hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name="background").Reg(N2,0,120, label=r"Leading di-$\tau$ Mass (GeV)").Double(), 
+			"SubLeadingHiggs_mass" : hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name="background").Reg(N2,0,120, label=r"Sub-Leading di-$\tau$ Mass (GeV)").Double(), 
+			"radionPT_Arr" : hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name="background").Reg(N1,0,500, label=r"Radion $p_T$ (GeV)").Double(), 
+			"tau_pt_Arr": hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name="background").Reg(N1,0,400, label=r"$\tau$ $p_T$ (GeV)").Double(),
+			"tau_eta_Arr": hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name="background").Reg(N1,-5,5, label = r"$\tau \ \eta$").Double(),
 			"ZMult_Arr": hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name="background").Reg(6,0,6, label = r"Z Boson Multiplicity").Double(),
 			"ZMult_ele_Arr": hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name="background").Reg(6,0,6, label = r"Z Boson Multiplicity (electrons only)").Double(),
 			"ZMult_mu_Arr": hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name="background").Reg(6,0,6, label = r"Z Boson Multiplicity (muons only)").Double(),
 			"ZMult_tau_Arr": hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name="background").Reg(6,0,6, label = r"Z Boson Multiplicity (from taus)").Double(),
 			"BJet_Arr": hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name="background").Reg(6,0,6, label = r"B Jet Multiplicity").Double(),
-			"tau_lead_pt_Arr": hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name="background").Reg(20,0,200, label=r"Leading $\tau $$p_T$ (GeV)").Double(),
-			"tau_sublead_pt_Arr": hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name="background").Reg(20,0,200, label=r"Leading $\tau $$p_T$ (GeV)").Double(),
-			"tau_3rdlead_pt_Arr": hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name="background").Reg(20,0,200, label=r"Leading $\tau $$p_T$ (GeV)").Double(),
-			"tau_4thlead_pt_Arr": hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name="background").Reg(20,0,200, label=r"Leading $\tau $$p_T$ (GeV)").Double(),
- 
+			"tau_lead_pt_Arr": hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name="background").Reg(N1,0,200, label=r"Subleading $\tau$ $p_T$ (GeV)").Double(),
+			"tau_sublead_pt_Arr": hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name="background").Reg(N1,0,200, label=r"Leading $\tau$ $p_T$ (GeV)").Double(),
+			"tau_3rdlead_pt_Arr": hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name="background").Reg(N1,0,200, label=r"Third Leading $\tau$ $p_T$ (GeV)").Double(),
+			"tau_4thlead_pt_Arr": hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name="background").Reg(N1,0,200, label=r"Fourth Leading $\tau$ $p_T$ (GeV)").Double(),
+			
+			"leading_dPhi_Arr": hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name="background").Reg(N1,-pi,pi, label = r"Leading di-$\tau$ $\Delta \phi$").Double(), 
+			"subleading_dPhi_Arr": hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name="background").Reg(N1,-pi,pi, label = r"Subleading di-$\tau$ $\Delta \phi$").Double(), 
+			"radionMET_dPhi_Arr": hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name="background").Reg(N1,-pi,pi, label = r"Radion MET $\Delta \phi$").Double(), 
+			"leadingHiggs_Rad_dR_Arr": hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name="background").Reg(N1,0,5, label = r"Leading Higgs Radion $\Delta$R").Double(),
+			"subleadingHiggs_Rad_dR_Arr": hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name="background").Reg(N1,0,5, label = r"Subleading Higgs Radion $\Delta$R").Double(),
+			"leadingHiggs_MET_dPhi_Arr": hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name="background").Reg(N1,-pi,pi, label = r"Leading Higgs MET $\Delta R$").Double(), 
+			"subleadingHiggs_MET_dPhi_Arr": hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name="background").Reg(N1,-pi,pi, label = r"Subleading Higgs MET $\Delta R$").Double(),
+			"Radion_eta_Arr": hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name="background").Reg(N1,-5,5, label = r"Radion $\eta$").Double(),
+			"Radion_Charge_Arr": hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name = "background").Reg(10,-5,5,label = r"Radion Electric Charge").Double(),
 
 		}
 		
 		hist_dict_signal = {
-			"FourTau_Mass_Arr": hist.Hist.new.StrCat(["Signal"],name="signal").Regular(20,0,3000, label = r"$m_{4\tau}$ [GeV]").Double(),
-			"HiggsDeltaPhi_Arr": hist.Hist.new.StrCat(["Signal"],name="signal").Reg(20,-pi,pi, label = r"Higgs $\Delta \phi$").Double(), 
-			"Higgs_DeltaR_Arr": hist.Hist.new.StrCat(["Signal"],name="signal").Reg(20,0,5, label = r"Higgs $\Delta$R").Double(),
-			"leading_dR_Arr": hist.Hist.new.StrCat(["Signal"],name="signal").Reg(20,0,5, label = r"Leading di-$\tau$ $\Delta$R").Double(),
-			"subleading_dR_Arr": hist.Hist.new.StrCat(["Signal"],name="signal").Reg(20,0,5, label = r"Sub-leading di-$\tau$ $\Delta$R").Double(),
-			"LeadingHiggs_mass" : hist.Hist.new.StrCat(["Signal"],name="signal").Reg(12,0,120, label=r"Leading di-$\tau$ Mass (GeV)").Double(),
-			"SubLeadingHiggs_mass" : hist.Hist.new.StrCat(["Signal"],name="signal").Reg(12,0,120, label=r"Sub-Leading di-$\tau$ Mass (GeV)").Double(),
-			"radionPT_Arr" : hist.Hist.new.StrCat(["Signal"],name="signal").Reg(20,0,500, label=r"Radion $p_T$ (GeV)").Double(),
-			"tau_pt_Arr": hist.Hist.new.StrCat(["Signal"],name="signal").Reg(20,0,400, label=r"$\tau$ $p_T$ (GeV)").Double(),
-			"tau_eta_Arr": hist.Hist.new.StrCat(["Signal"],name="signal").Reg(20,-5,5, label = r"$\tau \ \eta$").Double(),
+			"FourTau_Mass_Arr": hist.Hist.new.StrCat(["Signal"],name="signal").Regular(N1,0,3000, label = r"$m_{4\tau}$ [GeV]").Double(),
+			"HiggsDeltaPhi_Arr": hist.Hist.new.StrCat(["Signal"],name="signal").Reg(N1,-pi,pi, label = r"Higgs $\Delta \phi$").Double(), 
+			"Higgs_DeltaR_Arr": hist.Hist.new.StrCat(["Signal"],name="signal").Reg(N1,0,5, label = r"Higgs $\Delta$R").Double(),
+			"leading_dR_Arr": hist.Hist.new.StrCat(["Signal"],name="signal").Reg(N1,0,5, label = r"Leading di-$\tau$ $\Delta$R").Double(),
+			"subleading_dR_Arr": hist.Hist.new.StrCat(["Signal"],name="signal").Reg(N1,0,5, label = r"Sub-leading di-$\tau$ $\Delta$R").Double(),
+			"LeadingHiggs_mass" : hist.Hist.new.StrCat(["Signal"],name="signal").Reg(N2,0,120, label=r"Leading di-$\tau$ Mass (GeV)").Double(),
+			"SubLeadingHiggs_mass" : hist.Hist.new.StrCat(["Signal"],name="signal").Reg(N2,0,120, label=r"Sub-Leading di-$\tau$ Mass (GeV)").Double(),
+			"radionPT_Arr" : hist.Hist.new.StrCat(["Signal"],name="signal").Reg(N1,0,500, label=r"Radion $p_T$ (GeV)").Double(),
+			"tau_pt_Arr": hist.Hist.new.StrCat(["Signal"],name="signal").Reg(N1,0,400, label=r"$\tau$ $p_T$ (GeV)").Double(),
+			"tau_eta_Arr": hist.Hist.new.StrCat(["Signal"],name="signal").Reg(N1,-5,5, label = r"$\tau \ \eta$").Double(),
 			"ZMult_Arr": hist.Hist.new.StrCat(["Signal"],name="signal").Reg(6,0,6, label = r"Z Boson Multiplicity").Double(),
 			"ZMult_ele_Arr": hist.Hist.new.StrCat(["Signal"],name="signal").Reg(6,0,6, label = r"Z Boson Multiplicity (electrons only)").Double(),
 			"ZMult_mu_Arr": hist.Hist.new.StrCat(["Signal"],name="signal").Reg(6,0,6, label = r"Z Boson Multiplicity (muons only)").Double(),
 			"ZMult_tau_Arr": hist.Hist.new.StrCat(["Signal"],name="signal").Reg(6,0,6, label = r"Z Boson Multiplicity (from taus)").Double(),
 			"BJet_Arr": hist.Hist.new.StrCat(["Signal"],name="signal").Reg(6,0,6, label = r"B Jet Multiplicity").Double(),
-			"tau_lead_pt_Arr": hist.Hist.new.StrCat(["Signal"],name="signal").Reg(20,0,200, label=r"Leading $\tau$ $p_T$ (GeV)").Double(),
-			"tau_sublead_pt_Arr": hist.Hist.new.StrCat(["Signal"],name="signal").Reg(20,0,200, label=r"Subleading $\tau$ $p_T$ (GeV)").Double(),
-			"tau_3rdlead_pt_Arr": hist.Hist.new.StrCat(["Signal"],name="signal").Reg(20,0,200, label=r"Third leading $\tau$ $p_T$ (GeV)").Double(),
-			"tau_4thlead_pt_Arr": hist.Hist.new.StrCat(["Signal"],name="signal").Reg(20,0,200, label=r"Fourth leading $\tau$ $p_T$ (GeV)").Double(),
+			"tau_lead_pt_Arr": hist.Hist.new.StrCat(["Signal"],name="signal").Reg(N1,0,200, label=r"Leading $\tau$ $p_T$ (GeV)").Double(),
+			"tau_sublead_pt_Arr": hist.Hist.new.StrCat(["Signal"],name="signal").Reg(N1,0,200, label=r"Subleading $\tau$ $p_T$ (GeV)").Double(),
+			"tau_3rdlead_pt_Arr": hist.Hist.new.StrCat(["Signal"],name="signal").Reg(N1,0,200, label=r"Third leading $\tau$ $p_T$ (GeV)").Double(),
+			"tau_4thlead_pt_Arr": hist.Hist.new.StrCat(["Signal"],name="signal").Reg(N1,0,200, label=r"Fourth leading $\tau$ $p_T$ (GeV)").Double(),
+			"leading_dPhi_Arr": hist.Hist.new.StrCat(["Signal"],name="signal").Reg(N1,-pi,pi, label = r"Leading di-$\tau$ $\Delta \phi$").Double(), 
+			"subleading_dPhi_Arr": hist.Hist.new.StrCat(["Signal"],name="signal").Reg(N1,-pi,pi, label = r"Subleading di-$\tau$ $\Delta \phi$").Double(), 
+			"radionMET_dPhi_Arr": hist.Hist.new.StrCat(["Signal"],name="signal").Reg(N1,-pi,pi, label = r"Radion MET $\Delta \phi$").Double(), 
+			"leadingHiggs_Rad_dR_Arr": hist.Hist.new.StrCat(["Signal"],name="signal").Reg(N1,0,5, label = r"Leading Higgs Radion $\Delta$R").Double(),
+			"subleadingHiggs_Rad_dR_Arr": hist.Hist.new.StrCat(["Signal"],name="signal").Reg(N1,0,5, label = r"Subleading Higgs Radion $\Delta$R").Double(),
+			"leadingHiggs_MET_dPhi_Arr": hist.Hist.new.StrCat(["Signal"],name="signal").Reg(N1,-pi,pi, label = r"Leading Higgs MET $\Delta R$").Double(), 
+			"subleadingHiggs_MET_dPhi_Arr": hist.Hist.new.StrCat(["Signal"],name="signal").Reg(N1,-pi,pi, label = r"Subleading Higgs MET $\Delta R$").Double(),
+			"Radion_eta_Arr": hist.Hist.new.StrCat(["Signal"],name="signal").Reg(N1,-5,5, label = r"Radion $\eta$").Double(),
+			"Radion_Charge_Arr": hist.Hist.new.StrCat(["Signal"],name = "signal").Reg(10,-5,5,label = r"Radion Electric Charge").Double()
+
+
 		}
 		hist_dict_data = {
-			"FourTau_Mass_Arr": hist.Hist.new.StrCat(["Data"],name="data").Regular(20,0,3000, label = r"$m_{4\tau}$ [GeV]").Double(),
-			"HiggsDeltaPhi_Arr": hist.Hist.new.StrCat(["Data"],name="data").Reg(20,-pi,pi, label = r"Higgs $\Delta \phi$").Double(), 
-			"Higgs_DeltaR_Arr": hist.Hist.new.StrCat(["Data"],name="data").Reg(20,0,5, label = r"Higgs $\Delta$R").Double(),
-			"leading_dR_Arr": hist.Hist.new.StrCat(["Data"],name="data").Reg(20,0,5, label = r"Leading di-$\tau$ $\Delta$R").Double(),
-			"subleading_dR_Arr": hist.Hist.new.StrCat(["Data"],name="data").Reg(20,0,5, label = r"Sub-leading di-$\tau$ $\Delta$R").Double(),
-			"LeadingHiggs_mass" : hist.Hist.new.StrCat(["Data"],name="data").Reg(12,0,120, label=r"Leading di-$\tau$ Mass (GeV)").Double(),
-			"SubLeadingHiggs_mass" : hist.Hist.new.StrCat(["Data"],name="data").Reg(12,0,120, label=r"Sub-Leading di-$\tau$ Mass (GeV)").Double(),
-			"radionPT_Arr" : hist.Hist.new.StrCat(["Data"],name="data").Reg(20,0,500, label=r"Radion $p_T$ (GeV)").Double(),
-			"tau_pt_Arr": hist.Hist.new.StrCat(["Data"],name="data").Reg(20,0,400, label=r"$\tau$ $p_T$ (GeV)").Double(),
-			"tau_eta_Arr": hist.Hist.new.StrCat(["Data"],name="data").Reg(20,-5,5, label = r"$\tau \ \eta$").Double(),
+			"FourTau_Mass_Arr": hist.Hist.new.StrCat(["Data"],name="data").Regular(N1,0,3000, label = r"$m_{4\tau}$ [GeV]").Double(),
+			"HiggsDeltaPhi_Arr": hist.Hist.new.StrCat(["Data"],name="data").Reg(N1,-pi,pi, label = r"Higgs $\Delta \phi$").Double(), 
+			"Higgs_DeltaR_Arr": hist.Hist.new.StrCat(["Data"],name="data").Reg(N1,0,5, label = r"Higgs $\Delta$R").Double(),
+			"leading_dR_Arr": hist.Hist.new.StrCat(["Data"],name="data").Reg(N1,0,5, label = r"Leading di-$\tau$ $\Delta$R").Double(),
+			"subleading_dR_Arr": hist.Hist.new.StrCat(["Data"],name="data").Reg(N1,0,5, label = r"Sub-leading di-$\tau$ $\Delta$R").Double(),
+			"LeadingHiggs_mass" : hist.Hist.new.StrCat(["Data"],name="data").Reg(N2,0,120, label=r"Leading di-$\tau$ Mass (GeV)").Double(),
+			"SubLeadingHiggs_mass" : hist.Hist.new.StrCat(["Data"],name="data").Reg(N2,0,120, label=r"Sub-Leading di-$\tau$ Mass (GeV)").Double(),
+			"radionPT_Arr" : hist.Hist.new.StrCat(["Data"],name="data").Reg(N1,0,500, label=r"Radion $p_T$ (GeV)").Double(),
+			"tau_pt_Arr": hist.Hist.new.StrCat(["Data"],name="data").Reg(N1,0,400, label=r"$\tau$ $p_T$ (GeV)").Double(),
+			"tau_eta_Arr": hist.Hist.new.StrCat(["Data"],name="data").Reg(N1,-5,5, label = r"$\tau \ \eta$").Double(),
 			"ZMult_Arr": hist.Hist.new.StrCat(["Data"],name="data").Reg(6,0,6, label = r"Z Boson Multiplicity").Double(),
 			"ZMult_ele_Arr": hist.Hist.new.StrCat(["Data"],name="data").Reg(6,0,6, label = r"Z Boson Multiplicity (electrons only)").Double(),
 			"ZMult_mu_Arr": hist.Hist.new.StrCat(["Data"],name="data").Reg(6,0,6, label = r"Z Boson Multiplicity (muons only)").Double(),
 			"ZMult_tau_Arr": hist.Hist.new.StrCat(["Data"],name="data").Reg(6,0,6, label = r"Z Boson Multiplicity (from taus)").Double(),
 			"BJet_Arr": hist.Hist.new.StrCat(["Data"],name="data").Reg(6,0,6, label = r"B Jet Multiplicity").Double(),
-			"tau_lead_pt_Arr": hist.Hist.new.StrCat(["Data"],name="data").Reg(20,0,200, label=r"Leading $\tau$ $p_T$ (GeV)").Double(),
-			"tau_sublead_pt_Arr": hist.Hist.new.StrCat(["Data"],name="data").Reg(20,0,200, label=r"Subleading $\tau$ $p_T$ (GeV)").Double(),
-			"tau_3rdlead_pt_Arr": hist.Hist.new.StrCat(["Data"],name="data").Reg(20,0,200, label=r"Third leading $\tau$ $p_T$ (GeV)").Double(),
-			"tau_4thlead_pt_Arr": hist.Hist.new.StrCat(["Data"],name="data").Reg(20,0,200, label=r"Fourth leading $\tau$ $p_T$ (GeV)").Double(),
+			"tau_lead_pt_Arr": hist.Hist.new.StrCat(["Data"],name="data").Reg(N1,0,200, label=r"Leading $\tau$ $p_T$ (GeV)").Double(),
+			"tau_sublead_pt_Arr": hist.Hist.new.StrCat(["Data"],name="data").Reg(N1,0,200, label=r"Subleading $\tau$ $p_T$ (GeV)").Double(),
+			"tau_3rdlead_pt_Arr": hist.Hist.new.StrCat(["Data"],name="data").Reg(N1,0,200, label=r"Third leading $\tau$ $p_T$ (GeV)").Double(),
+			"tau_4thlead_pt_Arr": hist.Hist.new.StrCat(["Data"],name="data").Reg(N1,0,200, label=r"Fourth leading $\tau$ $p_T$ (GeV)").Double(),
+			"leading_dPhi_Arr": hist.Hist.new.StrCat(["Data"],name="data").Reg(N1,-pi,pi, label = r"Leading di-$\tau$ $\Delta \phi$").Double(), 
+			"subleading_dPhi_Arr": hist.Hist.new.StrCat(["Data"],name="data").Reg(N1,-pi,pi, label = r"Subleading di-$\tau$ $\Delta \phi$").Double(), 
+			"radionMET_dPhi_Arr": hist.Hist.new.StrCat(["Data"],name="data").Reg(N1,-pi,pi, label = r"Radion MET $\Delta \phi$").Double(), 
+			"leadingHiggs_Rad_dR_Arr": hist.Hist.new.StrCat(["Data"],name="data").Reg(N1,0,5, label = r"Leading Higgs Radion $\Delta$R").Double(),
+			"subleadingHiggs_Rad_dR_Arr": hist.Hist.new.StrCat(["Data"],name="data").Reg(N1,0,5, label = r"Subleading Higgs Radion $\Delta$R").Double(),
+			"leadingHiggs_MET_dPhi_Arr": hist.Hist.new.StrCat(["Data"],name="data").Reg(N1,-pi,pi, label = r"Leading Higgs MET $\Delta R$").Double(), 
+			"subleadingHiggs_MET_dPhi_Arr": hist.Hist.new.StrCat(["Data"],name="data").Reg(N1,-pi,pi, label = r"Subleading Higgs MET $\Delta R$").Double(),
+			"Radion_eta_Arr": hist.Hist.new.StrCat(["Data"],name="data").Reg(N1,-5,5, label = r"Radion $\eta$").Double(),
+			"Radion_Charge_Arr": hist.Hist.new.StrCat(["Data"],name = "data").Reg(10,-5,5,label = r"Radion Electric Charge").Double()
 		}
 		
 		background_list = [r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"]
@@ -1436,7 +1596,7 @@ if __name__ == "__main__":
 		background_plot_names = {r"$t\bar{t}$" : "_ttbar_", r"Drell-Yan+Jets": "_DYJets_", "Di-Bosons" : "_DiBosons_", "Single Top": "_SingleTop+", "QCD" : "_QCD_", "W+Jets" : "_WJets_", r"$ZZ \rightarrow 4l$" : "_ZZ4l_"} #For file names
 		background_dict = {r"$t\bar{t}$" : ["TTToSemiLeptonic","TTTo2L2Nu","TTToHadronic"], 
 				r"Drell-Yan+Jets": ["DYJetsToLL_Pt-50To100","DYJetsToLL_Pt-100To250","DYJetsToLL_Pt-250To400","DYJetsToLL_Pt-400To650","DYJetsToLL_Pt-650ToInf"], 
-				"Di-Bosons": ["WZ3l1nu","WZ2l2q","WZ1l1nu2q","ZZ2l2q","WZ3l1nu", "WZ1l3nu", "VV2l2nu"], "Single Top": ["Tbar-tchan","T-tchan","Tbar-tW","T-tW"], 
+				"Di-Bosons": ["WZ3l1nu","WZ2l2q","WZ1l1nu2q","ZZ2l2q", "WZ1l3nu", "VV2l2nu"], "Single Top": ["Tbar-tchan","T-tchan","Tbar-tW","T-tW"], 
 				"W+Jets": ["WJetsToLNu_HT-100To200","WJetsToLNu_HT-200To400","WJetsToLNu_HT-400To600","WJetsToLNu_HT-600To800","WJetsToLNu_HT-800To1200","WJetsToLNu_HT-1200To2500","WJetsToLNu_HT-2500ToInf"],
 				r"$ZZ \rightarrow 4l$" : ["ZZ4l"]
 		}
@@ -1453,6 +1613,12 @@ if __name__ == "__main__":
 				"ZMult_tau_Arr": "tau_ZMult_Mass_" + mass + "-" + trigger_name, "BJet_Arr": "BJetMult_Mass_" + mass + "-" + trigger_name, 
 				"tau_lead_pt_Arr": r"LeadTau_pT_Mass_" + mass + "-" + trigger_name, "tau_sublead_pt_Arr": r"SubleadTau_pT_Mass_" + mass + "-" + trigger_name, 
 				"tau_3rdlead_pt_Arr": r"ThirdleadTau_pT_Mass_" + mass + "-" + trigger_name,"tau_4thlead_pt_Arr": r"FourthleadTau_pT_Mass_" + mass + "-" + trigger_name,
+				"leading_dPhi_Arr": "leadingdiTau_DeltaPhi_Mass_" + mass + "-" + trigger_name, "subleading_dPhi_Arr": "leadingdiTau_DeltaPhi_Mass_" + mass + "-" + trigger_name,
+				"radionMET_dPhi_Arr": "Radion_MET_DeltaPhi_Mass_" + mass + "-" + trigger_name, "leadingHiggs_Rad_dR_Arr": "LeadingHiggs_Radion_DeltaR_Mass_" + mass + "-" + trigger_name, 
+				"subleadingHiggs_Rad_dR_Arr": "SubLeadingHiggs_Radion_DeltaR_Mass_" + mass + "-" + trigger_name, 
+				"leadingHiggs_MET_dPhi_Arr": "LeadingHiggs_MET_DeltaPhi_Mass_" + mass + "-" + trigger_name, 
+				"subleadingHiggs_MET_dPhi_Arr": "SubLeadingHiggs_MET_DeltaPhi_Mass_" + mass + "-" + trigger_name, "Radion_eta_Arr": "Radion_eta_Mass_" + mass + "-" + trigger_name,
+				"Radion_Charge_Arr": "Radion_Charge_Mass" + mass + "-" + trigger_name
 			}
 			
 			fourtau_out = iterative_runner(file_dict, treename="4tau_tree", processor_instance=FourTauPlotting(trigger_bit=trigger_pair[0], or_trigger=trigger_pair[1]))
@@ -1461,27 +1627,36 @@ if __name__ == "__main__":
 				fig0,ax0 = plt.subplots()
 				if (hist_name != "Pair_DeltaPhi_Hist" and hist_name != "RadionPTComp_Hist"):
 					hist_dict_only_signal = {
-						"FourTau_Mass_Arr": hist.Hist.new.Regular(20,0,3000, label = r"$m_{4\tau}$ [GeV]").Double(),
-						"HiggsDeltaPhi_Arr": hist.Hist.new.Regular(20,-pi,pi, label = r"Higgs $\Delta \phi$").Double(), 
-						"Higgs_DeltaR_Arr": hist.Hist.new.Regular(20,0,5, label = r"Higgs $\Delta$R").Double(),
-						"leading_dR_Arr": hist.Hist.new.Regular(20,0,5, label = r"Leading di-$\tau$ $\Delta$R").Double(),
-						"subleading_dR_Arr": hist.Hist.new.Regular(20,0,5, label = r"Sub-leading di-$\tau$ $\Delta$R").Double(),
-						"LeadingHiggs_mass" : hist.Hist.new.Regular(20,0,120, label=r"Leading Higgs Mass (GeV)").Double(),
-						"SubLeadingHiggs_mass" : hist.Hist.new.Regular(20,0,120, label=r"Sub-Leading Higgs Mass (GeV)").Double(),
-						"radionPT_Arr" : hist.Hist.new.Regular(20,0,500, label=r"Radion $p_T$ (GeV)").Double(),
-						"tau_pt_Arr": hist.Hist.new.Regular(20,0,400, label=r"$\tau$ $p_T$ (GeV)").Double(),
-						"tau_eta_Arr": hist.Hist.new.Regular(20,-5,5, label = r"$\tau \ \eta$").Double(),
+						"FourTau_Mass_Arr": hist.Hist.new.Regular(N1,0,3000, label = r"$m_{4\tau}$ [GeV]").Double(),
+						"HiggsDeltaPhi_Arr": hist.Hist.new.Regular(N1,-pi,pi, label = r"Higgs $\Delta \phi$").Double(), 
+						"Higgs_DeltaR_Arr": hist.Hist.new.Regular(N1,0,5, label = r"Higgs $\Delta$R").Double(),
+						"leading_dR_Arr": hist.Hist.new.Regular(N1,0,5, label = r"Leading di-$\tau$ $\Delta$R").Double(),
+						"subleading_dR_Arr": hist.Hist.new.Regular(N1,0,5, label = r"Sub-leading di-$\tau$ $\Delta$R").Double(),
+						"LeadingHiggs_mass" : hist.Hist.new.Regular(N2,0,120, label=r"Leading Higgs Mass (GeV)").Double(),
+						"SubLeadingHiggs_mass" : hist.Hist.new.Regular(N2,0,120, label=r"Sub-Leading Higgs Mass (GeV)").Double(),
+						"radionPT_Arr" : hist.Hist.new.Regular(N1,0,500, label=r"Radion $p_T$ (GeV)").Double(),
+						"tau_pt_Arr": hist.Hist.new.Regular(N1,0,400, label=r"$\tau$ $p_T$ (GeV)").Double(),
+						"tau_eta_Arr": hist.Hist.new.Regular(N1,-5,5, label = r"$\tau \ \eta$").Double(),
 						"ZMult_Arr": hist.Hist.new.Regular(6,0,6, label = r"Z Boson Multiplicity").Double(),
 						"ZMult_ele_Arr": hist.Hist.new.Regular(6,0,6, label = r"Z Boson Multiplicity (electrons only)").Double(),
 						"ZMult_mu_Arr": hist.Hist.new.Regular(6,0,6, label = r"Z Boson Multiplicity (muons only)").Double(),
 						"ZMult_tau_Arr": hist.Hist.new.Regular(6,0,6, label = r"Z Boson Multiplicity (from taus)").Double(),
 						"BJet_Arr": hist.Hist.new.Regular(6,0,6, label = r"BJet Multiplicity").Double(),
-						"tau_lead_pt_Arr" : hist.Hist.new.Regular(20,0,200, label=r"Leading $\tau$ $p_T$ (GeV)").Double(),
-						"tau_sublead_pt_Arr" : hist.Hist.new.Regular(20,0,200, label=r"Subleading $\tau$ $p_T$ (GeV)").Double(),
-						"tau_3rdlead_pt_Arr" : hist.Hist.new.Regular(20,0,200, label=r"Third leading $\tau$ $p_T$ (GeV)").Double(),
-						"tau_4thlead_pt_Arr" : hist.Hist.new.Regular(20,0,200, label=r"Fourht leading $\tau$ $p_T$ (GeV)").Double(),
+						"tau_lead_pt_Arr" : hist.Hist.new.Regular(N1,0,200, label=r"Leading $\tau$ $p_T$ (GeV)").Double(),
+						"tau_sublead_pt_Arr" : hist.Hist.new.Regular(N1,0,200, label=r"Subleading $\tau$ $p_T$ (GeV)").Double(),
+						"tau_3rdlead_pt_Arr" : hist.Hist.new.Regular(N1,0,200, label=r"Third leading $\tau$ $p_T$ (GeV)").Double(),
+						"tau_4thlead_pt_Arr" : hist.Hist.new.Regular(N1,0,200, label=r"Fourth leading $\tau$ $p_T$ (GeV)").Double(),
+						"leading_dPhi_Arr": hist.Hist.new.Regular(N1,-pi,pi, label = r"Leading di-$\tau$ $\Delta \phi$").Double(), 
+						"subleading_dPhi_Arr": hist.Hist.new.Regular(N1,-pi,pi, label = r"Subleading di-$\tau$ $\Delta \phi$").Double(), 
+						"radionMET_dPhi_Arr": hist.Hist.new.Regular(N1,-pi,pi, label = r"Radion MET $\Delta \phi$").Double(), 
+						"leadingHiggs_Rad_dR_Arr": hist.Hist.new.Regular(N1,0,5, label = r"Leading Higgs Radion $\Delta$R").Double(),
+						"subleadingHiggs_Rad_dR_Arr": hist.Hist.new.Regular(N1,0,5, label = r"Subleading Higgs Radion $\Delta$R").Double(),
+						"leadingHiggs_MET_dPhi_Arr": hist.Hist.new.Regular(N1,-pi,pi, label = r"Leading Higgs MET $\Delta R$").Double(), 
+						"subleadingHiggs_MET_dPhi_Arr": hist.Hist.new.Regular(N1,-pi,pi, label = r"Subleading Higgs MET $\Delta R$").Double(),
+						"Radion_eta_Arr": hist.Hist.new.Regular(N1,-5,5, label = r"Radion $\eta$").Double(),
+						"Radion_Charge_Arr": hist.Hist.new.Regular(10,-5,5,label = r"Radion Electric Charge").Double(),
 					}
-					hist_dict_only_signal[hist_name].fill(fourtau_out["Signal"][hist_name],fourtau_out["Signal"]["Weight"])
+					hist_dict_only_signal[hist_name].fill(fourtau_out["Signal"][hist_name],weight = fourtau_out["Signal"]["Weight"])
 					hist_dict_only_signal[hist_name].plot1d(ax=ax0)
 					plt.title("Signal Mass: " + mass[0] + "TeV")
 					plt.savefig("SignalSingle" + four_tau_names[hist_name])
@@ -1490,25 +1665,34 @@ if __name__ == "__main__":
 				if (hist_name != "Pair_DeltaPhi_Hist" and hist_name != "RadionPTComp_Hist"):
 					for background_type in background_list:
 						hist_dict_single_background = {
-							"FourTau_Mass_Arr": hist.Hist.new.Regular(20,0,3000, label = r"$m_{4\tau}$ [GeV]").Double(),
-							"HiggsDeltaPhi_Arr": hist.Hist.new.Regular(20,-pi,pi, label = r"Higgs $\Delta \phi$").Double(), 
-							"Higgs_DeltaR_Arr": hist.Hist.new.Regular(20,0,5, label = r"Higgs $\Delta$R").Double(),
-							"leading_dR_Arr": hist.Hist.new.Regular(20,0,5, label = r"Leading di-$\tau$ $\Delta$R").Double(),
-							"subleading_dR_Arr": hist.Hist.new.Regular(20,0,5, label = r"Sub-leading di-$\tau$ $\Delta$R").Double(),
-							"LeadingHiggs_mass" : hist.Hist.new.Regular(20,0,120, label=r"Leading Higgs Mass (GeV)").Double(),
-							"SubLeadingHiggs_mass" : hist.Hist.new.Regular(20,0,120, label=r"Sub-Leading Higgs Mass (GeV)").Double(),
-							"radionPT_Arr" : hist.Hist.new.Regular(20,0,200, label=r"Radion $p_T$ (GeV)").Double(),
-							"tau_pt_Arr": hist.Hist.new.Regular(20,0,400, label=r"$\tau$ $p_T$ (GeV)").Double(),
-							"tau_eta_Arr": hist.Hist.new.Regular(20,-5,5, label = r"$\tau \ \eta$").Double(),
+							"FourTau_Mass_Arr": hist.Hist.new.Regular(N1,0,3000, label = r"$m_{4\tau}$ [GeV]").Double(),
+							"HiggsDeltaPhi_Arr": hist.Hist.new.Regular(N1,-pi,pi, label = r"Higgs $\Delta \phi$").Double(), 
+							"Higgs_DeltaR_Arr": hist.Hist.new.Regular(N1,0,5, label = r"Higgs $\Delta$R").Double(),
+							"leading_dR_Arr": hist.Hist.new.Regular(N1,0,5, label = r"Leading di-$\tau$ $\Delta$R").Double(),
+							"subleading_dR_Arr": hist.Hist.new.Regular(N1,0,5, label = r"Sub-leading di-$\tau$ $\Delta$R").Double(),
+							"LeadingHiggs_mass" : hist.Hist.new.Regular(N2,0,120, label=r"Leading Higgs Mass (GeV)").Double(),
+							"SubLeadingHiggs_mass" : hist.Hist.new.Regular(N2,0,120, label=r"Sub-Leading Higgs Mass (GeV)").Double(),
+							"radionPT_Arr" : hist.Hist.new.Regular(N1,0,200, label=r"Radion $p_T$ (GeV)").Double(),
+							"tau_pt_Arr": hist.Hist.new.Regular(N1,0,400, label=r"$\tau$ $p_T$ (GeV)").Double(),
+							"tau_eta_Arr": hist.Hist.new.Regular(N1,-5,5, label = r"$\tau \ \eta$").Double(),
 							"ZMult_Arr": hist.Hist.new.Regular(6,0,6, label = r"Z Boson Multiplicity").Double(),
 							"ZMult_ele_Arr": hist.Hist.new.Regular(6,0,6, label = r"Z Boson Multiplicity (electrons only)").Double(),
 							"ZMult_mu_Arr": hist.Hist.new.Regular(6,0,6, label = r"Z Boson Multiplicity (muons only)").Double(),
 							"ZMult_tau_Arr": hist.Hist.new.Regular(6,0,6, label = r"Z Boson Multiplicity (from taus)").Double(),
 							"BJet_Arr": hist.Hist.new.Regular(6,0,6, label = r"BJet Multiplicity").Double(),
-							"tau_lead_pt_Arr" : hist.Hist.new.Regular(20,0,200, label=r"Leading $\tau$ $p_T$ (GeV)").Double(),
-							"tau_sublead_pt_Arr" : hist.Hist.new.Regular(20,0,200, label=r"Subleading $\tau$ $p_T$ (GeV)").Double(),
-							"tau_3rdlead_pt_Arr" : hist.Hist.new.Regular(20,0,200, label=r"Third leading $\tau$ $p_T$ (GeV)").Double(),
-							"tau_4thlead_pt_Arr" : hist.Hist.new.Regular(20,0,200, label=r"Fourth leading $\tau$ $p_T$ (GeV)").Double(),
+							"tau_lead_pt_Arr" : hist.Hist.new.Regular(N1,0,200, label=r"Leading $\tau$ $p_T$ (GeV)").Double(),
+							"tau_sublead_pt_Arr" : hist.Hist.new.Regular(N1,0,200, label=r"Subleading $\tau$ $p_T$ (GeV)").Double(),
+							"tau_3rdlead_pt_Arr" : hist.Hist.new.Regular(N1,0,200, label=r"Third leading $\tau$ $p_T$ (GeV)").Double(),
+							"tau_4thlead_pt_Arr" : hist.Hist.new.Regular(N1,0,200, label=r"Fourth leading $\tau$ $p_T$ (GeV)").Double(),
+							"leading_dPhi_Arr": hist.Hist.new.Regular(N1,-pi,pi, label = r"Leading di-$\tau$ $\Delta \phi$").Double(), 
+							"subleading_dPhi_Arr": hist.Hist.new.Regular(N1,-pi,pi, label = r"Subleading di-$\tau$ $\Delta \phi$").Double(), 
+							"radionMET_dPhi_Arr": hist.Hist.new.Regular(N1,-pi,pi, label = r"Radion MET $\Delta \phi$").Double(), 
+							"leadingHiggs_Rad_dR_Arr": hist.Hist.new.Regular(N1,0,5, label = r"Leading Higgs Radion $\Delta$R").Double(),
+							"subleadingHiggs_Rad_dR_Arr": hist.Hist.new.Regular(N1,0,5, label = r"Subleading Higgs Radion $\Delta$R").Double(),
+							"leadingHiggs_MET_dPhi_Arr": hist.Hist.new.Regular(N1,-pi,pi, label = r"Leading Higgs MET $\Delta R$").Double(), 
+							"subleadingHiggs_MET_dPhi_Arr": hist.Hist.new.Regular(N1,-pi,pi, label = r"Subleading Higgs MET $\Delta R$").Double(),
+							"Radion_eta_Arr": hist.Hist.new.Regular(N1,-5,5, label = r"Radion $\eta$").Double(),
+							"Radion_Charge_Arr": hist.Hist.new.Regular(10,-5,5,label = r"Radion Electric Charge").Double()
 						}
 						background_array = []
 						backgrounds = background_dict[background_type]
@@ -1516,40 +1700,57 @@ if __name__ == "__main__":
 						#Loop over all backgrounds
 						for background in backgrounds:
 							if (mass == "2000"): #Only need to generate single background once
+								if (hist_name == "Radion_CHarge_Arr"):
+									lumi_table_data["MC Sample"].append(background)
+									lumi_table_data["Luminosity"].append(fourtau_out[background]["Lumi_Val"])
+									lumi_table_data["Cross Section (pb)"].append(fourtau_out[background]["CrossSec_Val"])
+									lumi_table_data["Number of Events"].append(fourtau_out[background]["NEvent_Val"])
+									lumi_table_data["Calculated Weight"].append(fourtau_out[background]["Weight_Val"])
 								fig2, ax2 = plt.subplots()
-								hist_dict_single_background[hist_name].fill(fourtau_out[background][hist_name],fourtau_out[background]["Weight"]) #Obtain background distributions 
+								hist_dict_single_background[hist_name].fill(fourtau_out[background][hist_name],weight = fourtau_out[background]["Weight"]) #Obtain background distributions 
 								hist_dict_single_background[hist_name].plot1d(ax=ax2)
 								plt.title(background_type)
 								plt.savefig("SingleBackground" + background_plot_names[background_type] + four_tau_names[hist_name])
 								plt.close()
-							#if ((background_type == r"$t\bar{t}$" or background_type == "Drell-Yan+Jets" or background_type == r"$ZZ \rightarrow 4l$") and hist_name == "LeadingHiggs_mass"):
-								#print("!!!====================Debugging di-tau masses of %s====================!!!"%background_type)
-								#zeroMassCounter = 0
-								#firstbin_count = 0
-								#for ditau_mass in fourtau_out[background][hist_name]:
-								#	if (ditau_mass == 0):
-								#		zeroMassCounter += 1
-								#	if (ditau_mass >= 0 and ditau_mass <= 10):
-								#		firstbin_count += 1
-								#		print(ditau_mass)
-								#print("# of entries with 0 mass: %d"%zeroMassCounter)
-								#print("# of entries in first bin: %d"%firstbin_count)
-								
-							hist_dict_background[hist_name].fill(background_type,fourtau_out[background][hist_name],fourtau_out[background]["Weight"]) #Obtain background distributions
+								#if ((background_type == r"$t\bar{t}$" or background_type == "Drell-Yan+Jets" or background_type == r"$ZZ \rightarrow 4l$") and hist_name == "LeadingHiggs_mass"):
+									#print("!!!====================Debugging di-tau masses of %s====================!!!"%background_type)
+									#zeroMassCounter = 0
+									#firstbin_count = 0
+									#for ditau_mass in fourtau_out[background][hist_name]:
+									#	if (ditau_mass == 0):
+									#		zeroMassCounter += 1
+									#	if (ditau_mass >= 0 and ditau_mass <= 10):
+									#		firstbin_count += 1
+									#		print(ditau_mass)
+									#print("# of entries with 0 mass: %d"%zeroMassCounter)
+									#print("# of entries in first bin: %d"%firstbin_count)
+							
+							#Could there be issues here in terms of how the backgrounds are being combined???
+							hist_dict_background[hist_name].fill(background_type,fourtau_out[background][hist_name],weight = fourtau_out[background]["Weight"]) #Obtain background distributions
+							print("Background %s added"%background)
 							
 					
-					hist_dict_signal[hist_name].fill("Signal",fourtau_out["Signal"][hist_name],fourtau_out["Signal"]["Weight"]) #Obtain signal distribution
+					hist_dict_signal[hist_name].fill("Signal",fourtau_out["Signal"][hist_name],weight = fourtau_out["Signal"]["Weight"]) #Obtain signal distribution
 					
 					#Obtain data distributions
 					print("==================Hist %s================"%hist_name)
 					#print("Total amount of data = %d"%(len(fourtau_out["Data_SingleMuon"][hist_name]) + len(fourtau_out["Data_JetHT"][hist_name])))
 					#print("Total amount of data = %d"%(len(fourtau_out["Data_SingleMuon"][hist_name])))
 					#print("Total amount of data = %d"%(len(fourtau_out["Data_JetHT"][hist_name])))
-					hist_dict_data[hist_name].fill("Data",fourtau_out["Data_SingleMuon"][hist_name]) 
-					hist_dict_data[hist_name].fill("Data",fourtau_out["Data_JetHT"][hist_name]) 
+					if (trigger_name == "Mu50"):
+						print("Mu50 Only")
+						hist_dict_data[hist_name].fill("Data",fourtau_out["Data_SingleMuon"][hist_name]) 
+					if (trigger_name == "PFHT500_PFMET100_PFMHT100_IDTight"):
+						print("JetHTMHTMET Only")
+						hist_dict_data[hist_name].fill("Data",fourtau_out["Data_JetHT"][hist_name]) 
+					if (trigger_name == "EitherOr_Trigger"):
+						print("Both Triggers")
+						hist_dict_data[hist_name].fill("Data",fourtau_out["Data_SingleMuon"][hist_name]) 
+						hist_dict_data[hist_name].fill("Data",fourtau_out["Data_JetHT"][hist_name]) 
+
 					#print("Number of Jet HT entries: %d"%len(fourtau_out["Data_JetHT"][hist_name]))
 					
-					#Put histograms into stacks and arrays for plotting purposes
+					#Put histograms into stacks and arrays for plotting purposes (is the issue arising here??)
 					background_stack = hist_dict_background[hist_name].stack("background")
 					signal_stack = hist_dict_signal[hist_name].stack("signal")
 					data_stack = hist_dict_data[hist_name].stack("data")
@@ -1562,10 +1763,20 @@ if __name__ == "__main__":
 					fig,ax = plt.subplots()
 					hep.histplot(background_array,ax=ax,stack=True,histtype="fill",label=background_list)
 					hep.histplot(signal_array,ax=ax,stack=True,histtype="step",label=signal_list)
-					hep.histplot(data_array,ax=ax,stack=False,histtype="errorbar", yerr=False,label=["Data"],marker="o")
+					hep.histplot(data_array,ax=ax,stack=False,histtype="errorbar", yerr=False,label=["Data"],marker="o",color = "k") #,facecolor='black',edgecolor='black') #,mec='k')
 					hep.cms.text("Preliminary",loc=0,fontsize=13)
 					ax.set_title(hist_name_dict[hist_name],loc = "right")
 					ax.legend(fontsize=10, loc='upper right')
 					plt.savefig(four_tau_names[hist_name])
 					plt.close()
-
+	
+	#Store luminosity Weighting debugging table
+	#fig, ax = plt.subplots()
+	#fig.patch.set_visible(False)
+	#ax.axis('off')
+	#ax.axis('tight')
+	#lumi_frame = pd.DataFrame(lumi_table_data)
+	#lumi_frame.to_csv("Lumi_Weight_Table_Debugging.csv", sep='\t')
+	#outTable = ax.table(cellText=lumi_frame.values, colLabels=lumi_frame.columns, loc='center', cellLoc='center')	
+	
+	
