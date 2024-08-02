@@ -13,6 +13,7 @@ import numba
 import pandas as pd
 from matplotlib.backends.backend_pdf import PdfPages
 import vector
+import os
 vector.register_awkward()
 
 hep.style.use(hep.style.CMS)
@@ -1147,48 +1148,7 @@ class FourTauPlotting(processor.ProcessorABC):
 		event_level["ZMult_e"] = electron_ZMult
 		event_level["ZMult_mu"] = muon_ZMult
 
-
-		
-		#Construct all possible valid ditau pairs
 		tau = tau[ak.num(tau,axis=1) > 0] #Handle empty arrays left by the trigger
-		#for t in tau:
-		#	print(t.eta)
-		#	if len(t) != 4:
-		#		print("Event does not have 4 events")
-
-		#tau_plus = tau[tau.charge > 0]		
-		#tau_minus = tau[tau.charge < 0]
-		#tau_plus1, tau_plus2 = ak.unzip(ak.combinations(tau_plus,2))
-		#tau_minus1, tau_minus2 = ak.unzip(ak.combinations(tau_minus,2))
-
-		#if (self.isData):
-		#print(tau_plus1.eta)
-		#print(tau_plus2.eta)
-		#print(tau_minus1.eta)
-		#print(tau_minus2.eta)
-
-		#Get leading, subleading and fourth leading taus
-		##leading_tau = tau[:,0]
-		#subleading_tau = tau[:,1]
-		#thirdleading_tau = tau[:,2]
-		#fourthleading_tau = tau[:,3]
-		
-		#deltaR11 = deltaR(tau_plus1, tau_minus1)
-		#deltaR12 = deltaR(tau_plus1, tau_minus2)
-		#deltaR22 = deltaR(tau_plus2, tau_minus2)
-		#deltaR21 = deltaR(tau_plus2, tau_minus1)
-
-		#radionPT = np.sqrt((np.array(leading_tau.Px) + np.array(subleading_tau.Px) + np.array(thirdleading_tau.Px) + np.array(fourthleading_tau.Px))**2 + (np.array(leading_tau.Py) + np.array(subleading_tau.Py) + np.array(thirdleading_tau.Py) + np.array(fourthleading_tau.Py))**2) 
-		
-		#Construct each Higgs' transverse momenta
-		#lead_cond1 = np.bitwise_and(tau_plus1.pt > tau_minus1.pt, deltaR11 < deltaR12)
-		#lead_cond2 = np.bitwise_and(tau_plus1.pt > tau_minus1.pt, deltaR12 < deltaR11)
-		#lead_cond3 = np.bitwise_and(tau_plus1.pt < tau_minus1.pt, deltaR11 < deltaR21)
-		#lead_cond4 = np.bitwise_and(tau_plus1.pt < tau_minus1.pt, deltaR21 < deltaR11)
-		
-		#PxLeading = np.append(ak.ravel(tau_plus1[lead_cond1].Px + tau_minus1[lead_cond1].Px),ak.ravel(tau_plus1[lead_cond2].Px + tau_minus2[lead_cond2].Px))
-		#PxLeading = np.append(PxLeading,ak.ravel(tau_plus1[lead_cond3].Px + tau_minus1[lead_cond3].Px))
-		#PxLeading = np.append(PxLeading,ak.ravel(tau_plus2[lead_cond4].Px + tau_minus1[lead_cond4].Px))
 		
 		#Get the leading Higgs 4-momenta
 		PxLeading = tau[:,0].Px + tau[:,1].Px
@@ -1245,6 +1205,8 @@ class FourTauPlotting(processor.ProcessorABC):
 		Radion_Reco["phi"] = ak.from_iter(np.arctan2(Radion_Reco.Py,Radion_Reco.Px))
 		Radion_Reco["eta"] = Radion_4Vec.eta #ak.from_iter(np.arcsinh(Radion_Reco.Pz)/np.sqrt(Radion_Reco.Px**2 + Radion_Reco.Py**2 + Radion_Reco.Pz**2))
 		event_level["Radion_Charge"] = tau[:,0].charge + tau[:,1].charge + tau[:,2].charge + tau[:,3].charge
+		event_level["LeadingHiggs_Charge"] = tau[:,0].charge + tau[:,1].charge
+		event_level["SubleadingHiggs_Charge"] = tau[:,2].charge + tau[:,3].charge
 		
 		if (len(Higgs_Leading.eta) != 0):
 			#print("Mass Reconstructed")
@@ -1269,17 +1231,6 @@ class FourTauPlotting(processor.ProcessorABC):
 			subleadingHiggs_Rad_dR = np.array([])
 			leadingHiggs_MET_dPhi_Arr = np.array([])
 			subleadingHiggs_MET_dPhi_Arr = np.array([])
-
-		#Look at individual pair delta Phi
-		#TauDeltaPhi_all_hist.fill("Leading pair", ak.ravel((tau_plus1[lead_cond1].phi - tau_minus1[lead_cond1].phi + np.pi) % (2 * np.pi) - np.pi))	
-		#TauDeltaPhi_all_hist.fill("Subleading pair", ak.ravel((tau_plus2[lead_cond1].phi - tau_minus2[lead_cond1].phi + np.pi) % (2 * np.pi) - np.pi))	
-		#TauDeltaPhi_all_hist.fill("Leading pair", ak.ravel((tau_plus1[lead_cond2].phi - tau_minus2[lead_cond2].phi + np.pi) % (2 * np.pi) - np.pi))	
-		#TauDeltaPhi_all_hist.fill("Subleading pair", ak.ravel((tau_plus2[lead_cond2].phi - tau_minus1[lead_cond2].phi + np.pi) % (2 * np.pi) - np.pi))	
-		#TauDeltaPhi_all_hist.fill("Leading pair", ak.ravel((tau_plus1[lead_cond3].phi - tau_minus1[lead_cond3].phi + np.pi) % (2 * np.pi) - np.pi))	
-		#TauDeltaPhi_all_hist.fill("Subleading pair", ak.ravel((tau_plus2[lead_cond3].phi - tau_minus2[lead_cond3].phi + np.pi) % (2 * np.pi) - np.pi))	
-		#TauDeltaPhi_all_hist.fill("Leading pair", ak.ravel((tau_plus2[lead_cond4].phi - tau_minus1[lead_cond4].phi + np.pi) % (2 * np.pi) - np.pi))	
-		#TauDeltaPhi_all_hist.fill("Subleading pair", ak.ravel((tau_plus1[lead_cond4].phi - tau_minus2[lead_cond4].phi + np.pi) % (2 * np.pi) - np.pi))	
-
 		
 		#Fill Higgs Delta Phi
 		phi_leading = np.arctan2(PyLeading,PxLeading)
@@ -1316,6 +1267,41 @@ class FourTauPlotting(processor.ProcessorABC):
 		ind_event_weight = 1
 		if not(self.isData):
 			ind_event_weight = ak.prod(event_level.event_weight,axis=0)
+		
+		#Store data for NN as parquet file
+		var_nn = ak.zip(
+			{
+				"radion_pt": radionPT_Arr,
+				"vis_mass": LeadingHiggs_mass_Arr,
+				"vis_mass2": SubLeadingHiggs_mass_Arr,
+				"radion_eta": Radion_Reco.eta,
+				"higgs1_dr": leading_dR_Arr,
+				"higgs2_dr": subleading_dR_Arr,
+				"dphi_H1": phi_leading,
+				"dphi_H2": phi_subleading,
+				"dphi_H1_MET": leadingHiggs_MET_dPhi_Arr,
+				"dphi_H2_MET": subleadingHiggs_MET_dPhi_Arr,
+				"dr_HH": Higgs_DeltaPhi_Arr,
+				"dphi_HH": Higgs_DeltaPhi_Arr,
+				"dr_H1_Rad": leadingHiggs_MET_dPhi_Arr,
+				"dr_H2_Rad": subleadingHiggs_Rad_dR,
+				"dphi_rad_MET": radionMET_dPhi,
+				"H2OS": event_level.LeadingHiggs_Charge,
+				"H1OS": event_level.SubleadingHiggs_Charge,
+				"numBJet": event_level.nBJets,
+				"weight": event_level.event_weight*weight_Val,
+				}
+			)
+		file_name = (dataset + ".parquet")
+		if not(self.isData):
+			ak.to_parquet(var_nn,file_name)
+		else:
+			if (os.path.isfile(file_name)): #Append to existing parquet file
+				file_data = ak.from_parquet(file_name)
+				var_nn = ak.concatenate([file_data,var_nn])
+				ak.to_parquet(var_nn,file_name)
+			else:
+				ak.to_parquet(var_nn,file_name) #Create parquet file
 
 		
 		return{
@@ -1372,11 +1358,11 @@ if __name__ == "__main__":
 	#Trigger dictionaries
 	#trigger_dict = {"Mu50": (21,False), "PFMET120_PFMHT120_IDTight": (27,False), "EitherOr_Trigger": (41,True)}
 	#trigger_dict = {"Mu50": (21,False), "PFMET120_PFMHT120_IDTight": (27,False), "EitherOr_Trigger": (41,True)}
-	#trigger_dict = {"EitherOr_Trigger": (41,True)}
+	trigger_dict = {"EitherOr_Trigger": (41,True)}
 	#trigger_dict = {"Mu50": (21,False)}
 	#trigger_dict = {"PFHT500_PFMET100_PFMHT100_IDTight": (39,False)} #,"EitherOr_Trigger": (41,True)}
 	#trigger_dict = {"Mu50": (21,False), "EitherOr_Trigger": (41,True)}
-	trigger_dict = {"Mu50": (21,False), "PFHT500_PFMET100_PFMHT100_IDTight": (39,False), "EitherOr_Trigger": (41,True)}
+	#trigger_dict = {"Mu50": (21,False), "PFHT500_PFMET100_PFMHT100_IDTight": (39,False), "EitherOr_Trigger": (41,True)}
 	#trigger_dict = {"Mu50": (21,False), "PFHT500_PFMET100_PFMHT100_IDTight": (39,False)} #,"EitherOr_Trigger": (41,True)}
 	#trigger_dict = {"No_Trigger": (0,False)}
 	#trigger_dict = {"PFHT500_PFMET100_PFMHT100_IDTight": (39,False), "AK8PFJet400_TrimMass30": (40,False), "EitherOr_Trigger": (41,True)}

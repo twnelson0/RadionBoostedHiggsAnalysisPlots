@@ -155,10 +155,10 @@ cython_debug/
 # Plots and data
 *.png
 *.root
+*.parquet
 
 #Singularity files
 shell
-
 nohup.out
 
 # PyCharm
