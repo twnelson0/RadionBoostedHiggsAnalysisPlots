@@ -153,7 +153,7 @@ def find_Z_Candidates(event_leptons, builder):
 	
 
 class FourTauPlotting(processor.ProcessorABC):
-	def __init__(self, trigger_bit, trigger_cut = True, offline_cut = False, or_trigger = False, PUWeights = None, PU_weight_bool = False):
+	def __init__(self, trigger_bit, trigger_cut = True, offline_cut = False, or_trigger = False, PUWeights = None, PU_weight_bool = False, signal_mass = ""):
 		self.trigger_bit = trigger_bit
 		self.offline_cut = offline_cut
 		self.trigger_cut = trigger_cut
@@ -161,6 +161,7 @@ class FourTauPlotting(processor.ProcessorABC):
 		self.isData = False #Default assumption is running on MC
 		self.PU_bool = PU_weight_bool
 		self.PUWeights = PUWeights
+		self.massVal = signal_mass
 		#pass
 
 	def process(self, events):
@@ -1286,16 +1287,18 @@ class FourTauPlotting(processor.ProcessorABC):
 				"dr_H1_Rad": leadingHiggs_MET_dPhi_Arr,
 				"dr_H2_Rad": subleadingHiggs_Rad_dR,
 				"dphi_rad_MET": radionMET_dPhi,
-				"H2OS": event_level.LeadingHiggs_Charge,
-				"H1OS": event_level.SubleadingHiggs_Charge,
+				"H1OS": event_level.LeadingHiggs_Charge,
+				"H2OS": event_level.SubleadingHiggs_Charge,
 				"numBJet": event_level.nBJets,
 				"weight": event_level.event_weight*weight_Val,
 				}
 			)
-		file_name = (dataset + ".parquet")
+
 		if not(self.isData):
+			file_name = (dataset + ".parquet")
 			ak.to_parquet(var_nn,file_name)
 		else:
+			file_name = (dataset + "mass_" + self.massVal + "GeV.parquet")
 			if (os.path.isfile(file_name)): #Append to existing parquet file
 				file_data = ak.from_parquet(file_name)
 				var_nn = ak.concatenate([file_data,var_nn])
@@ -1316,6 +1319,8 @@ class FourTauPlotting(processor.ProcessorABC):
 				"Higgs_DeltaR_Arr": ak.to_list(diHiggs_dR_Arr),
 				"leading_dR_Arr": ak.to_list(leading_dR_Arr),
 				"subleading_dR_Arr": ak.to_list(subleading_dR_Arr),
+				"LeadingHiggsSgn_Arr" : ak.to_list(event_level.LeadingHiggs_Charge),
+				"SubleadingHiggsSgn_Arr" : ak.to_list(event_level.SubleadingHiggs_Charge),
 				
 				"leading_dPhi_Arr": ak.to_list(leading_dPhi_Arr),
 				"subleading_dPhi_Arr": ak.to_list(subleading_dPhi_Arr),
@@ -1390,7 +1395,9 @@ if __name__ == "__main__":
 	#		"radionMET_dPhi_Arr","leadingHiggs_Rad_dR_Arr","subleadingHiggs_Rad_dR_Arr","leadingHiggs_MET_dPhi_Arr","subleadingHiggs_MET_dPhi_Arr","Radion_eta_Arr", "Radion_Charge_Arr"]
 	four_tau_hist_list = ["FourTau_Mass_Arr","HiggsDeltaPhi_Arr", "Higgs_DeltaR_Arr","leading_dR_Arr","subleading_dR_Arr","LeadingHiggs_mass","SubLeadingHiggs_mass", "radionPT_Arr", 
 			"ZMult_Arr", "BJet_Arr", "tau_lead_pt_Arr", "tau_sublead_pt_Arr", "tau_3rdlead_pt_Arr", "tau_4thlead_pt_Arr", "leading_dPhi_Arr", "subleading_dPhi_Arr", 
-			"radionMET_dPhi_Arr","leadingHiggs_Rad_dR_Arr","subleadingHiggs_Rad_dR_Arr","leadingHiggs_MET_dPhi_Arr","subleadingHiggs_MET_dPhi_Arr","Radion_eta_Arr", "Radion_Charge_Arr"]
+			"radionMET_dPhi_Arr","leadingHiggs_Rad_dR_Arr","subleadingHiggs_Rad_dR_Arr","leadingHiggs_MET_dPhi_Arr","subleadingHiggs_MET_dPhi_Arr","Radion_eta_Arr", "Radion_Charge_Arr",
+			"LeadingHiggsSgn_Arr", "SubleadingHiggsSgn_Arr"]
+	#four_tau_hist_list = ["Radion_Charge_Arr"]
 	#four_tau_hist_list = ["ZMult_Arr","ZMult_ele_Arr","ZMult_mu_Arr", "ZMult_tau_Arr"]
 	#four_tau_hist_list = ["LeadingHiggs_mass"] #Only make 1 histogram for brevity/debugging purposes
 	hist_name_dict = {"FourTau_Mass_Arr": r"Reconstructed 4-$\tau$ invariant mass", "HiggsDeltaPhi_Arr": r"Reconstructed Higgs $\Delta \phi$", "Higgs_DeltaR_Arr": r"Reconstructed Higgs $\Delta R$",
@@ -1403,7 +1410,7 @@ if __name__ == "__main__":
 					"radionMET_dPhi_Arr": r"Radion MET $\Delta \phi$", "leadingHiggs_Rad_dR_Arr": r"Leading Higgs Radion $\Delta$R", 
 					"subleadingHiggs_Rad_dR_Arr": r"Subleading Higgs Radion $\Delta$R", "leadingHiggs_MET_dPhi_Arr": r"Leading Higgs MET $\Delta \phi$", 
 					"subleadingHiggs_MET_dPhi_Arr": r"Subleading Higgs MET $\Delta \phi$", "Radion_eta_Arr": r"Radion $\eta$", "Radion_Charge_Arr": r"Radion Charge"}
-	#four_tau_hist_list = ["HiggsDeltaPhi_Arr","Pair_DeltaPhi_Hist"]
+    #four_tau_hist_list = ["HiggsDeltaPhi_Arr","Pair_DeltaPhi_Hist"]
 
 	#Get PU Weighting information
 	PUWeight = np.array([])
@@ -1526,6 +1533,8 @@ if __name__ == "__main__":
 				"subleadingHiggs_MET_dPhi_Arr": hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name="background").Reg(N1,-pi,pi, label = r"Subleading Higgs MET $\Delta \phi$").Double(),
 				"Radion_eta_Arr": hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name="background").Reg(N1,-5,5, label = r"Radion $\eta$").Double(),
 				"Radion_Charge_Arr": hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name = "background").Reg(10,-5,5,label = r"Radion Electric Charge").Double(),
+				"LeadingHiggsSgn_Arr": hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name = "background").Reg(8,-4,4,label = r"Leading Higgs Electric Charge").Double(),
+				"SubleadingHiggsSgn_Arr": hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name = "background").Reg(8,-4,4,label = r"Subleading Higgs Electric Charge").Double(),
 
 			}
 			
@@ -1557,7 +1566,9 @@ if __name__ == "__main__":
 				"leadingHiggs_MET_dPhi_Arr": hist.Hist.new.StrCat(["Signal"],name="signal").Reg(N1,-pi,pi, label = r"Leading Higgs MET $\Delta \phi$").Double(), 
 				"subleadingHiggs_MET_dPhi_Arr": hist.Hist.new.StrCat(["Signal"],name="signal").Reg(N1,-pi,pi, label = r"Subleading Higgs MET $\Delta \phi$").Double(),
 				"Radion_eta_Arr": hist.Hist.new.StrCat(["Signal"],name="signal").Reg(N1,-5,5, label = r"Radion $\eta$").Double(),
-				"Radion_Charge_Arr": hist.Hist.new.StrCat(["Signal"],name = "signal").Reg(10,-5,5,label = r"Radion Electric Charge").Double()
+				"Radion_Charge_Arr": hist.Hist.new.StrCat(["Signal"],name = "signal").Reg(10,-5,5,label = r"Radion Electric Charge").Double(),
+				"LeadingHiggsSgn_Arr": hist.Hist.new.StrCat(["Signal"],name = "signal").Reg(8,-4,4,label = r"Leading Higgs Electric Charge").Double(),
+				"SubleadingHiggsSgn_Arr": hist.Hist.new.StrCat(["Signal"],name = "signal").Reg(8,-4,4,label = r"Subleading Higgs Electric Charge").Double(),
 
 
 			}
@@ -1589,7 +1600,9 @@ if __name__ == "__main__":
 				"leadingHiggs_MET_dPhi_Arr": hist.Hist.new.StrCat(["Data"],name="data").Reg(N1,-pi,pi, label = r"Leading Higgs MET $\Delta \phi$").Double(), 
 				"subleadingHiggs_MET_dPhi_Arr": hist.Hist.new.StrCat(["Data"],name="data").Reg(N1,-pi,pi, label = r"Subleading Higgs MET $\Delta \phi$").Double(),
 				"Radion_eta_Arr": hist.Hist.new.StrCat(["Data"],name="data").Reg(N1,-5,5, label = r"Radion $\eta$").Double(),
-				"Radion_Charge_Arr": hist.Hist.new.StrCat(["Data"],name = "data").Reg(10,-5,5,label = r"Radion Electric Charge").Double()
+				"Radion_Charge_Arr": hist.Hist.new.StrCat(["Data"],name = "data").Reg(10,-5,5,label = r"Radion Electric Charge").Double(),
+				"LeadingHiggsSgn_Arr": hist.Hist.new.StrCat(["Data"],name = "data").Reg(8,-4,4,label = r"Leading Higgs Electric Charge").Double(),
+				"SubleadingHiggsSgn_Arr": hist.Hist.new.StrCat(["Data"],name = "data").Reg(8,-4,4,label = r"Subleading Higgs Electric Charge").Double(),
 			}
 				
 			#Dictinary with file names
@@ -1608,10 +1621,12 @@ if __name__ == "__main__":
 				"subleadingHiggs_Rad_dR_Arr": "SubLeadingHiggs_Radion_DeltaR_Mass_" + mass + "-" + trigger_name, 
 				"leadingHiggs_MET_dPhi_Arr": "LeadingHiggs_MET_DeltaPhi_Mass_" + mass + "-" + trigger_name, 
 				"subleadingHiggs_MET_dPhi_Arr": "SubLeadingHiggs_MET_DeltaPhi_Mass_" + mass + "-" + trigger_name, "Radion_eta_Arr": "Radion_eta_Mass_" + mass + "-" + trigger_name,
-				"Radion_Charge_Arr": "Radion_Charge_Mass" + mass + "-" + trigger_name
+				"Radion_Charge_Arr": "Radion_Charge_Mass" + mass + "-" + trigger_name,
+				"LeadingHiggsSgn_Arr": "LeadingHiggs_Charge_Mass" + mass + "-" + trigger_name,
+				"SubleadingHiggsSgn_Arr": "SubleadingHiggs_Charge_Mass" + mass + "-" + trigger_name,
 			}
 			
-			fourtau_out = iterative_runner(file_dict, treename="4tau_tree", processor_instance=FourTauPlotting(trigger_bit=trigger_pair[0], or_trigger=trigger_pair[1],PUWeights = PUWeight, PU_weight_bool =True))
+			fourtau_out = iterative_runner(file_dict, treename="4tau_tree", processor_instance=FourTauPlotting(trigger_bit=trigger_pair[0], or_trigger=trigger_pair[1],PUWeights = PUWeight, PU_weight_bool =True, signal_mass = mass))
 			for hist_name in four_tau_hist_list: #Loop over all histograms
 				#fig,ax = plt.subplots()
 				fig0,ax0 = plt.subplots()
@@ -1645,6 +1660,8 @@ if __name__ == "__main__":
 						"subleadingHiggs_MET_dPhi_Arr": hist.Hist.new.Regular(N1,-pi,pi, label = r"Subleading Higgs MET $\Delta \phi$").Double(),
 						"Radion_eta_Arr": hist.Hist.new.Regular(N1,-5,5, label = r"Radion $\eta$").Double(),
 						"Radion_Charge_Arr": hist.Hist.new.Regular(10,-5,5,label = r"Radion Electric Charge").Double(),
+						"LeadingHiggsSgn_Arr": hist.Hist.new.Regular(8,-4,4,label = r"Leading Higgs Electric Charge").Double(),
+						"SubleadingHiggsSgn_Arr": hist.Hist.new.Regular(8,-4,4,label = r"Subleading Higgs Electric Charge").Double(),
 					}
 					hist_dict_only_signal[hist_name].fill(fourtau_out["Signal"][hist_name],weight = fourtau_out["Signal"]["Weight"])
 					hist_dict_only_signal[hist_name].plot1d(ax=ax0)
@@ -1682,7 +1699,9 @@ if __name__ == "__main__":
 							"leadingHiggs_MET_dPhi_Arr": hist.Hist.new.Regular(N1,-pi,pi, label = r"Leading Higgs MET $\Delta \phi$").Double(), 
 							"subleadingHiggs_MET_dPhi_Arr": hist.Hist.new.Regular(N1,-pi,pi, label = r"Subleading Higgs MET $\Delta \phi$").Double(),
 							"Radion_eta_Arr": hist.Hist.new.Regular(N1,-5,5, label = r"Radion $\eta$").Double(),
-							"Radion_Charge_Arr": hist.Hist.new.Regular(10,-5,5,label = r"Radion Electric Charge").Double()
+							"Radion_Charge_Arr": hist.Hist.new.Regular(10,-5,5,label = r"Radion Electric Charge").Double(),
+							"LeadingHiggsSgn_Arr": hist.Hist.new.Regular(8,-4,4,label = r"Leading Higgs Electric Charge").Double(),
+							"SubleadingHiggsSgn_Arr": hist.Hist.new.Regular(8,-4,4,label = r"Subleading Higgs Electric Charge").Double(),
 						}
 						background_array = []
 						backgrounds = background_dict[background_type]
@@ -1690,7 +1709,7 @@ if __name__ == "__main__":
 						#Loop over all backgrounds
 						for background in backgrounds:
 							if (mass == "2000"): #Only need to generate single background once
-								if (hist_name == "Radion_CHarge_Arr"):
+								if (hist_name == "Radion_Charge_Arr"):
 									lumi_table_data["MC Sample"].append(background)
 									lumi_table_data["Luminosity"].append(fourtau_out[background]["Lumi_Val"])
 									lumi_table_data["Cross Section (pb)"].append(fourtau_out[background]["CrossSec_Val"])
@@ -1748,6 +1767,10 @@ if __name__ == "__main__":
 					data_array = [data_stack["Data"]]
 					for background in background_list:
 						background_array.append(background_stack[background])
+
+					if (hist_name == "Radion_Charge_Arr"):
+						print("Background Histogram Sum: %f"%hist_dict_background[hist_name].sum())	
+						print("Data Histogram Sum: %f"%hist_dict_data[hist_name].sum())
 					
 					#Stack background distributions and plot signal + data distribution
 					fig,ax = plt.subplots()
