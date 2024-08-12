@@ -1150,6 +1150,9 @@ class FourTauPlotting(processor.ProcessorABC):
 		event_level["ZMult_mu"] = muon_ZMult
 
 		tau = tau[ak.num(tau,axis=1) > 0] #Handle empty arrays left by the trigger
+
+		#Determine if taus match to lepton (e or mu)
+		
 		
 		#Get the leading Higgs 4-momenta
 		PxLeading = tau[:,0].Px + tau[:,1].Px
@@ -1298,7 +1301,10 @@ class FourTauPlotting(processor.ProcessorABC):
 			file_name = (dataset + ".parquet")
 			ak.to_parquet(var_nn,file_name)
 		else:
-			file_name = (dataset + "mass_" + self.massVal + "GeV.parquet")
+			if (dataset != "Signal"):
+				file_name = (dataset  + ".parquet")
+			else:
+				file_name = (dataset + "_mass_" + self.massVal + "GeV.parquet")
 			if (os.path.isfile(file_name)): #Append to existing parquet file
 				file_data = ak.from_parquet(file_name)
 				var_nn = ak.concatenate([file_data,var_nn])
