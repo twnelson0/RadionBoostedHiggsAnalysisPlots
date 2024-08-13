@@ -842,29 +842,6 @@ class FourTauPlotting(processor.ProcessorABC):
 			#Find second pair
 			tau_lead = tau[tau.pt == tau[:,0].pt]
 			leadingpT = ak.ravel(tau_lead.pt)
-			
-			#Debugging deltaR, phi, eta and delta phi
-			NEvents = 10
-			#for i in range(NEvents):
-			#	print("Leading tau phi %.3f"%tau_lead[i].phi[0])
-			#	print("Paired tau phi %.3f"%leadingTau_Pair[i].phi[0])
-			#	print("Leading tau eta %.3f"%tau_lead[i].eta[0])
-			#	print("Paired tau eta %.3f"%leadingTau_Pair[i].eta[0])
-			#	print("Delta phi %.3f"%deltaphi_Arr[i][0])
-			#	print("Delta R %.3f"%deltaR_Arr[i])
-
-			#for i in range(len(deltaphi_Arr)):
-			#	if (np.abs(deltaphi_Arr[i][0]) > np.pi):
-			#		print("!!Delta phi outisde expected range!!")
-			#		print(deltaphi_Arr[i][0])
-			#		print(delta_phi(tau_lead[i].leadingTau_Pair))
-			#		print(tau_lead[i].phi)
-			#		print(leadingTau_Pair[i].phi)
-			
-			#for x in leadingTau_Pair.pt:
-			#	if len(x) != 1:
-			#		print("!!Multi-tau paired to leading tau!!")
-			#		print(x)
 
 			leadingPairpT = leadingTau_Pair.pt
 			tau_rem = tau[tau.pt != leadingpT]
@@ -966,8 +943,35 @@ class FourTauPlotting(processor.ProcessorABC):
 			tau = ak.concatenate((tau_lead,leadingTau_Pair),axis=1)
 			tau = ak.concatenate((tau,tau_nextlead),axis=1)
 			tau = ak.concatenate((tau,leadingTau_NextPair),axis=1)
+		
+			#Determine if taus match to lepton (e or mu) and make sutiable replacements
+			lead_tau = ak.zip({"t": tau[:,0].E,"x": tau[:,0].Px, "y": tau[:,0].Py,"z" : tau[:,0].Pz},with_name = "Momentum4D")
+			electron_fourVec = ak.zip({"t": electron.E, "x": electron.Px, "y": electron.Py, "z": electron.Pz},with_name = "Momentum4D")
+			muon_fourVec = ak.zip({"t": muon.E, "x": muon.Px, "y": muon.Py, "z": muon.Pz},with_name = "Momentum4D")
+			elec_dR = lead_tau.deltaR(electron_fourVec)
+			muon_dR = lead_tau.deltaR(muon_fourVec)
+
+			#Choose delta Rs such that meet criteria
+			misId_ele_cond = elec_dR < 0.1
+			misId_ele = electron_fourVec[misId_ele_cond]
+			misId_mu_cond = muon_dR < 0.1
+			misId_mu = muon_fourVec[misId_mu_cond]
+
+			#Debugging this implementation
+			for evnt in range(ak.num(misId_ele,axis=0)):
+				num_e = len(misId_ele[evnt])
+				num_mu = len(misId_mu[evnt])
+
+				if (num_e > 1 or num_mu > 1):
+					print("Lead tau reconstructed to %d electrons and %d muons"%(num_e, num_mu))
+				if (num_e == 1 and num_mu > 0):
+					print("Leading tau simultaneously matched to an electron and one or more muons")
+				if (num_mu == 1 and num_e > 0):
+					print("Leading tau simultaneously matched to a muon and one or more electrons")
+
 	
-			#reduced_deltaR = deltaR_Arr[deltaR_Arr != 0]			
+			
+            #reduced_deltaR = deltaR_Arr[deltaR_Arr != 0]			
 			#for x in reduced_deltaR:
 			#	print(x)
 
@@ -1151,7 +1155,7 @@ class FourTauPlotting(processor.ProcessorABC):
 
 		tau = tau[ak.num(tau,axis=1) > 0] #Handle empty arrays left by the trigger
 
-		#Determine if taus match to lepton (e or mu)
+
 		
 		
 		#Get the leading Higgs 4-momenta
@@ -1403,7 +1407,7 @@ if __name__ == "__main__":
 			"ZMult_Arr", "BJet_Arr", "tau_lead_pt_Arr", "tau_sublead_pt_Arr", "tau_3rdlead_pt_Arr", "tau_4thlead_pt_Arr", "leading_dPhi_Arr", "subleading_dPhi_Arr", 
 			"radionMET_dPhi_Arr","leadingHiggs_Rad_dR_Arr","subleadingHiggs_Rad_dR_Arr","leadingHiggs_MET_dPhi_Arr","subleadingHiggs_MET_dPhi_Arr","Radion_eta_Arr", "Radion_Charge_Arr",
 			"LeadingHiggsSgn_Arr", "SubleadingHiggsSgn_Arr"]
-	#four_tau_hist_list = ["Radion_Charge_Arr"]
+	four_tau_hist_list = ["Radion_Charge_Arr"]
 	#four_tau_hist_list = ["ZMult_Arr","ZMult_ele_Arr","ZMult_mu_Arr", "ZMult_tau_Arr"]
 	#four_tau_hist_list = ["LeadingHiggs_mass"] #Only make 1 histogram for brevity/debugging purposes
 	hist_name_dict = {"FourTau_Mass_Arr": r"Reconstructed 4-$\tau$ invariant mass", "HiggsDeltaPhi_Arr": r"Reconstructed Higgs $\Delta \phi$", "Higgs_DeltaR_Arr": r"Reconstructed Higgs $\Delta R$",

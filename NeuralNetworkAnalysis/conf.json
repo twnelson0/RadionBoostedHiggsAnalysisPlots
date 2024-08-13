@@ -1,0 +1,11 @@
+{
+  "model_path": "/afs/hep.wisc.edu/home/kpoppen/HH4tau/HH4T_/CMSSW_13_1_1/src/model.h5",
+  "input_tree_name": "tree_4tau",
+  "output_tree_name": "output_eval_tree",
+  "input_branches": ["radion_inv_mass", "LumiWeight", "radion_pt", "vis_mass", "vis_mass2","radion_eta", "higgs2_dr", "higgs1_dr", "dphi_H1",
+  "dphi_H1_MET", "dphi_H2", "dphi_H2_MET", "dr_HH", "dr_H1_Rad", "dphi_HH", "dr_H2_Rad", "dphi_rad_MET"]  ,
+  "evaluation_branches": ["radion_pt", "vis_mass", "vis_mass2","radion_eta", "higgs2_dr", "higgs1_dr", "dphi_H1",
+  "dphi_H1_MET", "dphi_H2", "dphi_H2_MET", "dr_HH","dr_H1_Rad", "dphi_HH", "dr_H2_Rad", "dphi_rad_MET", "H2OS", "H1OS", "numBJet"]  ,
+  "output_column_name": "HH4tau_NN_output"
+}
+
