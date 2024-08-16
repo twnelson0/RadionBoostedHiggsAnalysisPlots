@@ -946,30 +946,104 @@ class FourTauPlotting(processor.ProcessorABC):
 		
 			#Determine if taus match to lepton (e or mu) and make sutiable replacements
 			lead_tau = ak.zip({"t": tau[:,0].E,"x": tau[:,0].Px, "y": tau[:,0].Py,"z" : tau[:,0].Pz},with_name = "Momentum4D")
+			leadingpair_tau = ak.zip({"t": tau[:,1].E,"x": tau[:,1].Px, "y": tau[:,1].Py,"z" : tau[:,1].Pz},with_name = "Momentum4D")
+			sublead_tau = ak.zip({"t": tau[:,2].E,"x": tau[:,2].Px, "y": tau[:,2].Py,"z" : tau[:,2].Pz},with_name = "Momentum4D")
+			subleadingpair_tau = ak.zip({"t": tau[:,3].E,"x": tau[:,3].Px, "y": tau[:,3].Py,"z" : tau[:,3].Pz},with_name = "Momentum4D")
+			tau_fourVec_Arr = ak.Array([lead_tau,leadingpair_tau,sublead_tau,subleadingpair_tau])
+
 			electron_fourVec = ak.zip({"t": electron.E, "x": electron.Px, "y": electron.Py, "z": electron.Pz},with_name = "Momentum4D")
 			muon_fourVec = ak.zip({"t": muon.E, "x": muon.Px, "y": muon.Py, "z": muon.Pz},with_name = "Momentum4D")
-			elec_dR = lead_tau.deltaR(electron_fourVec)
-			muon_dR = lead_tau.deltaR(muon_fourVec)
+ 
+			for i in range(4):
+				print(i)
+				tau_fourVec = ak.zip({"t": tau[:,i].E,"x": tau[:,i].Px, "y": tau[:,i].Py,"z" : tau[:,i].Pz},with_name = "Momentum4D")
+				elec_dR = tau_fourVec.deltaR(electron_fourVec)
+				muon_dR = tau_fourVec.deltaR(muon_fourVec)
 
-			#Choose delta Rs such that meet criteria
-			misId_ele_cond = elec_dR < 0.1
-			misId_ele = electron_fourVec[misId_ele_cond]
-			misId_mu_cond = muon_dR < 0.1
-			misId_mu = muon_fourVec[misId_mu_cond]
+				#Choose leptons with smallest delta Rs such that are < 0.1 
+				valid_elec_dR = elec_dR[elec_dR < 0.1]
+				misId_ele_cond = elec_dR == ak.min(elec_dR,axis=1)
+				misId_ele_cond = ak.fill_none(misId_ele_cond,[False],axis=0) #Find the the smallest dR between electron and tau
 
-			#Debugging this implementation
-			for evnt in range(ak.num(misId_ele,axis=0)):
-				num_e = len(misId_ele[evnt])
-				num_mu = len(misId_mu[evnt])
+				min_elec_dR = ak.min(elec_dR,axis=1)
+				min_elec_dR = ak.fill_none(min_elec_dR,10) #Fill Nones with impossibly large values
+				
+				valid_mu_dR = muon_dR[muon_dR < 0.1] 
+				misId_mu_cond = muon_dR == ak.min(muon_dR,axis=1)
+				misId_mu_cond = ak.fill_none(misId_mu_cond,[False],axis=0) #Find the the smallest dR between muon and tau
 
-				if (num_e > 1 or num_mu > 1):
-					print("Lead tau reconstructed to %d electrons and %d muons"%(num_e, num_mu))
-				if (num_e == 1 and num_mu > 0):
-					print("Leading tau simultaneously matched to an electron and one or more muons")
-				if (num_mu == 1 and num_e > 0):
-					print("Leading tau simultaneously matched to a muon and one or more electrons")
+				min_mu_dR = ak.min(muon_dR,axis=1)
+				min_mu_dR = ak.fill_none(min_mu_dR,10) #Fill Nones with impossibly large values
+				
+				#Seperate electrons and muons into those matched and those not matched
+				misId_ele = electron_fourVec[misId_ele_cond]
+				misId_mu = muon_fourVec[misId_mu_cond]
 
-	
+				use_ele = min_elec_dR < min_mu_dR
+				use_mu = min_elec_dR > min_mu_dR
+
+				tau_fourVec = ak.where(use_ele, misId_ele, tau_fourVec) #Replace lead tau with electron when applicable
+				tau_fourVec = ak.where(use_mu, misId_mu, tau_fourVec) #Replace lead tau with electron when applicable
+				
+				if (i == 0):
+					misId_ele = electron_fourVec[misId_ele_cond]
+					misId_mu = muon_fourVec[misId_mu_cond]
+
+					#Debugging this implementation
+					for evnt in range(ak.num(misId_ele,axis=0)):
+						num_e = ak.num(misId_ele[evnt],axis=0)
+						num_mu = ak.num(misId_mu[evnt],axis=0)
+
+						if (num_e > 1 or num_mu > 1):
+							print("Lead tau reconstructed to %d electrons and %d muons"%(num_e, num_mu))
+						if (use_ele[evnt] == use_mu[evnt] and use_ele[evnt]):
+							print("Leading tau simultaneously matched to an electron and a muon")
+							print(min_elec_dR[evnt])
+							print(min_mu_dR[evnt])
+							print(tau_fourVec[evnt])
+							print(misId_ele[evnt])
+							print(misId_mu[evnt])
+							print("==============================================================")
+
+						if (use_ele[evnt]):
+							if (tau_fourVec[evnt].E != misId_ele[evnt].E):
+								print("========!!Electron not swapped in!!========")
+						if (use_mu[evnt]):
+							if (tau_fourVec[evnt].E != misId_mu[evnt].E):
+								print("========!!Muon not swapped in!!========")
+
+				#electron_fourVec = electron_fourVec[np.bitwise_not(misId_ele_cond)]
+				#muon_fourVec = muon_fourVec[np.bitwise_not(misId_mu_cond)]
+
+				#Update taus
+				tau[:,i].E = tau_fourVec.t
+				tau[:,i].Px = tau_fourVec.x
+				tau[:,i].Py = tau_fourVec.y
+				tau[:,i].Pz = tau_fourVec.z
+				
+			
+			#Check taus are not pairing to the same leptons
+			for evnt in range(ak.num(tau,axis=0)):
+				if (tau[:,0][evnt].E == tau[:,1][evnt].E):
+					print("!!!Leading tau and paired tau appear to be matching to the same lepton!!!")
+				if (tau[:,2][evnt].E == tau[:,3][evnt].E):
+					print("!!!Subleading tau and paired tau appear to be matching to the same lepton!!!")
+
+				
+
+
+				#if (not(use_mu[evnt]) and use_ele[evnt]):
+				#	if (lead_tau[evnt].E != misId_ele[evnt].E):
+				#		print("=====!!Electron not being used when it should be!!====")
+				#if (not(use_ele[evnt]) and use_mu[evnt]):
+				#	if (lead_tau[evnt].E != misId_mu[evnt].E):
+				#		print("=====!!Muon not being used when it should be!!====")
+				
+			#for i in range(4): #Update tau E, px py and pz
+			#	tau[:,i].E = tau_fourVec_Arr[i].t
+			#	tau[:,i].Px = tau_fourVec_Arr[i].x
+			#	tau[:,i].Py = tau_fourVec_Arr[i].y
+			#	tau[:,i].Pz = tau_fourVec_Arr[i].z
 			
             #reduced_deltaR = deltaR_Arr[deltaR_Arr != 0]			
 			#for x in reduced_deltaR:
@@ -1305,7 +1379,7 @@ class FourTauPlotting(processor.ProcessorABC):
 			file_name = (dataset + ".parquet")
 			ak.to_parquet(var_nn,file_name)
 		else:
-			if (dataset != "Signal"):
+			if (dataset != "signal"):
 				file_name = (dataset  + ".parquet")
 			else:
 				file_name = (dataset + "_mass_" + self.massVal + "GeV.parquet")
