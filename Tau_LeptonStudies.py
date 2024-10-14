@@ -138,16 +138,16 @@ if __name__ == "__main__":
 
     #Set up histograms
     histogram_dict = {
-            "Electron_tau_dR_Arr": hist.Hist.new.Regular(10,0,1,label = r"Minimized tau to electron $\Delta$R").Double(),
-            "Muon_tau_dR_Arr": hist.Hist.new.Regular(10,0,1,label = r"Minimized tau to muon $\Delta$R").Double(),
-            "Electron_gen_dR_Arr": hist.Hist.new.Regular(10,0,1,label = r"Minimized gen electron to reco electron $\Delta$R").Double(),
-            "Muon_gen_dR_Arr": hist.Hist.new.Regular(10,0,1,label = r"Minimized gen muon to reco muon $\Delta$R").Double(),
+            "Electron_tau_dR_Arr": hist.Hist.new.Regular(20,0,1,label = r"Minimized tau to electron $\Delta$R").Double(),
+            "Muon_tau_dR_Arr": hist.Hist.new.Regular(20,0,1,label = r"Minimized tau to muon $\Delta$R").Double(),
+            "Electron_gen_dR_Arr": hist.Hist.new.Regular(20,0,1,label = r"Minimized gen electron to reco electron $\Delta$R").Double(),
+            "Muon_gen_dR_Arr": hist.Hist.new.Regular(20,0,1,label = r"Minimized gen muon to reco muon $\Delta$R").Double(),
     }
     hist_name_dict = {
-            "Electron_tau_dR_Arr": "Signal_Electron_Tau_Minimized_dR_LinScale",
-            "Muon_tau_dR_Arr": "Signal_Muon_Tau_Minimized_dR_LinScale",
-            "Electron_gen_dR_Arr": "Signal_Electron_Gen_Minimized_dR_LinScale",
-            "Muon_gen_dR_Arr": "Signal_Muon_Gen_Minimized_dR_LinScale",
+            "Electron_tau_dR_Arr": "Signal_Electron_Tau_Minimized_dR_LogScale",
+            "Muon_tau_dR_Arr": "Signal_Muon_Tau_Minimized_dR_LogScale",
+            "Electron_gen_dR_Arr": "Signal_Electron_Gen_Minimized_dR_LogScale",
+            "Muon_gen_dR_Arr": "Signal_Muon_Gen_Minimized_dR_LogScale",
     }
 
     
@@ -158,7 +158,7 @@ if __name__ == "__main__":
         fill_Arr = fill_Arr[fill_Arr != 999] #Drop empty values 
         histogram_dict[hist_name].fill(fill_Arr)
         histogram_dict[hist_name].plot1d(ax = ax0)
-        #ax0.set_yscale('log')
+        ax0.set_yscale('log')
         plt.savefig(hist_name_dict[hist_name])
     
     #ele_tau_mindR = ak.from_iter(fourtau_out["Signal"]["Electron_tau_dR_Arr"])

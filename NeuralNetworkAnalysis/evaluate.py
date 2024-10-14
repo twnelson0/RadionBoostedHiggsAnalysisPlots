@@ -37,6 +37,12 @@ def read_root_tree(input_file_path, tree_name, branches):
     data = root_tree.arrays(branches)
     return data
 
+#def read_parquet(input_file):
+ #   data = pd.read_parquet(input_file,engine="pyarrow")
+  #  return data
+
+#def save_parquet(output_file):
+
 def save_output_root_tree(output_file_path, tree_name, data):
 
     print("Data type:", type(data))

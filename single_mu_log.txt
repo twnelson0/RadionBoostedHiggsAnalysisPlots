@@ -1,0 +1,1054 @@
+====================Radion Mass = 2.0 TeV====================
+Preprocessing 100% ━━━━━━━━━━━━━━━━━━━━ 31/31 [ 0:00:41 < 0:00:00 | 0.8 file/s ]
+!!!=====Dataset=====!!!!
+<class 'str'>
+Data_SingleMuon
+Number of events before selection + Trigger: 1905
+# of events after pT cut (dropping empty arrays): 1905
+# of events after eta cut (dropping empty arrays): 1905
+# of events after isolation and decay cuts (dropping empty arrays): 1796
+# of events after delta R cut (dropping empty arrays): 640
+# of events after lepton number cut (dropping empty arrays): 460
+# of events after 4-tau cut (dropping empty arrays): 39
+tau length = 39
+event_level length = 39
+Single Muon Trigger
+# of events after Trigger + Selection: 29
+# of events after Trigger + Selection (dropping empty arrays): 29
+[[0.485], [-0.976], [1.37], [0.307], ... [-0.306], [0.759], [-1.46], [0.79]]
+[[-0.166], [-1.34], [0.476], [0.513], [1.89, ... [1.08], [0.752], [1.64], [0.334]]
+[[0.427], [-1.5], [0.606], [0.718], [0.561, ... [-0.318], [1.12], [1.58], [0.319]]
+[[0.288], [-1.53], [1.29], [0.0807], ... [0.563], [0.253], [-1.46], [0.965]]
+0
+0
+Mass Reconstructed
+29
+!!!=====Dataset=====!!!!
+<class 'str'>
+Data_SingleMuon
+Number of events before selection + Trigger: 469
+# of events after pT cut (dropping empty arrays): 469
+# of events after eta cut (dropping empty arrays): 469
+# of events after isolation and decay cuts (dropping empty arrays): 439
+# of events after delta R cut (dropping empty arrays): 164
+# of events after lepton number cut (dropping empty arrays): 101
+# of events after 4-tau cut (dropping empty arrays): 10
+tau length = 10
+event_level length = 10
+Single Muon Trigger
+# of events after Trigger + Selection: 6
+# of events after Trigger + Selection (dropping empty arrays): 6
+[[-1.96], [0.5], [-2.09], [-0.326], [0.393], [-0.857]]
+[[0.0594], [-0.79], [-0.918], [0.104], [0.408], [1.95]]
+[[0.0864], [-1.01], [-0.976], [-0.689], [0.171], [1.9]]
+[[-2.01], [0.527], [-2.01], [0.0989], [0.282], [-0.988]]
+0
+0
+Mass Reconstructed
+6
+!!!=====Dataset=====!!!!
+<class 'str'>
+Data_SingleMuon
+Number of events before selection + Trigger: 424
+# of events after pT cut (dropping empty arrays): 424
+# of events after eta cut (dropping empty arrays): 424
+# of events after isolation and decay cuts (dropping empty arrays): 401
+# of events after delta R cut (dropping empty arrays): 138
+# of events after lepton number cut (dropping empty arrays): 105
+# of events after 4-tau cut (dropping empty arrays): 10
+tau length = 10
+event_level length = 10
+Single Muon Trigger
+# of events after Trigger + Selection: 8
+# of events after Trigger + Selection (dropping empty arrays): 8
+[[-0.377], [-0.846], [-1.91], [-0.122], [0.186], [-0.49], [-0.119], [0.0988]]
+[[0.664], [1.07], [-1.49], [-1.51], [1.04], [0.658], [-2.08], [0.384]]
+[[0.0783], [-0.856], [-1.96], [-0.222], [1], [-0.473], [0.118], [0.0445]]
+[[0.538], [1.35], [-1.57], [-0.906], [-0.0367], [0.758], [-1.72], [0.154]]
+0
+0
+Mass Reconstructed
+8
+!!!=====Dataset=====!!!!
+<class 'str'>
+Data_SingleMuon
+Number of events before selection + Trigger: 1008
+# of events after pT cut (dropping empty arrays): 1008
+# of events after eta cut (dropping empty arrays): 1008
+# of events after isolation and decay cuts (dropping empty arrays): 939
+# of events after delta R cut (dropping empty arrays): 333
+# of events after lepton number cut (dropping empty arrays): 243
+# of events after 4-tau cut (dropping empty arrays): 16
+tau length = 16
+event_level length = 16
+Single Muon Trigger
+# of events after Trigger + Selection: 7
+# of events after Trigger + Selection (dropping empty arrays): 7
+[[2.12], [1.67], [-1.21], [-0.907], [-0.228], [0.444], [1.13]]
+[[-0.354], [0.354], [-0.553], [-1.59], [1.03], [-0.312], [1.93]]
+[[2.14], [0.0612], [-0.991], [-1.29], [-0.911], [-0.634], [1.98]]
+[[-0.309], [1.09], [-0.516], [-1.2], [0.992], [0.656], [1.25]]
+0
+0
+Mass Reconstructed
+7
+!!!=====Dataset=====!!!!
+<class 'str'>
+Signal
+Number of events before selection + Trigger: 14343
+# of events after pT cut (dropping empty arrays): 14343
+# of events after eta cut (dropping empty arrays): 14343
+# of events after isolation and decay cuts (dropping empty arrays): 14343
+# of events after delta R cut (dropping empty arrays): 14166
+# of events after lepton number cut (dropping empty arrays): 13311
+# of events after 4-tau cut (dropping empty arrays): 10748
+tau length = 10748
+event_level length = 10748
+Number of events after selection + Trigger: 8330
+Number of events after Trigger + Selection (dropping empty arrays): 8330
+[[0.46], [0.14], [0.217], [-0.789], ... [-0.832], [-0.375], [1.37], [-0.794]]
+[[0.581], [-1.4], [-0.208], [0.0461], ... [1.4], [1.68], [0.157], [-0.646]]
+[[0.274], [0.172], [0.00302], [-0.477], ... [0.873], [1.86], [0.058], [-0.969]]
+[[0.676], [-1.81], [0.433], [0.36], ... [-1.03], [-0.0498], [1.02], [-0.443]]
+0
+0
+Mass Reconstructed
+8332
+=========!!!Weight Debugging!!!=========
+Signal
+Cross section = 0.001000
+Number of events Processed: 96000
+!!!=====Dataset=====!!!!
+<class 'str'>
+WJetsToLNu_HT-2500ToInf
+Number of events before selection + Trigger: 60
+# of events after pT cut (dropping empty arrays): 60
+# of events after eta cut (dropping empty arrays): 60
+# of events after isolation and decay cuts (dropping empty arrays): 57
+# of events after delta R cut (dropping empty arrays): 15
+# of events after lepton number cut (dropping empty arrays): 12
+# of events after 4-tau cut (dropping empty arrays): 0
+tau length = 0
+event_level length = 0
+Number of events after selection + Trigger: 0
+Number of events after Trigger + Selection (dropping empty arrays): 0
+[]
+[]
+[]
+[]
+0
+0
+Mass Not Reconstructed
+=========!!!Weight Debugging!!!=========
+WJetsToLNu_HT-2500ToInf
+Cross section = 0.038914
+Number of events Processed: 3273980
+!!!=====Dataset=====!!!!
+<class 'str'>
+WJetsToLNu_HT-1200To2500
+Number of events before selection + Trigger: 167
+# of events after pT cut (dropping empty arrays): 167
+# of events after eta cut (dropping empty arrays): 167
+# of events after isolation and decay cuts (dropping empty arrays): 159
+# of events after delta R cut (dropping empty arrays): 23
+# of events after lepton number cut (dropping empty arrays): 15
+# of events after 4-tau cut (dropping empty arrays): 1
+tau length = 1
+event_level length = 1
+Number of events after selection + Trigger: 0
+Number of events after Trigger + Selection (dropping empty arrays): 0
+[]
+[]
+[]
+[]
+0
+0
+Mass Not Reconstructed
+=========!!!Weight Debugging!!!=========
+WJetsToLNu_HT-1200To2500
+Cross section = 1.608090
+Number of events Processed: 7633949
+!!!=====Dataset=====!!!!
+<class 'str'>
+WJetsToLNu_HT-800To1200
+Number of events before selection + Trigger: 172
+# of events after pT cut (dropping empty arrays): 172
+# of events after eta cut (dropping empty arrays): 172
+# of events after isolation and decay cuts (dropping empty arrays): 167
+# of events after delta R cut (dropping empty arrays): 27
+# of events after lepton number cut (dropping empty arrays): 19
+# of events after 4-tau cut (dropping empty arrays): 0
+tau length = 0
+event_level length = 0
+Number of events after selection + Trigger: 0
+Number of events after Trigger + Selection (dropping empty arrays): 0
+[]
+[]
+[]
+[]
+0
+0
+Mass Not Reconstructed
+=========!!!Weight Debugging!!!=========
+WJetsToLNu_HT-800To1200
+Cross section = 6.656210
+Number of events Processed: 8402687
+!!!=====Dataset=====!!!!
+<class 'str'>
+WJetsToLNu_HT-600To800
+Number of events before selection + Trigger: 452
+# of events after pT cut (dropping empty arrays): 452
+# of events after eta cut (dropping empty arrays): 452
+# of events after isolation and decay cuts (dropping empty arrays): 437
+# of events after delta R cut (dropping empty arrays): 81
+# of events after lepton number cut (dropping empty arrays): 49
+# of events after 4-tau cut (dropping empty arrays): 1
+tau length = 1
+event_level length = 1
+Number of events after selection + Trigger: 0
+Number of events after Trigger + Selection (dropping empty arrays): 0
+[]
+[]
+[]
+[]
+0
+0
+Mass Not Reconstructed
+=========!!!Weight Debugging!!!=========
+WJetsToLNu_HT-600To800
+Cross section = 14.580500
+Number of events Processed: 19728401
+!!!=====Dataset=====!!!!
+<class 'str'>
+WJetsToLNu_HT-400To600
+Number of events before selection + Trigger: 120
+# of events after pT cut (dropping empty arrays): 120
+# of events after eta cut (dropping empty arrays): 120
+# of events after isolation and decay cuts (dropping empty arrays): 117
+# of events after delta R cut (dropping empty arrays): 32
+# of events after lepton number cut (dropping empty arrays): 20
+# of events after 4-tau cut (dropping empty arrays): 1
+tau length = 1
+event_level length = 1
+Number of events after selection + Trigger: 1
+Number of events after Trigger + Selection (dropping empty arrays): 1
+[[0.388]]
+[[1.55]]
+[[0.379]]
+[[0.795]]
+0
+0
+Mass Reconstructed
+1
+=========!!!Weight Debugging!!!=========
+WJetsToLNu_HT-400To600
+Cross section = 59.181100
+Number of events Processed: 5932701
+!!!=====Dataset=====!!!!
+<class 'str'>
+WJetsToLNu_HT-200To400
+Number of events before selection + Trigger: 235
+# of events after pT cut (dropping empty arrays): 235
+# of events after eta cut (dropping empty arrays): 235
+# of events after isolation and decay cuts (dropping empty arrays): 230
+# of events after delta R cut (dropping empty arrays): 69
+# of events after lepton number cut (dropping empty arrays): 51
+# of events after 4-tau cut (dropping empty arrays): 2
+tau length = 2
+event_level length = 2
+Number of events after selection + Trigger: 1
+Number of events after Trigger + Selection (dropping empty arrays): 1
+[[0.179]]
+[[1.43]]
+[[0.192]]
+[[1.42]]
+0
+0
+Mass Reconstructed
+1
+=========!!!Weight Debugging!!!=========
+WJetsToLNu_HT-200To400
+Cross section = 435.237000
+Number of events Processed: 25468933
+!!!=====Dataset=====!!!!
+<class 'str'>
+WJetsToLNu_HT-100To200
+Number of events before selection + Trigger: 40
+# of events after pT cut (dropping empty arrays): 40
+# of events after eta cut (dropping empty arrays): 40
+# of events after isolation and decay cuts (dropping empty arrays): 40
+# of events after delta R cut (dropping empty arrays): 15
+# of events after lepton number cut (dropping empty arrays): 6
+# of events after 4-tau cut (dropping empty arrays): 0
+tau length = 0
+event_level length = 0
+Number of events after selection + Trigger: 0
+Number of events after Trigger + Selection (dropping empty arrays): 0
+[]
+[]
+[]
+[]
+0
+0
+Mass Not Reconstructed
+=========!!!Weight Debugging!!!=========
+WJetsToLNu_HT-100To200
+Cross section = 1627.450000
+Number of events Processed: 29521158
+!!!=====Dataset=====!!!!
+<class 'str'>
+T-tW
+Number of events before selection + Trigger: 405
+# of events after pT cut (dropping empty arrays): 405
+# of events after eta cut (dropping empty arrays): 405
+# of events after isolation and decay cuts (dropping empty arrays): 389
+# of events after delta R cut (dropping empty arrays): 95
+# of events after lepton number cut (dropping empty arrays): 68
+# of events after 4-tau cut (dropping empty arrays): 4
+tau length = 4
+event_level length = 4
+Number of events after selection + Trigger: 1
+Number of events after Trigger + Selection (dropping empty arrays): 1
+[[0.0304]]
+[[0.468]]
+[[0.0951]]
+[[0.38]]
+0
+0
+Mass Reconstructed
+1
+=========!!!Weight Debugging!!!=========
+T-tW
+Cross section = 35.600000
+Number of events Processed: 9242000
+!!!=====Dataset=====!!!!
+<class 'str'>
+Tbar-tW
+Number of events before selection + Trigger: 299
+# of events after pT cut (dropping empty arrays): 299
+# of events after eta cut (dropping empty arrays): 299
+# of events after isolation and decay cuts (dropping empty arrays): 291
+# of events after delta R cut (dropping empty arrays): 66
+# of events after lepton number cut (dropping empty arrays): 39
+# of events after 4-tau cut (dropping empty arrays): 3
+tau length = 3
+event_level length = 3
+Number of events after selection + Trigger: 1
+Number of events after Trigger + Selection (dropping empty arrays): 1
+[[0.422]]
+[[-1.11]]
+[[-1.2]]
+[[0.0928]]
+0
+0
+Mass Reconstructed
+1
+=========!!!Weight Debugging!!!=========
+Tbar-tW
+Cross section = 35.600000
+Number of events Processed: 7623000
+!!!=====Dataset=====!!!!
+<class 'str'>
+T-tchan
+Number of events before selection + Trigger: 748
+# of events after pT cut (dropping empty arrays): 748
+# of events after eta cut (dropping empty arrays): 748
+# of events after isolation and decay cuts (dropping empty arrays): 674
+# of events after delta R cut (dropping empty arrays): 185
+# of events after lepton number cut (dropping empty arrays): 110
+# of events after 4-tau cut (dropping empty arrays): 9
+tau length = 9
+event_level length = 9
+Number of events after selection + Trigger: 2
+Number of events after Trigger + Selection (dropping empty arrays): 2
+[[-0.0514], [0.703]]
+[[-0.483], [1.08]]
+[[-0.515], [0.764]]
+[[0.134], [1.14]]
+0
+0
+Mass Reconstructed
+2
+=========!!!Weight Debugging!!!=========
+T-tchan
+Cross section = 44.070000
+Number of events Processed: 154130900
+!!!=====Dataset=====!!!!
+<class 'str'>
+Tbar-tchan
+Number of events before selection + Trigger: 450
+# of events after pT cut (dropping empty arrays): 450
+# of events after eta cut (dropping empty arrays): 450
+# of events after isolation and decay cuts (dropping empty arrays): 409
+# of events after delta R cut (dropping empty arrays): 121
+# of events after lepton number cut (dropping empty arrays): 76
+# of events after 4-tau cut (dropping empty arrays): 4
+tau length = 4
+event_level length = 4
+Number of events after selection + Trigger: 0
+Number of events after Trigger + Selection (dropping empty arrays): 0
+[]
+[]
+[]
+[]
+0
+0
+Mass Not Reconstructed
+=========!!!Weight Debugging!!!=========
+Tbar-tchan
+Cross section = 26.230000
+Number of events Processed: 79090800
+!!!=====Dataset=====!!!!
+<class 'str'>
+DYJetsToLL_Pt-650ToInf
+Number of events before selection + Trigger: 1188
+# of events after pT cut (dropping empty arrays): 1188
+# of events after eta cut (dropping empty arrays): 1188
+# of events after isolation and decay cuts (dropping empty arrays): 1182
+# of events after delta R cut (dropping empty arrays): 1082
+# of events after lepton number cut (dropping empty arrays): 1025
+# of events after 4-tau cut (dropping empty arrays): 52
+tau length = 52
+event_level length = 52
+Number of events after selection + Trigger: 33
+Number of events after Trigger + Selection (dropping empty arrays): 33
+[[-2.01], [0.373], [-0.113], [-0.464], ... [-0.361], [-0.396], [0.933], [-0.601]]
+[[2.19], [1.69], [0.868], [2.22], [0.327, ... 2.08], [-0.199], [-1.04], [2], [0.559]]
+[[-1.73], [1.88], [1.15], [-0.591], ... [-0.515], [-1.49], [0.785], [-0.863]]
+[[2.22], [0.362], [-0.0827], [2.25], ... [-0.196], [-0.402], [2.04], [0.561]]
+0
+0
+Mass Reconstructed
+33
+=========!!!Weight Debugging!!!=========
+DYJetsToLL_Pt-650ToInf
+Cross section = 0.043602
+Number of events Processed: 1895998
+!!!=====Dataset=====!!!!
+<class 'str'>
+DYJetsToLL_Pt-400To650
+Number of events before selection + Trigger: 1209
+# of events after pT cut (dropping empty arrays): 1209
+# of events after eta cut (dropping empty arrays): 1209
+# of events after isolation and decay cuts (dropping empty arrays): 1205
+# of events after delta R cut (dropping empty arrays): 1097
+# of events after lepton number cut (dropping empty arrays): 1036
+# of events after 4-tau cut (dropping empty arrays): 78
+tau length = 78
+event_level length = 78
+Number of events after selection + Trigger: 48
+Number of events after Trigger + Selection (dropping empty arrays): 48
+[[0.131], [-2], [-0.317], [-0.657], ... [0.809], [-0.278], [-0.903], [-0.307]]
+[[-0.247], [-1.69], [-1.87], [1.4], ... [-0.445], [0.072], [2.04], [-0.733]]
+[[0.355], [-1.64], [-0.707], [1.16], ... [0.834], [-0.0254], [-1.28], [-0.13]]
+[[-0.223], [-1.53], [-1.86], [-0.663], ... [-0.777], [-0.248], [2.01], [-0.726]]
+0
+0
+Mass Reconstructed
+48
+=========!!!Weight Debugging!!!=========
+DYJetsToLL_Pt-400To650
+Cross section = 0.464024
+Number of events Processed: 1863809
+!!!=====Dataset=====!!!!
+<class 'str'>
+DYJetsToLL_Pt-250To400
+Number of events before selection + Trigger: 8981
+# of events after pT cut (dropping empty arrays): 8981
+# of events after eta cut (dropping empty arrays): 8981
+# of events after isolation and decay cuts (dropping empty arrays): 8969
+# of events after delta R cut (dropping empty arrays): 7608
+# of events after lepton number cut (dropping empty arrays): 7179
+# of events after 4-tau cut (dropping empty arrays): 673
+tau length = 673
+event_level length = 673
+Number of events after selection + Trigger: 379
+Number of events after Trigger + Selection (dropping empty arrays): 379
+[[0.256], [1.22], [-0.668], [-0.821], ... [1.21], [-0.689], [0.116], [-0.688]]
+[[0.563], [-0.0289], [0.0545], [1.01], ... [0.911], [1.06], [1.67], [-0.729]]
+[[0.582], [-0.0305], [0.197], [-1.45], ... [0.936], [1.08], [1.25], [-0.709]]
+[[0.803], [0.589], [-0.677], [1.01], ... [0.806], [-0.141], [0.0949], [-0.864]]
+0
+0
+Mass Reconstructed
+379
+=========!!!Weight Debugging!!!=========
+DYJetsToLL_Pt-250To400
+Cross section = 3.435181
+Number of events Processed: 20121253
+!!!=====Dataset=====!!!!
+<class 'str'>
+DYJetsToLL_Pt-100To250
+Number of events before selection + Trigger: 7836
+# of events after pT cut (dropping empty arrays): 7836
+# of events after eta cut (dropping empty arrays): 7836
+# of events after isolation and decay cuts (dropping empty arrays): 7808
+# of events after delta R cut (dropping empty arrays): 2035
+# of events after lepton number cut (dropping empty arrays): 1376
+# of events after 4-tau cut (dropping empty arrays): 56
+tau length = 56
+event_level length = 56
+Number of events after selection + Trigger: 29
+Number of events after Trigger + Selection (dropping empty arrays): 29
+[[-0.233], [1.49], [-1.9], [-0.643], ... [-0.738], [0.189], [-1.76], [0.411]]
+[[-0.811], [1.6], [-0.707], [-0.435], ... [0.916], [1.29], [-0.413], [1.26]]
+[[-0.12], [2.13], [-1.9], [0.0366], [0.71, ... [-0.52], [0.766], [-0.404], [1.3]]
+[[-0.204], [1.58], [-0.697], [-0.059], [1.14, ... [0.88], [1.27], [-1.5], [0.393]]
+0
+0
+Mass Reconstructed
+29
+=========!!!Weight Debugging!!!=========
+DYJetsToLL_Pt-100To250
+Cross section = 89.395097
+Number of events Processed: 81633326
+!!!=====Dataset=====!!!!
+<class 'str'>
+DYJetsToLL_Pt-50To100
+Number of events before selection + Trigger: 2633
+# of events after pT cut (dropping empty arrays): 2633
+# of events after eta cut (dropping empty arrays): 2633
+# of events after isolation and decay cuts (dropping empty arrays): 2625
+# of events after delta R cut (dropping empty arrays): 617
+# of events after lepton number cut (dropping empty arrays): 329
+# of events after 4-tau cut (dropping empty arrays): 18
+tau length = 18
+event_level length = 18
+Number of events after selection + Trigger: 4
+Number of events after Trigger + Selection (dropping empty arrays): 4
+[[1.68], [0.349], [-0.196], [1.02]]
+[[1.4], [1.92], [-0.287], [0.645]]
+[[1.47], [0.324], [0.394], [-0.0383]]
+[[1.21], [1.96], [0.867], [-0.26]]
+0
+0
+Mass Reconstructed
+4
+=========!!!Weight Debugging!!!=========
+DYJetsToLL_Pt-50To100
+Cross section = 387.130778
+Number of events Processed: 120435658
+!!!=====Dataset=====!!!!
+<class 'str'>
+WZ1l1nu2q
+Number of events before selection + Trigger: 757
+# of events after pT cut (dropping empty arrays): 757
+# of events after eta cut (dropping empty arrays): 757
+# of events after isolation and decay cuts (dropping empty arrays): 739
+# of events after delta R cut (dropping empty arrays): 191
+# of events after lepton number cut (dropping empty arrays): 115
+# of events after 4-tau cut (dropping empty arrays): 3
+tau length = 3
+event_level length = 3
+Number of events after selection + Trigger: 1
+Number of events after Trigger + Selection (dropping empty arrays): 1
+[[-1.7]]
+[[-1.8]]
+[[-1.78]]
+[[-2.2]]
+0
+0
+Mass Reconstructed
+1
+=========!!!Weight Debugging!!!=========
+WZ1l1nu2q
+Cross section = 10.710000
+Number of events Processed: 68048958
+!!!=====Dataset=====!!!!
+<class 'str'>
+WZ2l2q
+Number of events before selection + Trigger: 3286
+# of events after pT cut (dropping empty arrays): 3286
+# of events after eta cut (dropping empty arrays): 3286
+# of events after isolation and decay cuts (dropping empty arrays): 3273
+# of events after delta R cut (dropping empty arrays): 1221
+# of events after lepton number cut (dropping empty arrays): 941
+# of events after 4-tau cut (dropping empty arrays): 39
+tau length = 39
+event_level length = 39
+Number of events after selection + Trigger: 22
+Number of events after Trigger + Selection (dropping empty arrays): 22
+[[0.307], [-0.544], [-0.369], [-0.0689], ... [-0.188], [0.358], [0.777], [-1.21]]
+[[0.36], [1.86], [-0.0768], [-0.544], ... [-0.467], [0.289], [-2.02], [0.541]]
+[[0.38], [-0.469], [-0.357], [-0.169], ... [-0.00509], [-0.632], [0.503], [-0.891]]
+[[1.1], [1.88], [0.0445], [0.473], ... [-0.382], [-0.896], [-2.02], [0.564]]
+0
+0
+Mass Reconstructed
+22
+=========!!!Weight Debugging!!!=========
+WZ2l2q
+Cross section = 5.595000
+Number of events Processed: 28193648
+!!!=====Dataset=====!!!!
+<class 'str'>
+ZZ2l2q
+Number of events before selection + Trigger: 5928
+# of events after pT cut (dropping empty arrays): 5928
+# of events after eta cut (dropping empty arrays): 5928
+# of events after isolation and decay cuts (dropping empty arrays): 5907
+# of events after delta R cut (dropping empty arrays): 2139
+# of events after lepton number cut (dropping empty arrays): 1611
+# of events after 4-tau cut (dropping empty arrays): 102
+tau length = 102
+event_level length = 102
+Number of events after selection + Trigger: 40
+Number of events after Trigger + Selection (dropping empty arrays): 40
+[[0.0445], [-0.742], [1.62], [-1.93], [-0.843, ... [1.78], [-2], [0.294], [0.872]]
+[[1.03], [0.704], [0.63], [-1.41], [0.113, ... [0.169], [0.413], [-0.285], [0.2]]
+[[-0.513], [0.359], [1.05], [-1.32], ... [2.03], [-1.43], [-0.328], [0.232]]
+[[1.04], [-1.08], [1.86], [-2.11], ... [0.159], [0.406], [-0.189], [0.571]]
+0
+0
+Mass Reconstructed
+40
+=========!!!Weight Debugging!!!=========
+ZZ2l2q
+Cross section = 3.220000
+Number of events Processed: 54856689
+!!!=====Dataset=====!!!!
+<class 'str'>
+WZ3l1nu
+Number of events before selection + Trigger: 5222
+# of events after pT cut (dropping empty arrays): 5222
+# of events after eta cut (dropping empty arrays): 5222
+# of events after isolation and decay cuts (dropping empty arrays): 5220
+# of events after delta R cut (dropping empty arrays): 2659
+# of events after lepton number cut (dropping empty arrays): 1888
+# of events after 4-tau cut (dropping empty arrays): 118
+tau length = 118
+event_level length = 118
+Number of events after selection + Trigger: 74
+Number of events after Trigger + Selection (dropping empty arrays): 74
+[[-1.8], [-1.96], [-0.89], [1.3], [0.34, ... 0.711], [1.37], [1.59], [0.948], [-1.9]]
+[[-0.346], [-1.91], [-1.59], [0.553], ... [1.89], [0.459], [1.41], [-0.603]]
+[[-1.38], [-1.78], [-2.11], [1.01], [0.642, ... [1.92], [1.71], [1.37], [-1.76]]
+[[-0.363], [-1.71], [-1.6], [1.28], [0.686, ... [1.56], [0.629], [1.27], [-1.34]]
+0
+0
+Mass Reconstructed
+74
+=========!!!Weight Debugging!!!=========
+WZ3l1nu
+Cross section = 4.708000
+Number of events Processed: 21997587
+!!!=====Dataset=====!!!!
+<class 'str'>
+WZ1l3nu
+Number of events before selection + Trigger: 4
+# of events after pT cut (dropping empty arrays): 4
+# of events after eta cut (dropping empty arrays): 4
+# of events after isolation and decay cuts (dropping empty arrays): 4
+# of events after delta R cut (dropping empty arrays): 2
+# of events after lepton number cut (dropping empty arrays): 2
+# of events after 4-tau cut (dropping empty arrays): 0
+tau length = 0
+event_level length = 0
+Number of events after selection + Trigger: 0
+Number of events after Trigger + Selection (dropping empty arrays): 0
+[]
+[]
+[]
+[]
+0
+0
+Mass Not Reconstructed
+=========!!!Weight Debugging!!!=========
+WZ1l3nu
+Cross section = 3.050000
+Number of events Processed: 1690064
+!!!=====Dataset=====!!!!
+<class 'str'>
+VV2l2nu
+Number of events before selection + Trigger: 164
+# of events after pT cut (dropping empty arrays): 164
+# of events after eta cut (dropping empty arrays): 164
+# of events after isolation and decay cuts (dropping empty arrays): 163
+# of events after delta R cut (dropping empty arrays): 62
+# of events after lepton number cut (dropping empty arrays): 52
+# of events after 4-tau cut (dropping empty arrays): 3
+tau length = 3
+event_level length = 3
+Number of events after selection + Trigger: 3
+Number of events after Trigger + Selection (dropping empty arrays): 3
+[[-0.0408], [-0.444], [0.632]]
+[[-0.0291], [-0.319], [1.74]]
+[[-0.591], [-0.221], [0.389]]
+[[0.00762], [-0.665], [1.7]]
+0
+0
+Mass Reconstructed
+3
+=========!!!Weight Debugging!!!=========
+VV2l2nu
+Cross section = 11.950000
+Number of events Processed: 9848488
+!!!=====Dataset=====!!!!
+<class 'str'>
+ZZ4l
+Number of events before selection + Trigger: 29065
+# of events after pT cut (dropping empty arrays): 29065
+# of events after eta cut (dropping empty arrays): 29065
+# of events after isolation and decay cuts (dropping empty arrays): 29064
+# of events after delta R cut (dropping empty arrays): 19335
+# of events after lepton number cut (dropping empty arrays): 15343
+# of events after 4-tau cut (dropping empty arrays): 7275
+tau length = 7275
+event_level length = 7275
+Number of events after selection + Trigger: 5225
+Number of events after Trigger + Selection (dropping empty arrays): 5225
+[[-1.23], [-0.534], [0.0478], [0.184], ... [0.0396], [0.248], [-0.919], [-1]]
+[[0.403], [-0.759], [-0.951], [-0.0249], ... [-0.437], [-0.839], [-0.913], [-1.21]]
+[[-1.14], [-1.13], [-0.459], [0.798], ... [-0.681], [-0.852], [-1.11], [-0.879]]
+[[0.394], [-0.688], [-0.288], [0.693], ... [-0.304], [-0.458], [-1.42], [-0.956]]
+0
+0
+Mass Reconstructed
+5225
+=========!!!Weight Debugging!!!=========
+ZZ4l
+Cross section = 1.212000
+Number of events Processed: 26371225
+!!!=====Dataset=====!!!!
+<class 'str'>
+TTToHadronic
+Number of events before selection + Trigger: 11511
+# of events after pT cut (dropping empty arrays): 11511
+# of events after eta cut (dropping empty arrays): 11511
+# of events after isolation and decay cuts (dropping empty arrays): 9396
+# of events after delta R cut (dropping empty arrays): 1790
+# of events after lepton number cut (dropping empty arrays): 1136
+# of events after 4-tau cut (dropping empty arrays): 39
+tau length = 39
+event_level length = 39
+Number of events after selection + Trigger: 2
+Number of events after Trigger + Selection (dropping empty arrays): 2
+[[0.895], [-2.04]]
+[[1], [-0.728]]
+[[0.585], [-2.02]]
+[[0.968], [-0.601]]
+0
+0
+Mass Reconstructed
+2
+=========!!!Weight Debugging!!!=========
+TTToHadronic
+Cross section = 377.951744
+Number of events Processed: 317792000
+!!!=====Dataset=====!!!!
+<class 'str'>
+TTTo2L2Nu
+Number of events before selection + Trigger: 15268
+# of events after pT cut (dropping empty arrays): 15268
+# of events after eta cut (dropping empty arrays): 15268
+# of events after isolation and decay cuts (dropping empty arrays): 15190
+# of events after delta R cut (dropping empty arrays): 4666
+# of events after lepton number cut (dropping empty arrays): 3163
+# of events after 4-tau cut (dropping empty arrays): 181
+tau length = 181
+event_level length = 181
+Number of events after selection + Trigger: 76
+Number of events after Trigger + Selection (dropping empty arrays): 76
+[[0.323], [-0.355], [-1.34], [1.38], ... [0.476], [1.46], [-1.7], [1.63]]
+[[1.68], [-0.354], [-1.51], [1.59], ... [-0.539], [0.699], [-2.14], [-0.274]]
+[[0.555], [-0.259], [-1.49], [2.04], ... [0.512], [1.08], [-0.833], [-0.306]]
+[[1.67], [-0.298], [-1.95], [1.51], ... [-0.599], [0.244], [-0.524], [1.6]]
+0
+0
+Mass Reconstructed
+76
+=========!!!Weight Debugging!!!=========
+TTTo2L2Nu
+Cross section = 88.249736
+Number of events Processed: 62300000
+!!!=====Dataset=====!!!!
+<class 'str'>
+TTToSemiLeptonic
+Number of events before selection + Trigger: 24625
+# of events after pT cut (dropping empty arrays): 24625
+# of events after eta cut (dropping empty arrays): 24625
+# of events after isolation and decay cuts (dropping empty arrays): 23888
+# of events after delta R cut (dropping empty arrays): 5084
+# of events after lepton number cut (dropping empty arrays): 3100
+# of events after 4-tau cut (dropping empty arrays): 106
+tau length = 106
+event_level length = 106
+Number of events after selection + Trigger: 24
+Number of events after Trigger + Selection (dropping empty arrays): 24
+[[-1.5], [-1.71], [-0.206], [-0.225], ... [2.13], [-0.878], [-0.808], [0.401]]
+[[-1.08], [-2.13], [0.18], [-0.529], [1.93, ... [1.68], [-1.25], [-0.57], [-1.04]]
+[[-1.13], [-2.04], [-0.478], [-0.464], ... [1.65], [0.117], [-0.388], [0.383]]
+[[-1.07], [-1.65], [0.293], [-0.549], [2, ... [1.72], [0.205], [-1.31], [-1.05]]
+0
+0
+Mass Reconstructed
+24
+=========!!!Weight Debugging!!!=========
+TTToSemiLeptonic
+Cross section = 365.308992
+Number of events Processed: 265706999
+Processing 100% ━━━━━━━━━━━━━━━━━━━━━━━━ 31/31 [ 0:13:55 < 0:00:00 | ? chunk/s ]
+==================Hist FourTau_Mass_Arr================
+Total amount of data = 50
+==================Hist HiggsDeltaPhi_Arr================
+Total amount of data = 50
+==================Hist Higgs_DeltaR_Arr================
+Total amount of data = 50
+==================Hist leading_dR_Arr================
+Total amount of data = 50
+==================Hist subleading_dR_Arr================
+Total amount of data = 50
+!!!====================Debugging di-tau masses of $t\bar{t}$====================!!!
+3.3077948351122664
+1.4213723805241791
+2.561909472717399
+5.127672976928771
+1.540772647467922
+4.628366251678525
+# of entries with 0 mass: 0
+# of entries in first bin: 6
+!!!====================Debugging di-tau masses of $t\bar{t}$====================!!!
+9.405640401647839
+3.4517531976146287
+8.66416486479315
+3.5844601830327947
+3.7091353211444886
+3.7990160482074438
+2.249557954336549
+2.6182061477804273
+6.6155107343261825
+2.778104632300188
+1.9196484981423307
+4.07078442200314
+4.08396643966316
+2.7996036011094882
+# of entries with 0 mass: 0
+# of entries in first bin: 14
+!!!====================Debugging di-tau masses of $t\bar{t}$====================!!!
+1.955234352781176
+# of entries with 0 mass: 0
+# of entries in first bin: 1
+!!!====================Debugging di-tau masses of Drell-Yan+Jets====================!!!
+9.267948589046627
+# of entries with 0 mass: 0
+# of entries in first bin: 1
+!!!====================Debugging di-tau masses of Drell-Yan+Jets====================!!!
+3.017774483499805
+5.964674203355121
+1.5049499659807057
+2.0936806459002777
+1.4059180610308681
+1.5735664080210137
+3.6257082108458
+# of entries with 0 mass: 0
+# of entries in first bin: 7
+!!!====================Debugging di-tau masses of Drell-Yan+Jets====================!!!
+3.2156393776261156
+2.166073903301534
+1.4759447196027022
+1.4886335606512433
+2.7012133236571527
+2.9960286939712386
+1.945070725603892
+1.8947116672037203
+4.3023495619479
+0.5514145305452757
+6.468628865594298
+2.464417602012014
+3.909112047026389
+2.6336102701114816
+2.3747943418856927
+4.943718846299388
+2.9203425388161146
+2.74312083213485
+3.9046728467835683
+8.216547621163587
+2.896761736152348
+4.0870186316934465
+1.9127368383331744
+3.3603367505794255
+1.6211150362587787
+1.6144611683941819
+1.2033874218558809
+2.7243584840377943
+2.682822088628847
+4.88791787333802
+1.891603103480994
+3.5978744357318893
+3.4952505294233833
+1.591535045805193
+2.1464629531112256
+5.270872921795649
+4.192842990381632
+3.225493119687202
+1.4765325462235843
+2.979256386482638
+8.501587345194622
+4.6023510827354315
+2.8063298771699876
+1.6396800875804063
+3.369965036810471
+5.377724424408602
+4.331234582240734
+2.1653495325153402
+2.8319919974661842
+4.33413878518639
+2.781222722286096
+2.6917826239008376
+1.5194954199413753
+3.3731854110203803
+1.766301047882739
+1.8594180518950312
+1.2785097211180765
+2.922214097752301
+3.6030917024838613
+4.085168462406937
+2.7211798790423676
+1.9231498093333275
+1.5027521305716582
+2.527972991564953
+2.624381870073892
+1.9289460155875033
+3.380152228353211
+2.2424557466254753
+1.9715639299923795
+2.4680319361738277
+2.036063512352066
+2.2222431431226815
+1.9707817236464358
+1.2504471345613246
+6.822698251512313
+1.6984331545647997
+3.4217490562658464
+1.8751007825369328
+6.545419388493847
+6.331714040446725
+3.1407703513084106
+2.519539803933531
+1.8166856142014611
+2.7164615862903294
+2.838067494323215
+3.024500556397557
+2.4890392656680174
+2.0636926359932635
+3.0871568988176596
+7.652859787165639
+3.520762049652112
+4.5785515478890275
+4.6305050560263
+4.448070294988994
+2.427428065280995
+2.8696473301214453
+4.8405044439912635
+3.8722705964546975
+2.3220892238181756
+# of entries with 0 mass: 0
+# of entries in first bin: 99
+!!!====================Debugging di-tau masses of Drell-Yan+Jets====================!!!
+2.0923513451943374
+3.9470069145204603
+6.186357950813838
+3.332982769827897
+3.123645638255768
+3.8097927532751434
+2.837257091831421
+8.188272427048556
+3.7037450570265835
+2.4386777870093233
+1.6747220968507193
+7.086856924798877
+# of entries with 0 mass: 0
+# of entries in first bin: 12
+!!!====================Debugging di-tau masses of Drell-Yan+Jets====================!!!
+4.739342409294033
+3.2688103057807405
+7.462236843306305
+# of entries with 0 mass: 0
+# of entries in first bin: 3
+!!!====================Debugging di-tau masses of $ZZ \rightarrow 4l$====================!!!
+7.800504305570492
+3.557697253356389
+3.978304033709206
+5.077650916311217
+3.271261946096083
+4.181151272773494
+4.324946247695789
+5.355396807641098
+7.051734100304594
+5.064733608956268
+6.897393643920195
+6.370017197698626
+8.70747303389776
+3.8426541071786615
+4.538111827133536
+5.450611077027631
+6.964316025716999
+3.074673516758802
+6.058112233477066
+8.051386014838917
+9.952260127613858
+4.89211505220804
+5.1284951128560525
+5.346381433520454
+9.851892894902416
+5.9548577861084215
+5.674487528538176
+8.374774066547285
+5.348966474721771
+6.557859550135136
+9.710982118002102
+8.320335248063873
+4.263496220964595
+7.358251014047763
+6.654678078733991
+6.043977611177773
+5.052055692678407
+7.6373748101962
+6.273886390745782
+6.942953905385813
+7.157247665491491
+4.857745997783915
+5.511424080394229
+4.352282146722222
+6.30881479509994
+6.363479099273615
+9.954871252178457
+9.839069189596348
+5.421696561981769
+7.215925292512273
+6.05896648061937
+5.951553834403942
+9.815117663002534
+4.538905111149089
+9.511453456270392
+5.61796692317474
+6.092538318018769
+6.883280620906007
+3.7442141417610046
+7.47606573426478
+6.372977261491148
+6.218682559215794
+9.544908797885045
+2.0098725131213255
+6.741835284890708
+7.964538438355549
+7.840534523976997
+5.7128131588588085
+4.579035966311402
+5.893185759640688
+6.106636245578515
+5.82886017697454
+5.640570370406782
+5.860294282881512
+# of entries with 0 mass: 0
+# of entries in first bin: 74
+==================Hist LeadingHiggs_mass================
+Total amount of data = 50
+==================Hist SubLeadingHiggs_mass================
+Total amount of data = 50
+==================Hist radionPT_Arr================
+Total amount of data = 50
+==================Hist tau_pt_Arr================
+Total amount of data = 200
+==================Hist tau_eta_Arr================
+Total amount of data = 200

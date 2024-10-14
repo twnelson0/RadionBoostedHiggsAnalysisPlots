@@ -13,7 +13,7 @@ from keras import optimizers
 from keras.models import Sequential
 from keras.layers import Dense, Conv2D, MaxPooling2D, Dropout, Flatten
 from keras import regularizers
-from keras.wrappers.scikit_learn import KerasClassifier
+#from keras.wrappers.scikit_learn import KerasClassifier
 from keras.callbacks import EarlyStopping
 
 from sklearn.model_selection import cross_val_score
@@ -29,7 +29,7 @@ from sklearn.svm import SVC
 from sklearn.utils import class_weight
 
 from matplotlib import pyplot
-#import ROOT
+import ROOT
 import numpy as np
 import pandas as pd
 import uproot as uprt
@@ -57,7 +57,7 @@ def prepare_data():
     # Get data from root files
     #samples = ['output_ZZ', 'out_2000']  ## eventually change this to 'output_ZZ_even', 'out_2000_even' 
     #samples = ['output_ZZ_odd', 'out_2000_odd']
-    samples = ["ZZ4l","sample"]
+    samples = ["ZZ4l","Signal"]
     DataFrames = {} # define empty dictionary to hold dataframes
     Selection = {}    
 
@@ -72,8 +72,9 @@ def prepare_data():
     #Read training data from parquet files
     for s in samples:
         #file = pd.read_parquet(s + ".paquet",engine="pyarrow")
-        DataFrames[s] = pd.read_parquet(s + ".paquet",engine="pyarrow")
-        DataFrames[s] = pd.Series({var : DataFrames[s][var].to_numpy() for var in ML_inputs}) #Store everything as a pandas series
+        DataFrames[s] = pd.read_parquet(s + ".parquet",engine="pyarrow")
+        #DataFrames[s] = pd.Series({var : DataFrames[s][var].to_numpy() for var in ML_inputs}) #Store everything as a pandas series (using a series may be causing problems)
+        #DataFrames[s] = pd.DataFrame({var: DataFrames[s][var].to_list for var in ML_inputs})
         DataFrames[s] = DataFrames[s].iloc[0:8500]
 
     
@@ -100,7 +101,8 @@ def prepare_data():
         print(s)
         if s!='data': # only MC should pass this
             all_MC.append(DataFrames[s][ML_inputs]) # append the MC dataframe to the list containing all MC features
-            if 'out_2000_odd' in s: # only signal MC should pass this
+            #if 'out_2000_odd' in s: # only signal MC should pass this
+            if "Signal" in s:
             ## sort between even and odd 
 
                 all_y.append(np.ones(DataFrames[s].shape[0])) # signal events are labelled with 1
@@ -114,9 +116,10 @@ def prepare_data():
     # make train and test sets
     print('Preparing train and test data')
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=492 ) # set the random seed for reproducibility
+    print(X_train)
 
     scaler = StandardScaler() # initialise StandardScaler
-    scaler.fit(X_train) # Fit only to the training data
+    scaler.fit(X_train) # Fit only to the training data (This line is causing problems not sure why though)
     X_train_scaled = scaler.transform(X_train)
     X_test_scaled = scaler.transform(X_test)
     X_scaled = scaler.transform(X)
@@ -139,9 +142,9 @@ def prepare_data():
     y_valid, y_train_nn = y_train[:1000], y_train[1000:] # first 1000 events for validation
 
     print('Input feature correlation')
-    print(DataFrames['out_2000_odd'].corr()) #Pearson
+    print(DataFrames['Signal'].corr()) #Pearson
     fig = pyplot.figure(figsize=(20, 16))
-    corrMatrix = DataFrames['out_2000_odd'].corr()
+    corrMatrix = DataFrames['Signal'].corr()
     ax = pyplot.gca()    
     pyplot.text(0.5, 1.05, "CMS Simulation (Work In Progress)      (13 TeV)", fontweight="bold", horizontalalignment='center',verticalalignment='center', transform=ax.transAxes, fontsize=28)   
     sns.heatmap(corrMatrix, annot=True, cmap=pyplot.cm.Blues)
@@ -226,7 +229,8 @@ def train_model(X_train, y_train, X_test, y_test, X_val, y_val):
     pyplot.savefig('confusion_matrix.png')
 
     # save trained model
-    model.save('model.h5')
+    #model.save('model.h5')
+    model.save('model.keras')
 
     return acc, history
 
@@ -255,9 +259,11 @@ def main():
     X_train, y_train, X_test, y_test, X_val, y_val = prepare_data()
 
     # 2 train model
+    print("Training")
     history = train_model(X_train, y_train, X_test, y_test, X_val, y_val)
 
     # 3 plot model
+    print("Plotting")
     plot_model(history)
 
     print(('\033[1m'+'> Time Elapsed = {:.3f} sec'+'\033[0m').format((time.time()-start_time)))

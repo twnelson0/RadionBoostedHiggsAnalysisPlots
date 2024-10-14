@@ -9,6 +9,8 @@ from sklearn.metrics import auc
 from sklearn.multiclass import OneVsRestClassifier
 from sklearn.linear_model import LogisticRegression
 from array import array
+#from ROOT import *
+#from pyroot import *
 from ROOT import *
 
 def compare_train_test(clf, X_train, y_train, X_test, y_test, xlabel, node):
@@ -218,8 +220,9 @@ def plot_input_features(X, y, idx_label, xlabel):
     ax = plt.gca()    
     plt.text(0.5, 1.05, "CMS Simulation (Work In Progress)      (13 TeV)", fontweight="bold", horizontalalignment='center',verticalalignment='center', transform=ax.transAxes, fontsize=28)
 
-    plt.hist(decisions[0],bins=bin_edges,density=True,histtype='stepfilled',color='blue',label='Background- ZZ4l + ZZ2l2q',alpha=0.5)
-    plt.hist(decisions[1],bins=bin_edges,density=True,histtype='stepfilled',color='orange',label='Signal-GluGluToRadionToHHTo4T_M-1000',alpha=0.5)
+    #plt.hist(decisions[0],bins=bin_edges,density=True,histtype='stepfilled',color='blue',label='Background- ZZ4l + ZZ2l2q',alpha=0.5)
+    plt.hist(decisions[0],bins=bin_edges,density=True,histtype='stepfilled',color='blue',label='Background- ZZ4l',alpha=0.5)
+    plt.hist(decisions[1],bins=bin_edges,density=True,histtype='stepfilled',color='orange',label='Signal-GluGluToRadionToHHTo4T_M-2000',alpha=0.5)
     #plt.hist(decisions[2],bins=bin_edges,density=True,histtype='stepfilled',color='mediumpurple',label='ttcc',alpha=0.5)
     #plt.hist(decisions[3],bins=bin_edges,density=True,histtype='stepfilled',color='cadetblue',label='ttlf',alpha=0.5)
 

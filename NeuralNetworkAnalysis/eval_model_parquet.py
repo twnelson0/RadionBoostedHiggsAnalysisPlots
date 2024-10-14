@@ -19,8 +19,9 @@ if __name__ == "__main__":
     #file_array = ["Data_JetHT_mass_2000GeV.parquet", "Data_SingleMuonmass_2000GeV.parquet"]
     #file_array = ["Data_JetHT","Data_SingleMuon","Signal"]
     
-    file_array = ["Data_JetHT","Data_SingleMuon","Signal","TTToSemiLeptonic","TTTo2L2Nu","TTToHadronic","DYJetsToLL_Pt-50To100","DYJetsToLL_Pt-100To250","DYJetsToLL_Pt-250To400",
-            "DYJetsToLL_Pt-400To650","DYJetsToLL_Pt-650ToInf","WZ3l1nu","WZ2l2q","WZ1l1nu2q","ZZ2l2q", "WZ1l3nu", "VV2l2nu", "Tbar-tchan","T-tchan","Tbar-tW","T-tW", 
+    file_array = ["Data_JetHT","Data_SingleMuon","Signal_mass_1000GeV","Signal_mass_2000GeV","Signal_mass_3000GeV","TTToSemiLeptonic","TTTo2L2Nu","TTToHadronic",
+            "DYJetsToLL_Pt-50To100","DYJetsToLL_Pt-100To250","DYJetsToLL_Pt-250To400","DYJetsToLL_Pt-400To650","DYJetsToLL_Pt-650ToInf",
+            "WZ3l1nu","WZ2l2q","WZ1l1nu2q","ZZ2l2q", "WZ1l3nu", "VV2l2nu", "Tbar-tchan","T-tchan","Tbar-tW","T-tW", 
 			"WJetsToLNu_HT-100To200","WJetsToLNu_HT-200To400","WJetsToLNu_HT-400To600","WJetsToLNu_HT-600To800","WJetsToLNu_HT-800To1200","WJetsToLNu_HT-1200To2500","WJetsToLNu_HT-2500ToInf",
 			"ZZ4l"]
 
@@ -43,7 +44,11 @@ if __name__ == "__main__":
 
         #Load the data
         data_full = read_file(file_name +".parquet")
+        
+        #Drop 
         data = data_full.drop("weight",axis=1)
+        data = data.drop("ZMult",axis=1)
+        data = data.drop("RecoRadion_Mass",axis=1)
 
         #Read in normalization information and normalize data
         norm_data = pd.read_csv("variable_norm.csv")

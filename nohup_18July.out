@@ -1,0 +1,155 @@
+====================Radion Mass = 2.0 TeV====================
+Preprocessing 100% ━━━━━━━━━━━━━━━━━━━━━━ 6/6 [ 0:00:04 < 0:00:00 | 1.2 file/s ]
+!!!=====Dataset=====!!!!
+<class 'str'>
+Data_SingleMuon
+Number of events before selection + Trigger: 1905
+Single Muon Trigger
+# of events after Trigger + Selection: 476
+# of events after Trigger + Selection (dropping empty arrays): 476
+# of events after pT cut (dropping empty arrays): 476
+# of events after eta cut (dropping empty arrays): 476
+# of events after decay cut (dropping empty arrays): 476
+# of events after isolation cut (dropping empty arrays): 52
+# of events after visible mass cut (dropping empty arrays): 19
+# of events after Higgs cut (dropping empty arrays): 15
+# of events after topology cut (dropping empty arrays): 15
+# of events after b-jet cut (dropping empty arrays): 15
+!!!=====Dataset=====!!!!
+<class 'str'>
+Data_SingleMuon
+Number of events before selection + Trigger: 469
+Single Muon Trigger
+# of events after Trigger + Selection: 110
+# of events after Trigger + Selection (dropping empty arrays): 110
+# of events after pT cut (dropping empty arrays): 110
+# of events after eta cut (dropping empty arrays): 110
+# of events after decay cut (dropping empty arrays): 110
+# of events after isolation cut (dropping empty arrays): 10
+# of events after visible mass cut (dropping empty arrays): 5
+# of events after Higgs cut (dropping empty arrays): 5
+# of events after topology cut (dropping empty arrays): 5
+# of events after b-jet cut (dropping empty arrays): 5
+!!!=====Dataset=====!!!!
+<class 'str'>
+Data_SingleMuon
+Number of events before selection + Trigger: 424
+Single Muon Trigger
+# of events after Trigger + Selection: 101
+# of events after Trigger + Selection (dropping empty arrays): 101
+# of events after pT cut (dropping empty arrays): 101
+# of events after eta cut (dropping empty arrays): 101
+# of events after decay cut (dropping empty arrays): 101
+# of events after isolation cut (dropping empty arrays): 11
+# of events after visible mass cut (dropping empty arrays): 6
+# of events after Higgs cut (dropping empty arrays): 5
+# of events after topology cut (dropping empty arrays): 5
+# of events after b-jet cut (dropping empty arrays): 5
+!!!=====Dataset=====!!!!
+<class 'str'>
+Data_SingleMuon
+Number of events before selection + Trigger: 1008
+Single Muon Trigger
+# of events after Trigger + Selection: 222
+# of events after Trigger + Selection (dropping empty arrays): 222
+# of events after pT cut (dropping empty arrays): 222
+# of events after eta cut (dropping empty arrays): 222
+# of events after decay cut (dropping empty arrays): 222
+# of events after isolation cut (dropping empty arrays): 20
+# of events after visible mass cut (dropping empty arrays): 13
+# of events after Higgs cut (dropping empty arrays): 7
+# of events after topology cut (dropping empty arrays): 7
+# of events after b-jet cut (dropping empty arrays): 7
+!!!=====Dataset=====!!!!
+<class 'str'>
+Signal
+Number of events before selection + Trigger: 14343
+Single Trigger: Mu Trigger (21)
+Number of events after selection + Trigger: 6494
+Number of events after Trigger + Selection (dropping empty arrays): 6494
+# of events after pT cut (dropping empty arrays): 6494
+# of events after eta cut (dropping empty arrays): 6494
+# of events after decay cut (dropping empty arrays): 6494
+# of events after isolation cut (dropping empty arrays): 5428
+# of events after visible mass cut (dropping empty arrays): 5426
+# of events after Higgs cut (dropping empty arrays): 5405
+# of events after topology cut (dropping empty arrays): 5405
+# of events after b-jet cut (dropping empty arrays): 5405
+=========!!!Weight Debugging!!!=========
+Signal
+Luminosity Weight = 0.006232
+Luminosity = 59830.000000
+Cross section = 0.010000
+Number of events Processed: 96000
+!!!=====Dataset=====!!!!
+<class 'str'>
+ZZ4l
+Number of events before selection + Trigger: 29065
+Single Trigger: Mu Trigger (21)
+Number of events after selection + Trigger: 19846
+Number of events after Trigger + Selection (dropping empty arrays): 19846
+# of events after pT cut (dropping empty arrays): 19846
+# of events after eta cut (dropping empty arrays): 19846
+# of events after decay cut (dropping empty arrays): 19846
+# of events after isolation cut (dropping empty arrays): 15107
+# of events after visible mass cut (dropping empty arrays): 14736
+# of events after Higgs cut (dropping empty arrays): 13636
+# of events after topology cut (dropping empty arrays): 13636
+# of events after b-jet cut (dropping empty arrays): 13636
+=========!!!Weight Debugging!!!=========
+ZZ4l
+Luminosity Weight = 0.002750
+Luminosity = 59830.000000
+Cross section = 1.212000
+Number of events Processed: 26371225
+Processing 100% ━━━━━━━━━━━━━━━━━━━━━━━━ 6/6 [ 0:01:23 < 0:00:00 | 0.1 chunk/s ]
+Background ZZ4l added
+==================Hist FourTau_Mass_Arr================
+Background ZZ4l added
+==================Hist HiggsDeltaPhi_Arr================
+Background ZZ4l added
+==================Hist Higgs_DeltaR_Arr================
+Background ZZ4l added
+==================Hist leading_dR_Arr================
+Background ZZ4l added
+==================Hist subleading_dR_Arr================
+Background ZZ4l added
+==================Hist LeadingHiggs_mass================
+Background ZZ4l added
+==================Hist SubLeadingHiggs_mass================
+Background ZZ4l added
+==================Hist radionPT_Arr================
+Background ZZ4l added
+==================Hist tau_pt_Arr================
+Background ZZ4l added
+==================Hist tau_eta_Arr================
+Background ZZ4l added
+==================Hist ZMult_Arr================
+Background ZZ4l added
+==================Hist BJet_Arr================
+Background ZZ4l added
+==================Hist tau_lead_pt_Arr================
+Background ZZ4l added
+==================Hist tau_sublead_pt_Arr================
+Background ZZ4l added
+==================Hist tau_3rdlead_pt_Arr================
+Background ZZ4l added
+==================Hist tau_4thlead_pt_Arr================
+Background ZZ4l added
+==================Hist leading_dPhi_Arr================
+Background ZZ4l added
+==================Hist subleading_dPhi_Arr================
+Background ZZ4l added
+==================Hist radionMET_dPhi_Arr================
+Background ZZ4l added
+==================Hist leadingHiggs_Rad_dR_Arr================
+Background ZZ4l added
+==================Hist subleadingHiggs_Rad_dR_Arr================
+Background ZZ4l added
+==================Hist leadingHiggs_MET_dPhi_Arr================
+Background ZZ4l added
+==================Hist subleadingHiggs_MET_dPhi_Arr================
+Background ZZ4l added
+==================Hist Radion_eta_Arr================
+Background ZZ4l added
+==================Hist Radion_Charge_Arr================
