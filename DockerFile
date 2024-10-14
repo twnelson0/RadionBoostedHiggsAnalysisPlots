@@ -1,4 +1,0 @@
-FROM index.docker.io/coffeateam/coffea-dask-cc7:latest
-
-RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir tensorflow 
