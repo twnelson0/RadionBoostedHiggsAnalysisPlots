@@ -75,7 +75,6 @@ def StackPlot(signal_array,signal_list,background_array,background_list,data_arr
 #            data_input[data] = data_input[data][data_input[data].predictions >= 0.7]
 
 if __name__ == "__main__":
-    print("Test")
 
     #mass = "2000"
     mass_array = ["1000","2000","3000"]
@@ -202,7 +201,7 @@ if __name__ == "__main__":
                     "numBJet": hist.Hist.new.StrCat(["Data"],name="data").Reg(6,0,6, label = r"B Jet Multiplicity").Double(),
                     "ZMult": hist.Hist.new.StrCat(["Data"],name="data").Reg(6,0,6, label = r"Z Boson Multiplicity").Double(),
                     "predictions": hist.Hist.new.StrCat(["Data"],name="data").Reg(7,0,0.7, label = r"Neural Network Model Output").Double(), 
-                    "RecoRadion_Mass": hist.Hist.new.StrCat(["Data"],name="data").Reg(N1,0,reco_mass, label = r"Reconstructed Radion Mass (GeV)").Double(),
+                    "RecoRadion_Mass": hist.Hist.new.StrCat(["Data"],name="data").Reg(15,0,reco_mass, label = r"Reconstructed Radion Mass (GeV)").Double(),
                 }
             
             if (region_name == "ZCR"):
@@ -231,29 +230,29 @@ if __name__ == "__main__":
                     data_input_dict[data] = data_input_dict[data][np.bitwise_or(data_input_dict[data].H1OS != 1,data_input_dict[data].H2OS != 0)]
             if (region_name == "LowPurity"):
                 signal_input = signal_input[np.bitwise_and(signal_input.ZMult < 1,signal_input.numBJet < 1)]
-                signal_input = signal_input[np.bitwise_or(signal_input.H1OS != 0,signal_input.H2OS != 1)]
+                signal_input = signal_input[np.bitwise_and(signal_input.H1OS == 0,signal_input.H2OS == 0)]
                 signal_input = signal_input[signal_input.predictions < 0.7]
                 for background_type in background_dict:
                     for background in background_dict[background_type]: 
                         background_input_dict[background] = background_input_dict[background][np.bitwise_and(background_input_dict[background].ZMult < 1,background_input_dict[background].numBJet < 1)]
-                        background_input_dict[background] = background_input_dict[background][np.bitwise_or(background_input_dict[background].H1OS != 0,background_input_dict[background].H2OS != 0)]
+                        background_input_dict[background] = background_input_dict[background][np.bitwise_and(background_input_dict[background].H1OS == 0,background_input_dict[background].H2OS == 0)]
                         background_input_dict[background] = background_input_dict[background][background_input_dict[background].predictions < 0.7]
                 for data in data_files:
                     data_input_dict[data] = data_input_dict[data][np.bitwise_and(data_input_dict[data].ZMult < 1,data_input_dict[data].numBJet < 1)]
-                    data_input_dict[data] = data_input_dict[data][np.bitwise_or(data_input_dict[data].H1OS != 1,data_input_dict[data].H2OS != 0)]
+                    data_input_dict[data] = data_input_dict[data][np.bitwise_and(data_input_dict[data].H1OS == 0,data_input_dict[data].H2OS == 0)]
                     data_input_dict[data] = data_input_dict[data][data_input_dict[data].predictions < 0.7]
             if (region_name == "HighPurity"):
                 signal_input = signal_input[np.bitwise_and(signal_input.ZMult < 1,signal_input.numBJet < 1)]
-                signal_input = signal_input[np.bitwise_or(signal_input.H1OS != 0,signal_input.H2OS != 1)]
+                signal_input = signal_input[np.bitwise_and(signal_input.H1OS == 0,signal_input.H2OS == 0)]
                 signal_input = signal_input[signal_input.predictions >= 0.7]
                 for background_type in background_dict:
                     for background in background_dict[background_type]: 
                         background_input_dict[background] = background_input_dict[background][np.bitwise_and(background_input_dict[background].ZMult < 1,background_input_dict[background].numBJet < 1)]
-                        background_input_dict[background] = background_input_dict[background][np.bitwise_or(background_input_dict[background].H1OS != 0,background_input_dict[background].H2OS != 0)]
+                        background_input_dict[background] = background_input_dict[background][np.bitwise_and(background_input_dict[background].H1OS == 0,background_input_dict[background].H2OS == 0)]
                         background_input_dict[background] = background_input_dict[background][background_input_dict[background].predictions >= 0.7]
                 for data in data_files:
                     data_input_dict[data] = data_input_dict[data][np.bitwise_and(data_input_dict[data].ZMult < 1,data_input_dict[data].numBJet < 1)]
-                    data_input_dict[data] = data_input_dict[data][np.bitwise_or(data_input_dict[data].H1OS != 1,data_input_dict[data].H2OS != 0)]
+                    data_input_dict[data] = data_input_dict[data][np.bitwise_and(data_input_dict[data].H1OS == 0,data_input_dict[data].H2OS == 0)]
                     data_input_dict[data] = data_input_dict[data][data_input_dict[data].predictions >= 0.7]
 
             #Generate all histograms
