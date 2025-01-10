@@ -56,10 +56,12 @@ if __name__ == "__main__":
                 #NB_error = NB_real_error*NB
                 NB_error = NB_real_error*(weight_sum/NB_real)
                 hep.histplot(four_tau_hist)
-                ax.set_title(r"$N_B$ = %.3f $\pm$ %.3f"%(NB,NB_error),loc="center")
+                #ax.set_title(r"$N_B$ = %.3f $\pm$ %.3f"%(NB,NB_error),loc="center")
+                ax.set_title("B",fontsize=45,loc="center")
+                plt.text(1000,1.56*10**-1,r"$N_B$ = %.3f $\pm$ %.3f"%(NB,NB_error),fontsize=35)
                 ax.set_yscale('log')
                 print("There are %.3f events in region B +/- %.3f"%(NB,NB_error))
-                plt.savefig("ttBar_region_" + region_name + "_Mass_" +mass)
+                plt.savefig("ttBar_region_" + region_name + "_Mass_" +mass,bbox_inches = "tight")
                 plt.close()
 
             if (region_name == "C"):
@@ -79,10 +81,12 @@ if __name__ == "__main__":
                 #NC_error = NC_real_error*NC
                 NC_error = NC_real_error*weight_sum/NC_real
                 hep.histplot(four_tau_hist)
-                ax.set_title(r"$N_C$ = %.3f $\pm$ %.3f"%(NC,NC_error),loc="center")
+                #ax.set_title(r"$N_C$ = %.3f $\pm$ %.3f"%(NC,NC_error),loc="center")
+                plt.text(1000,10**0,r"$N_C$ = %.3f $\pm$ %.3f"%(NC,NC_error),fontsize=35)
+                ax.set_title("C",fontsize=45,loc="center")
                 ax.set_yscale('log')
                 print("There are %.3f events in region C +/- %.3f"%(NC,NC_error))
-                plt.savefig("ttBar_region_" + region_name + "_Mass_" +mass)
+                plt.savefig("ttBar_region_" + region_name + "_Mass_" +mass,bbox_inches = "tight")
                 plt.close()
 
             if (region_name == "D"):
@@ -102,10 +106,12 @@ if __name__ == "__main__":
                 #ND_error = ND_real_error*ND
                 ND_error = ND_real_error*weight_sum/ND_real
                 hep.histplot(four_tau_hist)
-                ax.set_title(r"$N_D$ = %.3f $\pm$ %.3f"%(ND,ND_error),loc="center")
+                #ax.set_title(r"$N_D$ = %.3f $\pm$ %.3f"%(ND,ND_error),loc="center")
+                ax.set_title("D",fontsize=45,loc="center")
                 ax.set_yscale('log')
+                plt.text(1000,10**0,r"$N_D$ = %.3f $\pm$ %.3f"%(ND,ND_error),fontsize=35)
                 print("There are %.3f events in region D +/- %.3f"%(ND,ND_error))
-                plt.savefig("ttBar_region_" + region_name + "_Mass_" +mass)
+                plt.savefig("ttBar_region_" + region_name + "_Mass_" +mass,bbox_inches = "tight")
                 plt.close()
             
             if (region_name == "A"): #Obtain old estimate for 
@@ -126,7 +132,8 @@ if __name__ == "__main__":
                 #NA_error = NA_real_error*(weight_sum)
                 NA_error = 0
                 hep.histplot(four_tau_hist)
-                ax.set_title(r"$N_A$ = %.3f $\pm$ %.3f"%(NA,NA_error),loc="center")
+                #ax.set_title(r"$N_A$ = %.3f $\pm$ %.3f"%(NA,NA_error),loc="center")
+                ax.set_title("A",fontsize=25,loc="center")
                 ax.set_yscale('log')
                 print("There are %.3f events in region A +/- %.3f"%(NA,NA_error))
                 plt.savefig("ttBar_region_" + region_name + "_Mass_" +mass)

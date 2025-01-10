@@ -40,7 +40,12 @@ def fin_state(n_ele, n_mu):
 		state += "$\\tau_h$"
 	return state
 
+#Function that gets theoretical branching fraction
+def branch_ratio(n_had, n_mu, n_ele):
+	return (2/3)**n_had * (1/6)**(n_ele)* (1/6)**(n_mu)
+
 fin_state_vec = np.vectorize(fin_state)
+branch_ratio_vec = np.vectorize(branch_ratio)
 
 #Count the number of Z-Bosons from a set of leptons with a total number of lepton pairs given by num_pairs within a certain range of the Z-peak
 def Z_Count(leptons, num_pairs, Z_lower = 80, Z_upper = 100):
@@ -193,7 +198,8 @@ class FourTauPlotting(processor.ProcessorABC):
                 "n_electrons": ak.zeros_like(events.pfMET),
                 "n_muons": ak.zeros_like(events.pfMET),
                 "n_tau_electrons": ak.zeros_like(events.pfMET),
-                "n_tau_muons": ak.zeros_like(events.pfMET)
+                "n_tau_muons": ak.zeros_like(events.pfMET),
+				"n_tau_hadronic": ak.zeros_like(events.pfMET)
 				#"n_muons": events.nEle,
 				#"n_electrons": events.nMu,
 			},
@@ -284,6 +290,7 @@ class FourTauPlotting(processor.ProcessorABC):
 			Gen_Info = ak.zip({
 					"MCId": events.mcPID,
 					"MotherId": events.mcMomPID,
+					"GMotherId": events.mcGMomPID,
 					"Pt": events.mcPt,
 					"Eta": events.mcEta,
 					"Phi": events.mcPhi,
@@ -393,10 +400,21 @@ class FourTauPlotting(processor.ProcessorABC):
 		Jet_HT = Jet_HT[Jet_HT.PFLooseId > 0.5]
 		event_level["HT"] = ak.sum(Jet_HT.Pt, axis = 1, keepdims=False)
 		
+		#Apply trigger weights
+		#if not(self.isData):
+		#	sum_metmht = event_level["HT"] + event_level["MHT"]
+		#	MET = event_level["MET"]
+			#Get 2d histograms
+		#	with uproot.open("/hdfs/store/user/abdollah/TrgEFF/sf_met_trgEff_2D_2018.root") as f1:
+		#		f1["TrgEfficiency2D"]
+		#		MET = ak.where(MET > 2000,2000,MET)
+		#		sum_metmht = ak.where(sum_metmht > 1500,1500,sum_metmht)
+
+		
 		#Triggering logic
 		trigger_mask = bit_mask([self.trigger_bit])
 		if (not(self.isData)):	#MC trigger logic
-			if (self.OrTrigger):  #and np.pi == np.exp(1)): #Select for both triggers
+			if (self.OrTrigger): # and np.pi == np.exp(1)): #Select for both triggers
 				print("Both Triggers")
 				event_level_21 = event_level[np.bitwise_and(event_level.mu_trigger,bit_mask([21])) == bit_mask([21])]
 				event_level_fail = event_level[np.bitwise_and(event_level.mu_trigger,bit_mask([21])) != bit_mask([21])]
@@ -665,7 +683,7 @@ class FourTauPlotting(processor.ProcessorABC):
 				electron = electron[ak.any(muon.pt > 52, axis = 1)]
 				muon = muon[ak.any(muon.pt > 52, axis = 1)]
 				
-			if ("JetHT" in dataset and np.exp(1) == np.pi): #HT 
+			if ("JetHT" in dataset): # and np.exp(1) == np.pi): #HT 
 				print("Jet Trigger")
 				tau = tau[np.bitwise_and(event_level.jet_trigger,bit_mask([39])) == bit_mask([39])]	
 				AK8Jet = AK8Jet[np.bitwise_and(event_level.jet_trigger,bit_mask([39])) == bit_mask([39])]	
@@ -733,11 +751,14 @@ class FourTauPlotting(processor.ProcessorABC):
 		muon = muon[muon.pt > 20]
 		electron = electron[electron.pt > 20]
 		
-		cond1 = np.bitwise_and(np.abs(electron.SCEta) <= 0.8, electron.IDMVANoIso > 0.837)
-		cond2 = np.bitwise_and(np.bitwise_and(np.abs(electron.SCEta) > 0.8, np.abs(electron.SCEta) <= 1.5), electron.IDMVANoIso > 0.715)
-		cond3 = np.bitwise_and(np.abs(electron.SCEta) >= 1.5, electron.IDMVANoIso > 0.357)
-		good_electron_cond = np.bitwise_or(cond1,np.bitwise_or(cond2,cond3))
-		electron = electron[good_electron_cond]
+		#cond1 = np.bitwise_and(np.abs(electron.SCEta) <= 0.8, electron.IDMVANoIso > 0.837)
+		#cond2 = np.bitwise_and(np.bitwise_and(np.abs(electron.SCEta) > 0.8, np.abs(electron.SCEta) <= 1.5), electron.IDMVANoIso > 0.715)
+		#cond3 = np.bitwise_and(np.abs(electron.SCEta) >= 1.5, electron.IDMVANoIso > 0.357)
+		#good_electron_cond = np.bitwise_or(cond1,np.bitwise_or(cond2,cond3))
+		#electron = electron[good_electron_cond]
+
+		#Good muon selection
+		#cond
 		
 		event_level["n_muons"] = ak.singletons(ak.num(muon.pt,axis=1))
 		event_level["n_electrons"] = ak.singletons(ak.num(electron.pt,axis=1))
@@ -793,7 +814,7 @@ class FourTauPlotting(processor.ProcessorABC):
             
 		
 		#Apply selections
-		tau = tau[tau.pt > 20] #pT selection
+		tau = tau[tau.pt > 30] #pT selection
 		
 		#Remove events with fewer than 4 taus
 		AK8Jet = AK8Jet[ak.num(tau) >= 4]
@@ -806,48 +827,48 @@ class FourTauPlotting(processor.ProcessorABC):
 		tau = tau[ak.num(tau) >= 4] #4 tau events
 		if (self.isData or not(self.isData)):
 			print("# of events after pT cut (dropping empty arrays): %d"%ak.num(tau[ak.num(tau,axis=1) > 0],axis=0))
-		tau = tau[np.abs(tau.eta) < 2.3] #eta selection
+		#tau = tau[np.abs(tau.eta) < 2.3] #eta selection
 		
 		#Remove events with fewer than 4 taus	
-		AK8Jet = AK8Jet[ak.num(tau) >= 4]
-		event_level = event_level[ak.num(tau) >= 4]
-		Jet = Jet[ak.num(tau) >= 4]
-		electron = electron[ak.num(tau) >= 4] 
-		muon = muon[ak.num(tau) >= 4] 
-		if (not(self.isData)): # and self.isData):
-			Gen_Info = Gen_Info[ak.num(tau) >= 4] 
-		tau = tau[ak.num(tau) >= 4] #4 tau events
-		if (self.isData or not(self.isData)):
-			print("# of events after eta cut (dropping empty arrays): %d"%ak.num(tau[ak.num(tau,axis=1) > 0],axis=0))
+		#AK8Jet = AK8Jet[ak.num(tau) >= 4]
+		#event_level = event_level[ak.num(tau) >= 4]
+		#Jet = Jet[ak.num(tau) >= 4]
+		#electron = electron[ak.num(tau) >= 4] 
+		#muon = muon[ak.num(tau) >= 4] 
+		#if (not(self.isData)): # and self.isData):
+		#	Gen_Info = Gen_Info[ak.num(tau) >= 4] 
+		#tau = tau[ak.num(tau) >= 4] #4 tau events
+		#if (self.isData or not(self.isData)):
+		#	print("# of events after eta cut (dropping empty arrays): %d"%ak.num(tau[ak.num(tau,axis=1) > 0],axis=0))
 		
 		
 		#Isolation and decay selections
-		tau = tau[tau.decay >= 0.5]
+		#tau = tau[tau.decay >= 0.5]
 		
 		#Remove events with fewer than 4 taus	
-		AK8Jet = AK8Jet[ak.num(tau) >= 4]
-		event_level = event_level[ak.num(tau) >= 4]
-		Jet = Jet[ak.num(tau) >= 4]
-		electron = electron[ak.num(tau) >= 4] 
-		muon = muon[ak.num(tau) >= 4] 
-		if (not(self.isData)): # and self.isData):
-			Gen_Info = Gen_Info[ak.num(tau) >= 4] 
-		tau = tau[ak.num(tau) >= 4] #4 tau events
-		if (self.isData or not(self.isData)):
-			print("# of events after decay cut (dropping empty arrays): %d"%ak.num(tau[ak.num(tau,axis=1) > 0],axis=0))
+		#AK8Jet = AK8Jet[ak.num(tau) >= 4]
+		#event_level = event_level[ak.num(tau) >= 4]
+		#Jet = Jet[ak.num(tau) >= 4]
+		#electron = electron[ak.num(tau) >= 4] 
+		#muon = muon[ak.num(tau) >= 4] 
+		#if (not(self.isData)): # and self.isData):
+		#	Gen_Info = Gen_Info[ak.num(tau) >= 4] 
+		#tau = tau[ak.num(tau) >= 4] #4 tau events
+		#if (self.isData or not(self.isData)):
+		#	print("# of events after decay cut (dropping empty arrays): %d"%ak.num(tau[ak.num(tau,axis=1) > 0],axis=0))
 		
-		tau = tau[tau.iso >= 0.0] #Make loose to ensure high number of statistics
+		#tau = tau[tau.iso >= 0.0] #Make loose to ensure high number of statistics
 		#Remove events with fewer than 4 taus	
-		AK8Jet = AK8Jet[ak.num(tau) >= 4]
-		event_level = event_level[ak.num(tau) >= 4]
-		Jet = Jet[ak.num(tau) >= 4]
-		electron = electron[ak.num(tau) >= 4] 
-		muon = muon[ak.num(tau) >= 4] 
-		if (not(self.isData)): # and self.isData):
-			Gen_Info = Gen_Info[ak.num(tau) >= 4] 
-		tau = tau[ak.num(tau) >= 4] #4 tau events
-		if (self.isData or not(self.isData)):
-			print("# of events after isolation cut (dropping empty arrays): %d"%ak.num(tau[ak.num(tau,axis=1) > 0],axis=0))
+		#AK8Jet = AK8Jet[ak.num(tau) >= 4]
+		#event_level = event_level[ak.num(tau) >= 4]
+		#Jet = Jet[ak.num(tau) >= 4]
+		#electron = electron[ak.num(tau) >= 4] 
+		#muon = muon[ak.num(tau) >= 4] 
+		#if (not(self.isData)): # and self.isData):
+		#	Gen_Info = Gen_Info[ak.num(tau) >= 4] 
+		#tau = tau[ak.num(tau) >= 4] #4 tau events
+		#if (self.isData or not(self.isData)):
+		#	print("# of events after isolation cut (dropping empty arrays): %d"%ak.num(tau[ak.num(tau,axis=1) > 0],axis=0))
 
 
 		#Delta R Cut on taus (identifiy and remove jets incorrectly reconstructed as taus)
@@ -861,6 +882,7 @@ class FourTauPlotting(processor.ProcessorABC):
 		#if (self.isData or not(self.isData)):
 		#	print("# of events after delta R cut (dropping empty arrays): %d"%ak.num(tau[ak.num(tau,axis=1) > 0],axis=0))
 		
+		#!!!DO NOT UN COMMENT THIS OUT!!!
 		#AK8Jet = AK8Jet[(ak.sum(tau.charge,axis=1) == 0)] #Apply charge conservation cut to AK8Jets
 		#event_level = event_level[(ak.sum(tau.charge,axis=1) == 0)]
 		#Jet = Jet[(ak.sum(tau.charge,axis=1) == 0)]
@@ -868,24 +890,20 @@ class FourTauPlotting(processor.ProcessorABC):
 		#muon = muon[(ak.sum(tau.charge,axis=1) == 0)]
 		#tau = tau[(ak.sum(tau.charge,axis=1) == 0)] #Charge conservation
 		#if (self.isData or not(self.isData)):
-			#print(ak.sum(tau.charge,axis=1))
-		#	for q in ak.sum(tau.charge,axis=1):
-		#		if q != 0:
-		#			print("Somethign went wrong")
 		#	print("# of events after lepton number cut (dropping empty arrays): %d"%ak.num(tau[ak.num(tau,axis=1) > 0],axis=0))
 
 		#Remove all events with 3 or fewer taus (after selections at once)
-		#AK8Jet = AK8Jet[ak.num(tau) >= 4]
-		#event_level = event_level[ak.num(tau) >= 4]
-		#Jet = Jet[ak.num(tau) >= 4]
-		#electron = electron[ak.num(tau) >= 4] 
-		#muon = muon[ak.num(tau) >= 4] 
-		#tau = tau[ak.num(tau) >= 4] #4 tau events
-		#if (self.isData or not(self.isData)):
-		#	print("# of events after 4-tau cut (dropping empty arrays): %d"%ak.num(tau[ak.num(tau,axis=1) > 0],axis=0))
+		AK8Jet = AK8Jet[ak.num(tau) >= 4]
+		event_level = event_level[ak.num(tau) >= 4]
+		Jet = Jet[ak.num(tau) >= 4]
+		electron = electron[ak.num(tau) >= 4] 
+		muon = muon[ak.num(tau) >= 4] 
+		tau = tau[ak.num(tau) >= 4] #4 tau events
+		if (self.isData or not(self.isData)):
+			print("# of events after 4-tau cut (dropping empty arrays): %d"%ak.num(tau[ak.num(tau,axis=1) > 0],axis=0))
 	
-		#print("tau length = %d\nevent_level length = %d"%(ak.num(tau,axis=0),ak.num(event_level,axis=0)))	
-		#tau = tau[ak.num(tau) > 0] #Handle empty arrays left over
+		print("tau length = %d\nevent_level length = %d"%(ak.num(tau,axis=0),ak.num(event_level,axis=0)))	
+		tau = tau[ak.num(tau) > 0] #Handle empty arrays left over
 		
 		#Z Mutliplticity of taus
 		event_level["ZMult_tau"] = find_Z_Candidates(tau,ak.ArrayBuilder()).snapshot()
@@ -1133,46 +1151,186 @@ class FourTauPlotting(processor.ProcessorABC):
 			electron_Dict = {0: "LeadingTau_ele", 1: "PairedLeadingTau_ele", 2: "NextLeadingTau_ele", 3: "PairedNextLeadingTau_ele"}
 			muon_Dict = {0: "LeadingTau_mu", 1: "PairedLeadingTau_mu", 2: "NextLeadingTau_mu", 3: "PairedNextLeadingTau_mu"}
 
-			temp_electron = electron
-			temp_muon = muon
+			temp_electron = electron_fourVec
+			temp_muon = muon_fourVec
+
+			min_elec_dR_dict = {}
 			
+			#Number of taus reconstructed as electrons, muons and taus
+			n_electron_array = np.zeros(len(electron.E))
+			n_muon_array = np.zeros(len(electron.E))
+			n_hadron_array = np.zeros(len(electron.E))
+
+			prev_min_elec_dR = []
+			prev_min_muon_dR = []
+
+			if not(self.isData):
+				gen_elec_arr = ak.zeros_like(event_level.n_tau_muons)
+				gen_muon_arr = ak.zeros_like(event_level.n_tau_muons)
+				gen_had_arr = ak.zeros_like(event_level.n_tau_muons)
+
+				Good_GenTau = Gen_Info[np.abs(Gen_Info.MotherId) == 15] #Ensure mother particles are Taus
+				Good_GenTau = Good_GenTau[Good_GenTau.GMotherId == 25] #Ensure Taus come from Higgs
+				print(len(Good_GenTau))
+
+				#Count muons, electrons and hadrons
+				gen_elec_arr = ak.sum(np.abs(Good_GenTau.MCId) == 11,axis = 1)
+				gen_muon_arr = ak.sum(np.abs(Good_GenTau.MCId) == 13,axis = 1)
+				gen_had_arr = ak.sum(np.bitwise_and(np.abs(Good_GenTau.MCId) != 11,np.abs(Good_GenTau.MCId) != 13),axis=1)
+				#gen_elec_arr = ak.where(np.abs(Good_GenTau.MCId) == 11, gen_elec_arr + 1, gen_elec_arr)
+				#gen_muon_arr = ak.where(np.abs(Good_GenTau.MCId) == 13, gen_muon_arr + 1, gen_muon_arr)
+				#gen_had_arr = ak.where(np.bitwise_and(np.abs(Good_GenTau.MCId) != 13, np.abs(Good_GenTau.MCId) != 11), gen_had_arr + 1, gen_had_arr)
+
+				n_4had_gen = 0
+				n_3had_1e_gen = 0
+				n_3had_1mu_gen = 0
+
+				for evnt in range(len(Good_GenTau)):
+					print(gen_had_arr[evnt])
+					if (gen_had_arr[evnt] + gen_muon_arr[evnt] + gen_elec_arr[evnt] > 4):
+						print("!!!Too many gen level particles!!!!!")
+						print("Electrons from tau: %d"%gen_elec_arr[evnt])
+						print("Muons from tau: %d"%gen_muon_arr[evnt])
+						print("Hardonic taus: %d"%gen_had_arr[evnt])
+					if (gen_had_arr[evnt] + gen_muon_arr[evnt] + gen_elec_arr[evnt] < 4):
+						print("!!!Too few gen level particles!!!!!!")
+						print("Electrons from tau: %d"%gen_elec_arr[evnt])
+						print("Muons from tau: %d"%gen_muon_arr[evnt])
+						print("Hardonic taus: %d"%gen_had_arr[evnt])
+					if (gen_had_arr[evnt] == 4):
+						n_4had_gen += 1
+					if (gen_had_arr[evnt] == 3 and gen_muon_arr[evnt] == 1):
+						n_3had_1mu_gen += 1
+					if (gen_had_arr[evnt] == 3 and gen_elec_arr[evnt] == 1):
+						n_3had_1e_gen += 1
+				
+				print("Fraction of gen 4 hadron decays: %.3f"%(n_4had_gen/len(gen_elec_arr)))	
+				print("Fraction of gen 3 hadron 1 electron decays: %.3f"%(n_3had_1e_gen/len(gen_elec_arr)))	
+				print("Fraction of gen 3 hadron 1 muon decays: %.3f"%(n_3had_1mu_gen/len(gen_elec_arr)))	
+
+			
+			#Old style implementation (mostly awkward free)
+			print("==========Begin Mostly Awkward Free Algorithm==========")
+			
+			for n in range(len(temp_electron.t)): #Just use event loop
+				#Keep track of the indicies of previously paired electrons and muons
+				prev_used_ele = []
+				prev_used_mu = []
+				for i in range(4): #Loop over all taus
+					elec_dR_Array = []
+					muon_dR_Array = []
+					tau_fourVec = ak.zip({"t": tau[n][i].E,"x": tau[n][i].Px, "y": tau[n][i].Py,"z" : tau[n][i].Pz},with_name = "Momentum4D")
+				
+					#Get lepton tau angular seperations
+					for j_e in range(len(temp_electron[n])):
+						elec_dR_Array.append(tau_fourVec.deltaR(temp_electron[n][j_e]))
+						if (j_e in prev_used_ele): #Skip previously paired electrons
+							continue
+					if (len(temp_electron[n]) == 0): #Handle events with no electrons
+						elec_dR_Array.append(10)
+					for j_mu in range(len(temp_muon[n])):
+						muon_dR_Array.append(tau_fourVec.deltaR(temp_muon[n][j_mu]))
+						if (j_mu in prev_used_mu): #Skip previously paired muons
+							continue
+					if (len(temp_muon[n]) == 0): #Handle events with no muons
+						muon_dR_Array.append(10)
+					
+					#Get the smallest delta R Values
+					min_elec_dR = min(elec_dR_Array)
+					min_muon_dR = min(muon_dR_Array) 
+
+					if (min_elec_dR < min_muon_dR and min_elec_dR < 0.05):
+						n_electron_array[n] += 1
+						prev_used_ele.append(elec_dR_Array.index(min_elec_dR))
+					if (min_muon_dR < min_elec_dR and min_muon_dR < 0.05):
+						n_muon_array[n] += 1
+						prev_used_mu.append(muon_dR_Array.index(min_muon_dR))
+					if (min_elec_dR >= 0.05 and min_muon_dR >= 0.05):
+						n_hadron_array[n] += 1
+				#if (i == 0):
+				#	print(prev_used_ele)
+				#temp_electron = temp_electron[ak.from_iter(prev_used_ele)]#prev_elec_dR
+				#temp_muon = temp_muon[ak.from_iter(prev_used_mu)]#prev_elec_dR
+
+			n_3had_1elec = 0
+			n_3had_1muon = 0
+			n_4had = 0
+			
+			for n in range(len(n_electron_array)):
+				#Debugging work
+				if (n_electron_array[n] + n_muon_array[n] + n_hadron_array[n] > 4):
+					print("==========!!!More particles coming out than going in at event %d!!!=========="%n)
+
+				#Count number of 4 hadronic, and 3 hadronic + 1 lepton states
+				if (n_hadron_array[n] == 4):
+					n_4had += 1
+				if (n_electron_array[n] == 1 and n_hadron_array[n] == 3):
+					n_3had_1elec += 1
+				if (n_muon_array[n] == 1 and n_hadron_array[n] == 3):
+					n_3had_1muon += 1
+
+			print("==========Checking the branching factions==========")
+			print("Observed fraction of 4 hadron fraction: %.3f"%(n_4had/len(n_hadron_array)))
+			print("Expcted fraction of 4 hadron fraction: %.3f"%((2/3)**4))
+			print("Observed fraction of 3 hadron + 1 electron fraction: %.3f"%(n_3had_1elec/len(n_hadron_array)))
+			print("Expcted fraction of 3 hadron + 1 electron fraction: %.3f"%((2/3)**3*(1/6)))
+			print("Observed fraction of 3 hadron + 1 muon fraction: %.3f"%(n_3had_1muon/len(n_hadron_array)))
+			print("Expcted fraction of 3 hadron + 1 muon fraction: %.3f"%((2/3)**3*(1/6)))
+			print("==========End Mostly Awkward Free Algorithm==========")
+		
+			#Awkward implementation
 			for i in range(4):
 				print("Tau %d"%i)
 				tau_fourVec = ak.zip({"t": tau[:,i].E,"x": tau[:,i].Px, "y": tau[:,i].Py,"z" : tau[:,i].Pz},with_name = "Momentum4D")
 				elec_dR = tau_fourVec.deltaR(electron_fourVec)
 				muon_dR = tau_fourVec.deltaR(muon_fourVec)
 
-				#Choose leptons with smallest delta Rs such that are < 0.1 
-				misId_ele_cond = np.bitwise_and(elec_dR == ak.min(elec_dR,axis=1),elec_dR < 0.1)
+				#Choose leptons with smallest delta Rs such that are < 0.05 
+				misId_ele_cond = np.bitwise_and(elec_dR == ak.min(elec_dR,axis=1),elec_dR < 0.05)
 				
 				misId_ele_cond = ak.fill_none(misId_ele_cond,[False],axis=0) #Find the the smallest dR between electron and tau
 				if (i == 0):
 					not_prev_id_elec = ak.ones_like(misId_ele_cond)*True
 				misId_ele_cond = np.bitwise_and(misId_ele_cond,not_prev_id_elec)
-				#Update list of paired leptons
-				if (i == 0):
-					not_prev_id_elec = np.bitwise_not(misId_ele_cond)
-				else:
-					not_prev_id_elec = np.bitwise_or(not_prev_id_elec,np.bitwise_not(misId_ele_cond))
+
+				#Check that there is only one electron
 				
-				min_elec_dR = ak.min(elec_dR[misId_ele_cond],axis=1)
+				#Update list of paired leptons
+				#if (i == 0):
+				#	not_prev_id_elec = np.bitwise_not(misId_ele_cond)
+				#else:
+				#	not_prev_id_elec = np.bitwise_or(not_prev_id_elec,np.bitwise_not(np.bitwise_and(misId_ele_cond)))
+				
+				min_elec_dR = ak.min(elec_dR[misId_ele_cond],axis=1) 
 				min_elec_dR = ak.fill_none(min_elec_dR,10) #Fill Nones with impossibly large values
+				#print("================Electron %d====================="%i)
+				#for j in range(10):
+				#	print("%dth Event:"%j)
+				#	print("Minimum Delta R = %f"%min_elec_dR[j])
+			
+				#print(min_elec_dR)
+				#for x in min_elec_dR:
+					#print(x)
+					#if x > 1:
+					#	print("!!!More than 1 min electron (unexpected)!!!")
 				
 				#misId_mu_cond = valid_mu_dR == ak.min(muon_dR,axis=1)
-				misId_mu_cond = np.bitwise_and(muon_dR == ak.min(muon_dR,axis=1),muon_dR < 0.1)
+				misId_mu_cond = np.bitwise_and(muon_dR == ak.min(muon_dR,axis=1),muon_dR < 0.05)
 				misId_mu_cond = ak.fill_none(misId_mu_cond,[False],axis=0) #Find the the smallest dR between muon and tau
 				if (i == 0):
 					not_prev_id_muon = ak.ones_like(misId_mu_cond)*True
 				misId_mu_cond = np.bitwise_and(misId_mu_cond,not_prev_id_muon)
+				
 				#Update list of paired leptons
-				if (i == 0):
-					not_prev_id_muon = np.bitwise_not(misId_mu_cond)
-				else:
-					not_prev_id_muon = np.bitwise_or(not_prev_id_muon,np.bitwise_not(misId_mu_cond))
+				#if (i == 0):
+				#	not_prev_id_muon = np.bitwise_not(misId_mu_cond)
+				#else:
+				#	not_prev_id_muon = np.bitwise_or(not_prev_id_muon,np.bitwise_not(misId_mu_cond))
 				#if (i != 0):
 				#	misId_mu_cond = np.bitwise_and(misId_mu_cond,not_prev_id_muon)
 
 				min_mu_dR = ak.min(muon_dR[misId_mu_cond],axis=1)
+				#min_mu_dR = muon_dR[misId_mu_cond]
 				min_mu_dR = ak.fill_none(min_mu_dR,10) #Fill Nones with impossibly large values
 				
 				#Seperate electrons and muons into those matched and those not matched
@@ -1197,8 +1355,23 @@ class FourTauPlotting(processor.ProcessorABC):
 				#electron_fourVec = electron_fourVec[electron_fourVec.t != misId_ele.t]
 				#muon_fourVec = muon_fourVec[muon_fourVec.t != misId_mu.t]
 
-				use_ele = np.bitwise_anvd(min_elec_dR < min_mu_dR, min_elec_dR < 0.1) #,not_prev_id_elec)
-				use_mu = np.bitwise_and(min_elec_dR > min_mu_dR, min_mu_dR < 0.1) #,not_prev_id_muon)
+				#Check size of min_elec_dR and min_mu_dR
+				#for x in min_elec_dR:
+
+				use_ele = min_elec_dR < min_mu_dR #, min_elec_dR < 0.05) #,not_prev_id_elec)
+				use_mu = min_elec_dR > min_mu_dR #, min_mu_dR < 0.05) #,not_prev_id_muon)
+				use_had = np.bitwise_not(np.bitwise_or(use_ele,use_mu))
+
+				for a,b in zip(use_ele,use_mu):
+					if (a and b):
+						print("!!!!Use both electron and muon!!!!")
+
+				#Update paired electrons and muons
+				#print(len(use_ele))
+				#print(len(misId_ele_cond))
+				not_prev_id_elec = np.bitwise_and(not_prev_id_elec,np.bitwise_not(misId_ele_cond*ak.ravel(use_ele)))
+				not_prev_id_muon = np.bitwise_and(not_prev_id_muon,np.bitwise_not(misId_mu_cond*ak.ravel(use_mu)))
+				
 				#hadronic_debug = np.bitwise_and(use_ele,use_mu)
                 
 				#for x in hadronic_debug:
@@ -1206,27 +1379,51 @@ class FourTauPlotting(processor.ProcessorABC):
 				#	    #print("!!!Hadronic Tau!!!")
 				#		n_hadron
 
+				#Check use_ele and use_mu
+
 				#Count number of taus originating from leptons (Is this logic broken??)
 				event_level["n_tau_electrons"] = ak.where(ak.all(ak.singletons(use_ele) == True,axis=1),event_level["n_tau_electrons"] + 1, event_level["n_tau_electrons"])
 				event_level["n_tau_muons"] = ak.where(ak.all(ak.singletons(use_mu) == True,axis=1),event_level["n_tau_muons"] + 1, event_level["n_tau_muons"]) 
+				event_level["n_tau_hadronic"] = ak.where(ak.all(ak.singletons(use_had) == True,axis=1),event_level["n_tau_hadronic"] + 1,event_level["n_tau_hadronic"])
 
 				#print("Max number of electrons = %d"%ak.max(event_level.n_electrons,axis=0))
 				#print("Max number of muons = %d"%ak.max(event_level.n_muons,axis=0))
                 
-				n_wrong0 = 0
-				n_wrong1 = 0
-				n_wrong2 = 0
-				for j in range(len(event_level.n_tau_electrons)):
-					if (event_level[j].n_tau_electrons > 4):
-						n_wrong0 += 1
-					if (event_level[j].n_tau_muons > 4):
-						n_wrong1 += 1
-					if (event_level[j].n_tau_muons + event_level[j].n_tau_electrons > 4):
-						n_wrong2 += 1
-                
-				print("%d events have more than 4 electrons"%n_wrong0)
-				print("%d events have more than 4 muons"%n_wrong1)
-				print("%d events in which electrons + muons > 4"%n_wrong2)
+
+				if (i == 3):
+					n_wrong0 = 0
+					n_wrong1 = 0
+					n_wrong2 = 0
+					for j in range(len(event_level.n_tau_electrons)):
+						if (event_level[j].n_tau_electrons > 4):
+							n_wrong0 += 1
+						if (event_level[j].n_tau_muons > 4):
+							n_wrong1 += 1
+						if (event_level[j].n_tau_muons + event_level[j].n_tau_electrons > 4):
+							n_wrong2 += 1
+					
+					print("%d events have more than 4 electrons"%n_wrong0)
+					print("%d events have more than 4 muons"%n_wrong1)
+					print("%d events in which electrons + muons > 4"%n_wrong2)
+
+					#Check how many 3 hardonic tau + 1 leptonic tau events there are
+					num_3h1mu = 0
+					num_3h1e = 0
+					num_4h = 0 
+					for j in range(len(event_level.n_tau_hadronic)):
+						if (event_level[j].n_tau_hadronic == 4):
+							num_4h += 1
+						if (event_level[j].n_tau_hadronic == 3):
+							if (event_level[j].n_tau_electrons == 1):
+								num_3h1e += 1
+							if (event_level[j].n_tau_muons == 1):
+								num_3h1mu += 1
+							if (event_level[j].n_tau_muons > 1 or event_level[j].n_tau_electrons > 1):
+								print("!!!!=======================Electron and/or muon miscount=======================!!!!")
+					print("Fraction of events with 3 hadronic taus and 1 muon: %.3f"%(num_3h1mu/len(event_level.n_tau_hadronic)))
+					print("Fraction of events with 4 hadronic taus: %.3f"%(num_4h/len(event_level.n_tau_hadronic)))
+					print("Fraction of events with 3 hadronic taus and 1 electron: %.3f"%(num_3h1e/len(event_level.n_tau_hadronic)))
+
 
 				#Store reco information of taus
 				#event_level[Hadronic_Dict[i]] = np.bitwise_not(np.bitwise_or(use_ele,use_mu)) #I think the logic (with bitwise_and) is broken
@@ -1321,6 +1518,10 @@ class FourTauPlotting(processor.ProcessorABC):
 					print("!!!Subleading tau and paired tau appear to be matching to the same lepton!!!")
 				if (tau[:,1][evnt].E == tau[:,3][evnt].E and tau[:,1][evnt].Px == tau[:,3][evnt].Px and tau[:,1][evnt].Py == tau[:,3][evnt].Py and tau[:,1][evnt].Pz == tau[:,3][evnt].Pz):
 					print("!!!Paired taus appear to be matching to the same lepton!!!")
+				if (tau[:,0][evnt].E == tau[:,3][evnt].E and tau[:,0][evnt].Px == tau[:,3][evnt].Px and tau[:,0][evnt].Py == tau[:,3][evnt].Py and tau[:,0][evnt].Pz == tau[:,3][evnt].Pz):
+					print("!!!Leading tau and subleading paired taus appear to be matching to the same lepton!!!")
+				if (tau[:,1][evnt].E == tau[:,2][evnt].E and tau[:,1][evnt].Px == tau[:,2][evnt].Px and tau[:,1][evnt].Py == tau[:,2][evnt].Py and tau[:,1][evnt].Pz == tau[:,2][evnt].Pz):
+					print("!!!Subleading tau matched to leading paired taus appear to be matching to the same lepton!!!")
 
 				
 
@@ -1771,19 +1972,26 @@ if __name__ == "__main__":
 	#Set up dictionary of all possible final states (in the least efficient way but I just don't care anymore)
 	template_array_1 = []
 	template_array_2 = []
+	template_array_3 = []
 	for i in range(5):
 		for j in range(5):
 			for k in range(5):
 				if (i + j + k == 4):
-					template_array_1.append(i)
-					template_array_2.append(j)
+					template_array_1.append(i) #electron
+					template_array_2.append(j) #muon
+					template_array_3.append(k) #Hadron
 
 	final_state_dict_signal = dict.fromkeys(fin_state_vec(template_array_1,template_array_2),0)
 	final_state_dict_data = dict.fromkeys(fin_state_vec(template_array_1,template_array_2),0)
 	final_state_dict_background = dict.fromkeys(fin_state_vec(template_array_1,template_array_2),0)
-	final_state_dict_data_full = dict.fromkeys(fin_state_vec(template_array_1,template_array_2),[])
-	final_state_dict_signal_full = dict.fromkeys(fin_state_vec(template_array_1,template_array_2),[])
-	final_state_dict_background_full = dict.fromkeys(fin_state_vec(template_array_1,template_array_2),[])
+	final_state_dict_signal_error = dict.fromkeys(fin_state_vec(template_array_1,template_array_2),0)
+	final_state_dict_data_error = dict.fromkeys(fin_state_vec(template_array_1,template_array_2),0)
+	final_state_dict_background_error = dict.fromkeys(fin_state_vec(template_array_1,template_array_2),0)
+	#final_state_dict_data_full = dict.fromkeys(fin_state_vec(template_array_1,template_array_2),[])
+	#final_state_dict_signal_full = dict.fromkeys(fin_state_vec(template_array_1,template_array_2),[])
+	#final_state_dict_background_full = dict.fromkeys(fin_state_vec(template_array_1,template_array_2),[])
+	#final_state_dict_theory = dict.fromkeys(fin_state_vec(template_array_1,template_array_2),branch_ratio_vec(template_array_3,template_array_2,template_array_1))
+	final_state_dict_theory = dict(zip(fin_state_vec(template_array_1,template_array_2),branch_ratio_vec(template_array_3,template_array_2,template_array_1)))
 	background_state_array = []
 
 	
@@ -1855,7 +2063,7 @@ if __name__ == "__main__":
 	#Loop over all mass points
 	for mass in mass_str_arr:
 		print("====================Radion Mass = " + mass[0] + "." + mass[1] + " TeV====================")
-		file_dict_test = { #Reduced files to run over
+		file_dict = { #Reduced files to run over
 			#"ZZ4l": [background_base + "ZZ4l.root"],
 			"DYJetsToLL_Pt-50To100": [background_base + "DYJetsToLL_Pt-50To100.root"] ,
 			"DYJetsToLL_Pt-100To250": [ background_base + "DYJetsToLL_Pt-100To250.root"], 
@@ -1876,7 +2084,7 @@ if __name__ == "__main__":
 		}
 		
 		#Grand Unified Background + Signal + Data Dictionary links file name to location of root file
-		file_dict = {
+		file_dict_full = {
 			"TTToSemiLeptonic": [background_base + "TTToSemiLeptonic.root"], "TTTo2L2Nu": [background_base + "TTTo2L2Nu.root"], "TTToHadronic": [background_base + "TTToHadronic.root"],
 			"ZZ4l": [background_base + "ZZ4l.root"],  
 			"VV2l2nu" : [background_base + "VV2l2nu.root"], 
@@ -2247,6 +2455,11 @@ if __name__ == "__main__":
 							final_state_array = fin_state_vec(fourtau_out["Signal"]["num_electron_tau_Arr"],fourtau_out["Signal"]["num_muon_tau_Arr"])
 							for state in final_state_array:
 								final_state_dict_signal[state] += 1/len(fourtau_out["Signal"]["num_electron_tau_Arr"]) #Why is this getting me non sensical results??
+
+							#Obtain uncertainties
+							for state in final_state_dict_signal:
+								final_state_dict_signal_error[state] = np.sqrt(final_state_dict_signal[state]*len(fourtau_out["Signal"]["num_electron_tau_Arr"]))
+								final_state_dict_signal_error[state] /= len(fourtau_out["Signal"]["num_electron_tau_Arr"])
                         
 
 					
@@ -2274,6 +2487,11 @@ if __name__ == "__main__":
 								    final_state_dict_data[state] += 1/(len(fourtau_out["Data_SingleMuon"]["num_electron_tau_Arr"]) + len(fourtau_out["Data_JetHT"]["num_electron_tau_Arr"]))
 							    for state in final_state_array_Jet:
 								    final_state_dict_data[state] += 1/(len(fourtau_out["Data_SingleMuon"]["num_electron_tau_Arr"]) + len(fourtau_out["Data_JetHT"]["num_electron_tau_Arr"]))
+
+								#Obtain uncertanties
+							    for state in final_state_dict_data:
+								    final_state_dict_data_error[state] = np.sqrt(final_state_dict_data[state]*(len(fourtau_out["Data_SingleMuon"]["num_electron_tau_Arr"]) + len(fourtau_out["Data_JetHT"]["num_electron_tau_Arr"])))
+								    final_state_dict_data_error[state] /= (len(fourtau_out["Data_SingleMuon"]["num_electron_tau_Arr"]) + len(fourtau_out["Data_JetHT"]["num_electron_tau_Arr"]))
 
 						#print("Number of Jet HT entries: %d"%len(fourtau_out["Data_JetHT"][hist_name]))
 					
@@ -2305,6 +2523,11 @@ if __name__ == "__main__":
 	#Store final states in tables
 	for state in background_state_array:
 		final_state_dict_background[state] += 1/len(background_state_array)
+
+	#Obtain error bars
+	for state in final_state_dict_background:
+		final_state_dict_background_error[state] = np.sqrt(final_state_dict_background[state]*len(background_state_array))
+		final_state_dict_background_error[state] /= len(background_state_array)
 	
 	#for state in final_state_dict_signal_full:
 	#	final_state_dict_signal_full[state].append(final_state_dict_signal[state])
@@ -2325,7 +2548,7 @@ if __name__ == "__main__":
 	store_tau_states = True
 	if (store_tau_states):
 		#file = open("Final_State_Table_Gen.tex","w")
-		file = open("Final_State_Table_Reco.tex","w")
+		file = open("Final_State_Table_Reco_errorbars_05.tex","w")
 
 		#Set up the tex document
 		file.write("\\documentclass{article} \n")
@@ -2339,12 +2562,15 @@ if __name__ == "__main__":
 		#Set up the table
 		file.write("\\begin{tabular}{|p{4.5cm}|p{3cm}|p{3cm}|p{3cm}|}")
 		file.write("\\hline \n")
-		file.write("\\multicolumn{4}{|c|}{Final State Table (Reco)} \\\\ \n")
+		file.write("\\multicolumn{4}{|c|}{Final State Table (Reco \\(\\Delta R < 0.05\\))} \\\\ \n")
 		file.write("\\hline \n")
-		file.write("4$\\tau$ Channel & 2 TeV Signal & Drell-Yan + Jets & Data \\\\ \n")
+		file.write("4$\\tau$ Channel & 2 TeV Signal & Drell-Yan + Jets & Theory \\\\ \n")
 		file.write("\\hline \n")
 		for state in final_state_dict_signal:
-			file.write(state + " & %.3f"%final_state_dict_signal[state] + " & %.3f"%final_state_dict_background[state] + " & %.3f"%final_state_dict_data[state] + "\\\\")
+			file.write(state + " & %.3f"%final_state_dict_signal[state] + " $\\pm$ %.3f"%final_state_dict_signal_error[state] + 
+					" & %.3f"%final_state_dict_background[state] + "$\\pm$ %.3f"%final_state_dict_background_error[state] +
+					" & %.3f"%(final_state_dict_theory[state]) + "\\\\")
+					#" & %.3f"%final_state_dict_data[state] + " $\\pm$ %.3f"%final_state_dict_data_error[state] + "\\\\")
 			file.write("\n")
 			file.write("\\hline \n")
 		file.write("\\end{tabular} \n")

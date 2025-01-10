@@ -49,6 +49,9 @@ if __name__ == "__main__":
         data = data_full.drop("weight",axis=1)
         data = data.drop("ZMult",axis=1)
         data = data.drop("RecoRadion_Mass",axis=1)
+        data = data.drop("numBJet",axis=1)
+        data = data.drop("H1OS",axis=1)
+        data = data.drop("H2OS",axis=1)
 
         #Read in normalization information and normalize data
         norm_data = pd.read_csv("variable_norm.csv")

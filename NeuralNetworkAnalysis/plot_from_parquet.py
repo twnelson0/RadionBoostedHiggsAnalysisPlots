@@ -16,8 +16,8 @@ def StackPlot(signal_array,signal_list,background_array,background_list,data_arr
     hep.histplot(signal_array,ax=ax,stack=True,histtype="step",label=signal_list,edgecolor=TABLEAU_COLORS[len(background_list)+1],linewidth=2.95)
     hep.histplot(data_array,ax=ax,stack=False,histtype="errorbar", yerr=True,label=["Data"],marker="o",color = "k") 
     hep.cms.text("Preliminary",loc=0,fontsize=13)
-    ax.set_title("2018 Data",loc = "right")
-    ax.legend(fontsize=10, loc='upper right')
+    ax.set_title(r"2018 Data $59.83 \text{ fb}^{-1}$",loc = "right")
+    ax.legend(fontsize=12, loc='upper right')
     plt.savefig(plot_name)
     plt.close()
 
@@ -124,7 +124,12 @@ if __name__ == "__main__":
             
             #Histogram binning
             N1 = 10
+            N_fourMass = 15
             N2 = 8
+
+            #if (region_name == "HighPurity"):
+                #N_fourMass = 1
+                
 
             #Histogram dictionaries
             hist_dict_background = {
@@ -148,7 +153,7 @@ if __name__ == "__main__":
                     "numBJet": hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name="background").Reg(6,0,6, label = r"B Jet Multiplicity").Double(),
                     "ZMult": hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name="background").Reg(6,0,6, label = r"Z Boson Multiplicity").Double(),
                     "predictions": hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name="background").Reg(N1,0,1.0, label = r"Neural Network Model Output").Double(),
-                    "RecoRadion_Mass": hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name="background").Reg(15,0,3000, label = r"Reconstructed Radion Mass (GeV)").Double(),
+                    "RecoRadion_Mass": hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name="background").Reg(N_fourMass,0,3000, label = r"Reconstructed Radion Mass (GeV)").Double(),
                 }
 
             hist_dict_signal = {
@@ -172,7 +177,7 @@ if __name__ == "__main__":
                     "numBJet": hist.Hist.new.StrCat(["Signal"],name="signal").Reg(6,0,6, label = r"B Jet Multiplicity").Double(),
                     "ZMult": hist.Hist.new.StrCat(["Signal"],name="signal").Reg(6,0,6, label = r"Z Boson Multiplicity").Double(),
                     "predictions": hist.Hist.new.StrCat(["Signal"],name="signal").Reg(N1,0,1.0, label = r"Neural Network Model Output").Double(),
-                    "RecoRadion_Mass": hist.Hist.new.StrCat(["Signal"],name="signal").Reg(15,0,3000, label = r"Reconstructed Radion Mass (GeV)").Double(),
+                    "RecoRadion_Mass": hist.Hist.new.StrCat(["Signal"],name="signal").Reg(N_fourMass,0,3000, label = r"Reconstructed Radion Mass (GeV)").Double(),
                 }
 
             if (region_name == "HighPurity" or region_name == "All"):
@@ -201,7 +206,7 @@ if __name__ == "__main__":
                     "numBJet": hist.Hist.new.StrCat(["Data"],name="data").Reg(6,0,6, label = r"B Jet Multiplicity").Double(),
                     "ZMult": hist.Hist.new.StrCat(["Data"],name="data").Reg(6,0,6, label = r"Z Boson Multiplicity").Double(),
                     "predictions": hist.Hist.new.StrCat(["Data"],name="data").Reg(7,0,0.7, label = r"Neural Network Model Output").Double(), 
-                    "RecoRadion_Mass": hist.Hist.new.StrCat(["Data"],name="data").Reg(15,0,reco_mass, label = r"Reconstructed Radion Mass (GeV)").Double(),
+                    "RecoRadion_Mass": hist.Hist.new.StrCat(["Data"],name="data").Reg(N_fourMass,0,reco_mass, label = r"Reconstructed Radion Mass (GeV)").Double(),
                 }
             
             if (region_name == "ZCR"):
@@ -220,14 +225,14 @@ if __name__ == "__main__":
                     data_input_dict[data] = data_input_dict[data][np.bitwise_and(data_input_dict[data].numBJet >= 1, data_input_dict[data].ZMult < 1)]
             if (region_name == "FakeCR"):
                 signal_input = signal_input[np.bitwise_and(signal_input.ZMult < 1,signal_input.numBJet < 1)]
-                signal_input = signal_input[np.bitwise_or(signal_input.H1OS != 0,signal_input.H2OS != 1)]
+                signal_input = signal_input[np.bitwise_or(signal_input.H1OS != 0,signal_input.H2OS !=0)]
                 for background_type in background_dict:
                     for background in background_dict[background_type]: 
                         background_input_dict[background] = background_input_dict[background][np.bitwise_and(background_input_dict[background].ZMult < 1,background_input_dict[background].numBJet < 1)]
                         background_input_dict[background] = background_input_dict[background][np.bitwise_or(background_input_dict[background].H1OS != 0,background_input_dict[background].H2OS != 0)]
                 for data in data_files:
                     data_input_dict[data] = data_input_dict[data][np.bitwise_and(data_input_dict[data].ZMult < 1,data_input_dict[data].numBJet < 1)]
-                    data_input_dict[data] = data_input_dict[data][np.bitwise_or(data_input_dict[data].H1OS != 1,data_input_dict[data].H2OS != 0)]
+                    data_input_dict[data] = data_input_dict[data][np.bitwise_or(data_input_dict[data].H1OS != 0,data_input_dict[data].H2OS != 0)]
             if (region_name == "LowPurity"):
                 signal_input = signal_input[np.bitwise_and(signal_input.ZMult < 1,signal_input.numBJet < 1)]
                 signal_input = signal_input[np.bitwise_and(signal_input.H1OS == 0,signal_input.H2OS == 0)]
@@ -287,7 +292,10 @@ if __name__ == "__main__":
                     background_array.append(background_stack[background])
 
                 #Generate plots
-                StackPlot(signal_array,signal_list,background_array,background_list,data_array,dict_plot_names[hist_name] + "_" + region_name) 
+                if (region_name == "HighPurity"):
+                    StackPlot(signal_array,signal_list,background_array,background_list,data_array,dict_plot_names[hist_name] + "_" + region_name + "_single_bin") 
+                else:
+                    StackPlot(signal_array,signal_list,background_array,background_list,data_array,dict_plot_names[hist_name] + "_" + region_name) 
         
          
 

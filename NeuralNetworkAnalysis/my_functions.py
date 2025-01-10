@@ -11,7 +11,10 @@ from sklearn.linear_model import LogisticRegression
 from array import array
 #from ROOT import *
 #from pyroot import *
-from ROOT import *
+#from ROOT import *
+from ROOT import TFile
+from ROOT import TGraph
+from ROOT import TMath
 
 def compare_train_test(clf, X_train, y_train, X_test, y_test, xlabel, node):
     decisions = [] # list to hold decisions of classifier
@@ -139,7 +142,7 @@ def compare_train_test_binary(clf, X_train, y_train, X_test, y_test, xlabel):
     handles.append(mpatches.Patch(color='none', label=extraString_Bkg))
 
     plt.xlabel(xlabel,fontsize=24) # write x-axis label
-    plt.ylabel("Arbitrary units",fontsize=24) # write y-axis label
+    #plt.ylabel("Arbitrary units",fontsize=24) # write y-axis label
     plt.legend(loc='best',handles=handles,fontsize=20) # add legend
     plt.savefig('KS_binary_classification.png')
     plt.close(figKS)
@@ -221,13 +224,15 @@ def plot_input_features(X, y, idx_label, xlabel):
     plt.text(0.5, 1.05, "CMS Simulation (Work In Progress)      (13 TeV)", fontweight="bold", horizontalalignment='center',verticalalignment='center', transform=ax.transAxes, fontsize=28)
 
     #plt.hist(decisions[0],bins=bin_edges,density=True,histtype='stepfilled',color='blue',label='Background- ZZ4l + ZZ2l2q',alpha=0.5)
+    #plt.hist(decisions[0],bins=bin_edges,density=True,histtype='stepfilled',color='blue',label='Background- ZZ4l',alpha=0.5)
+    #plt.hist(decisions[1],bins=bin_edges,density=True,histtype='stepfilled',color='orange',label='Signal-GluGluToRadionToHHTo4T_M-2000',alpha=0.5)
     plt.hist(decisions[0],bins=bin_edges,density=True,histtype='stepfilled',color='blue',label='Background- ZZ4l',alpha=0.5)
-    plt.hist(decisions[1],bins=bin_edges,density=True,histtype='stepfilled',color='orange',label='Signal-GluGluToRadionToHHTo4T_M-2000',alpha=0.5)
+    plt.hist(decisions[1],bins=bin_edges,density=True,histtype='stepfilled',color='red',label='Signal-GluGluToRadionToHHTo4T_M-2000',alpha=0.5)
     #plt.hist(decisions[2],bins=bin_edges,density=True,histtype='stepfilled',color='mediumpurple',label='ttcc',alpha=0.5)
     #plt.hist(decisions[3],bins=bin_edges,density=True,histtype='stepfilled',color='cadetblue',label='ttlf',alpha=0.5)
 
     plt.xlabel(xlabel,fontsize=28) # write x-axis label
-    plt.ylabel("Arbitrary units",fontsize=28) # write y-axis label
+    #plt.ylabel("Arbitrary units",fontsize=28) # write y-axis label
     plt.legend(loc='best',fontsize=24) # add legend
     plt.savefig('Var_'+xlabel+'_.png')
     plt.close(fig)
