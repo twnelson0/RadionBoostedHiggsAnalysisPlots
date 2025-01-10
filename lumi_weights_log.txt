@@ -1,0 +1,616 @@
+====================Radion Mass = 2.0 TeV====================
+Preprocessing 100% ━━━━━━━━━━━━━━━━━━━━ 35/35 [ 0:00:33 < 0:00:00 | 1.1 file/s ]
+!!!=====Dataset=====!!!!
+<class 'str'>
+Data_JetHT
+Number of events before selection + Trigger: 2532
+# of events after pT cut (dropping empty arrays): 2532
+# of events after eta cut (dropping empty arrays): 2532
+# of events after decay cut (dropping empty arrays): 2532
+# of events after isolation cut (dropping empty arrays): 79
+# of events after Higgs cut (dropping empty arrays): 47
+# of events after topology cut (dropping empty arrays): 47
+# of events after b-jet cut (dropping empty arrays): 47
+# of events after Trigger + Selection: 5
+# of events after Trigger + Selection (dropping empty arrays): 5
+!!!=====Dataset=====!!!!
+<class 'str'>
+Data_JetHT
+Number of events before selection + Trigger: 522
+# of events after pT cut (dropping empty arrays): 522
+# of events after eta cut (dropping empty arrays): 522
+# of events after decay cut (dropping empty arrays): 522
+# of events after isolation cut (dropping empty arrays): 22
+# of events after Higgs cut (dropping empty arrays): 13
+# of events after topology cut (dropping empty arrays): 13
+# of events after b-jet cut (dropping empty arrays): 13
+# of events after Trigger + Selection: 0
+# of events after Trigger + Selection (dropping empty arrays): 0
+!!!=====Dataset=====!!!!
+<class 'str'>
+Data_JetHT
+Number of events before selection + Trigger: 611
+# of events after pT cut (dropping empty arrays): 611
+# of events after eta cut (dropping empty arrays): 611
+# of events after decay cut (dropping empty arrays): 611
+# of events after isolation cut (dropping empty arrays): 19
+# of events after Higgs cut (dropping empty arrays): 11
+# of events after topology cut (dropping empty arrays): 11
+# of events after b-jet cut (dropping empty arrays): 11
+# of events after Trigger + Selection: 1
+# of events after Trigger + Selection (dropping empty arrays): 1
+!!!=====Dataset=====!!!!
+<class 'str'>
+Data_JetHT
+Number of events before selection + Trigger: 1289
+# of events after pT cut (dropping empty arrays): 1289
+# of events after eta cut (dropping empty arrays): 1289
+# of events after decay cut (dropping empty arrays): 1289
+# of events after isolation cut (dropping empty arrays): 36
+# of events after Higgs cut (dropping empty arrays): 24
+# of events after topology cut (dropping empty arrays): 24
+# of events after b-jet cut (dropping empty arrays): 24
+# of events after Trigger + Selection: 2
+# of events after Trigger + Selection (dropping empty arrays): 2
+!!!=====Dataset=====!!!!
+<class 'str'>
+Data_SingleMuon
+Number of events before selection + Trigger: 1905
+# of events after pT cut (dropping empty arrays): 1905
+# of events after eta cut (dropping empty arrays): 1905
+# of events after decay cut (dropping empty arrays): 1905
+# of events after isolation cut (dropping empty arrays): 175
+# of events after Higgs cut (dropping empty arrays): 129
+# of events after topology cut (dropping empty arrays): 129
+# of events after b-jet cut (dropping empty arrays): 129
+# of events after Trigger + Selection: 39
+# of events after Trigger + Selection (dropping empty arrays): 39
+!!!=====Dataset=====!!!!
+<class 'str'>
+Data_SingleMuon
+Number of events before selection + Trigger: 469
+# of events after pT cut (dropping empty arrays): 469
+# of events after eta cut (dropping empty arrays): 469
+# of events after decay cut (dropping empty arrays): 469
+# of events after isolation cut (dropping empty arrays): 50
+# of events after Higgs cut (dropping empty arrays): 41
+# of events after topology cut (dropping empty arrays): 41
+# of events after b-jet cut (dropping empty arrays): 41
+# of events after Trigger + Selection: 9
+# of events after Trigger + Selection (dropping empty arrays): 9
+!!!=====Dataset=====!!!!
+<class 'str'>
+Data_SingleMuon
+Number of events before selection + Trigger: 424
+# of events after pT cut (dropping empty arrays): 424
+# of events after eta cut (dropping empty arrays): 424
+# of events after decay cut (dropping empty arrays): 424
+# of events after isolation cut (dropping empty arrays): 37
+# of events after Higgs cut (dropping empty arrays): 26
+# of events after topology cut (dropping empty arrays): 26
+# of events after b-jet cut (dropping empty arrays): 26
+# of events after Trigger + Selection: 10
+# of events after Trigger + Selection (dropping empty arrays): 10
+!!!=====Dataset=====!!!!
+<class 'str'>
+Data_SingleMuon
+Number of events before selection + Trigger: 1008
+# of events after pT cut (dropping empty arrays): 1008
+# of events after eta cut (dropping empty arrays): 1008
+# of events after decay cut (dropping empty arrays): 1008
+# of events after isolation cut (dropping empty arrays): 119
+# of events after Higgs cut (dropping empty arrays): 89
+# of events after topology cut (dropping empty arrays): 89
+# of events after b-jet cut (dropping empty arrays): 89
+# of events after Trigger + Selection: 13
+# of events after Trigger + Selection (dropping empty arrays): 13
+!!!=====Dataset=====!!!!
+<class 'str'>
+Signal
+Number of events before selection + Trigger: 14343
+# of events after pT cut (dropping empty arrays): 14343
+# of events after eta cut (dropping empty arrays): 14343
+# of events after decay cut (dropping empty arrays): 14343
+# of events after isolation cut (dropping empty arrays): 11760
+# of events after Higgs cut (dropping empty arrays): 11594
+# of events after topology cut (dropping empty arrays): 11594
+# of events after b-jet cut (dropping empty arrays): 11594
+Number of events after selection + Trigger: 9103
+Number of events after Trigger + Selection (dropping empty arrays): 9103
+=========!!!Weight Debugging!!!=========
+Signal
+Luminosity Weight = 0.006232
+Cross section = 0.010000
+Number of events Processed: 96000
+!!!=====Dataset=====!!!!
+<class 'str'>
+WJetsToLNu_HT-2500ToInf
+Number of events before selection + Trigger: 60
+# of events after pT cut (dropping empty arrays): 60
+# of events after eta cut (dropping empty arrays): 60
+# of events after decay cut (dropping empty arrays): 60
+# of events after isolation cut (dropping empty arrays): 2
+# of events after Higgs cut (dropping empty arrays): 1
+# of events after topology cut (dropping empty arrays): 1
+# of events after b-jet cut (dropping empty arrays): 1
+Number of events after selection + Trigger: 1
+Number of events after Trigger + Selection (dropping empty arrays): 1
+=========!!!Weight Debugging!!!=========
+WJetsToLNu_HT-2500ToInf
+Luminosity Weight = 0.000711
+Cross section = 0.038914
+Number of events Processed: 3273980
+!!!=====Dataset=====!!!!
+<class 'str'>
+WJetsToLNu_HT-1200To2500
+Number of events before selection + Trigger: 167
+# of events after pT cut (dropping empty arrays): 167
+# of events after eta cut (dropping empty arrays): 167
+# of events after decay cut (dropping empty arrays): 167
+# of events after isolation cut (dropping empty arrays): 3
+# of events after Higgs cut (dropping empty arrays): 2
+# of events after topology cut (dropping empty arrays): 2
+# of events after b-jet cut (dropping empty arrays): 2
+Number of events after selection + Trigger: 0
+Number of events after Trigger + Selection (dropping empty arrays): 0
+=========!!!Weight Debugging!!!=========
+WJetsToLNu_HT-1200To2500
+Luminosity Weight = 0.012603
+Cross section = 1.608090
+Number of events Processed: 7633949
+!!!=====Dataset=====!!!!
+<class 'str'>
+WJetsToLNu_HT-800To1200
+Number of events before selection + Trigger: 172
+# of events after pT cut (dropping empty arrays): 172
+# of events after eta cut (dropping empty arrays): 172
+# of events after decay cut (dropping empty arrays): 172
+# of events after isolation cut (dropping empty arrays): 2
+# of events after Higgs cut (dropping empty arrays): 2
+# of events after topology cut (dropping empty arrays): 2
+# of events after b-jet cut (dropping empty arrays): 2
+Number of events after selection + Trigger: 1
+Number of events after Trigger + Selection (dropping empty arrays): 1
+=========!!!Weight Debugging!!!=========
+WJetsToLNu_HT-800To1200
+Luminosity Weight = 0.047394
+Cross section = 6.656210
+Number of events Processed: 8402687
+!!!=====Dataset=====!!!!
+<class 'str'>
+WJetsToLNu_HT-600To800
+Number of events before selection + Trigger: 452
+# of events after pT cut (dropping empty arrays): 452
+# of events after eta cut (dropping empty arrays): 452
+# of events after decay cut (dropping empty arrays): 452
+# of events after isolation cut (dropping empty arrays): 19
+# of events after Higgs cut (dropping empty arrays): 11
+# of events after topology cut (dropping empty arrays): 11
+# of events after b-jet cut (dropping empty arrays): 11
+Number of events after selection + Trigger: 6
+Number of events after Trigger + Selection (dropping empty arrays): 6
+=========!!!Weight Debugging!!!=========
+WJetsToLNu_HT-600To800
+Luminosity Weight = 0.044218
+Cross section = 14.580500
+Number of events Processed: 19728401
+!!!=====Dataset=====!!!!
+<class 'str'>
+WJetsToLNu_HT-400To600
+Number of events before selection + Trigger: 120
+# of events after pT cut (dropping empty arrays): 120
+# of events after eta cut (dropping empty arrays): 120
+# of events after decay cut (dropping empty arrays): 120
+# of events after isolation cut (dropping empty arrays): 7
+# of events after Higgs cut (dropping empty arrays): 4
+# of events after topology cut (dropping empty arrays): 4
+# of events after b-jet cut (dropping empty arrays): 4
+Number of events after selection + Trigger: 3
+Number of events after Trigger + Selection (dropping empty arrays): 3
+=========!!!Weight Debugging!!!=========
+WJetsToLNu_HT-400To600
+Luminosity Weight = 0.596829
+Cross section = 59.181100
+Number of events Processed: 5932701
+!!!=====Dataset=====!!!!
+<class 'str'>
+WJetsToLNu_HT-200To400
+Number of events before selection + Trigger: 235
+# of events after pT cut (dropping empty arrays): 235
+# of events after eta cut (dropping empty arrays): 235
+# of events after decay cut (dropping empty arrays): 235
+# of events after isolation cut (dropping empty arrays): 15
+# of events after Higgs cut (dropping empty arrays): 13
+# of events after topology cut (dropping empty arrays): 13
+# of events after b-jet cut (dropping empty arrays): 13
+Number of events after selection + Trigger: 7
+Number of events after Trigger + Selection (dropping empty arrays): 7
+=========!!!Weight Debugging!!!=========
+WJetsToLNu_HT-200To400
+Luminosity Weight = 1.022431
+Cross section = 435.237000
+Number of events Processed: 25468933
+!!!=====Dataset=====!!!!
+<class 'str'>
+WJetsToLNu_HT-100To200
+Number of events before selection + Trigger: 40
+# of events after pT cut (dropping empty arrays): 40
+# of events after eta cut (dropping empty arrays): 40
+# of events after decay cut (dropping empty arrays): 40
+# of events after isolation cut (dropping empty arrays): 5
+# of events after Higgs cut (dropping empty arrays): 5
+# of events after topology cut (dropping empty arrays): 5
+# of events after b-jet cut (dropping empty arrays): 5
+Number of events after selection + Trigger: 3
+Number of events after Trigger + Selection (dropping empty arrays): 3
+=========!!!Weight Debugging!!!=========
+WJetsToLNu_HT-100To200
+Luminosity Weight = 3.298324
+Cross section = 1627.450000
+Number of events Processed: 29521158
+!!!=====Dataset=====!!!!
+<class 'str'>
+T-tW
+Number of events before selection + Trigger: 405
+# of events after pT cut (dropping empty arrays): 405
+# of events after eta cut (dropping empty arrays): 405
+# of events after decay cut (dropping empty arrays): 405
+# of events after isolation cut (dropping empty arrays): 30
+# of events after Higgs cut (dropping empty arrays): 20
+# of events after topology cut (dropping empty arrays): 20
+# of events after b-jet cut (dropping empty arrays): 20
+Number of events after selection + Trigger: 7
+Number of events after Trigger + Selection (dropping empty arrays): 7
+=========!!!Weight Debugging!!!=========
+T-tW
+Luminosity Weight = 0.230464
+Cross section = 35.600000
+Number of events Processed: 9242000
+!!!=====Dataset=====!!!!
+<class 'str'>
+Tbar-tW
+Number of events before selection + Trigger: 299
+# of events after pT cut (dropping empty arrays): 299
+# of events after eta cut (dropping empty arrays): 299
+# of events after decay cut (dropping empty arrays): 299
+# of events after isolation cut (dropping empty arrays): 28
+# of events after Higgs cut (dropping empty arrays): 19
+# of events after topology cut (dropping empty arrays): 19
+# of events after b-jet cut (dropping empty arrays): 19
+Number of events after selection + Trigger: 7
+Number of events after Trigger + Selection (dropping empty arrays): 7
+=========!!!Weight Debugging!!!=========
+Tbar-tW
+Luminosity Weight = 0.279411
+Cross section = 35.600000
+Number of events Processed: 7623000
+!!!=====Dataset=====!!!!
+<class 'str'>
+T-tchan
+Number of events before selection + Trigger: 748
+# of events after pT cut (dropping empty arrays): 748
+# of events after eta cut (dropping empty arrays): 748
+# of events after decay cut (dropping empty arrays): 748
+# of events after isolation cut (dropping empty arrays): 39
+# of events after Higgs cut (dropping empty arrays): 28
+# of events after topology cut (dropping empty arrays): 28
+# of events after b-jet cut (dropping empty arrays): 28
+Number of events after selection + Trigger: 8
+Number of events after Trigger + Selection (dropping empty arrays): 8
+=========!!!Weight Debugging!!!=========
+T-tchan
+Luminosity Weight = 0.017107
+Cross section = 44.070000
+Number of events Processed: 154130900
+!!!=====Dataset=====!!!!
+<class 'str'>
+Tbar-tchan
+Number of events before selection + Trigger: 450
+# of events after pT cut (dropping empty arrays): 450
+# of events after eta cut (dropping empty arrays): 450
+# of events after decay cut (dropping empty arrays): 450
+# of events after isolation cut (dropping empty arrays): 23
+# of events after Higgs cut (dropping empty arrays): 15
+# of events after topology cut (dropping empty arrays): 15
+# of events after b-jet cut (dropping empty arrays): 15
+Number of events after selection + Trigger: 3
+Number of events after Trigger + Selection (dropping empty arrays): 3
+=========!!!Weight Debugging!!!=========
+Tbar-tchan
+Luminosity Weight = 0.019842
+Cross section = 26.230000
+Number of events Processed: 79090800
+!!!=====Dataset=====!!!!
+<class 'str'>
+DYJetsToLL_Pt-650ToInf
+Number of events before selection + Trigger: 1188
+# of events after pT cut (dropping empty arrays): 1188
+# of events after eta cut (dropping empty arrays): 1188
+# of events after decay cut (dropping empty arrays): 1188
+# of events after isolation cut (dropping empty arrays): 132
+# of events after Higgs cut (dropping empty arrays): 79
+# of events after topology cut (dropping empty arrays): 79
+# of events after b-jet cut (dropping empty arrays): 79
+Number of events after selection + Trigger: 52
+Number of events after Trigger + Selection (dropping empty arrays): 52
+=========!!!Weight Debugging!!!=========
+DYJetsToLL_Pt-650ToInf
+Luminosity Weight = 0.001376
+Cross section = 0.043602
+Number of events Processed: 1895998
+!!!=====Dataset=====!!!!
+<class 'str'>
+DYJetsToLL_Pt-400To650
+Number of events before selection + Trigger: 1209
+# of events after pT cut (dropping empty arrays): 1209
+# of events after eta cut (dropping empty arrays): 1209
+# of events after decay cut (dropping empty arrays): 1209
+# of events after isolation cut (dropping empty arrays): 154
+# of events after Higgs cut (dropping empty arrays): 106
+# of events after topology cut (dropping empty arrays): 106
+# of events after b-jet cut (dropping empty arrays): 106
+Number of events after selection + Trigger: 65
+Number of events after Trigger + Selection (dropping empty arrays): 65
+=========!!!Weight Debugging!!!=========
+DYJetsToLL_Pt-400To650
+Luminosity Weight = 0.014896
+Cross section = 0.464024
+Number of events Processed: 1863809
+!!!=====Dataset=====!!!!
+<class 'str'>
+DYJetsToLL_Pt-250To400
+Number of events before selection + Trigger: 8981
+# of events after pT cut (dropping empty arrays): 8981
+# of events after eta cut (dropping empty arrays): 8981
+# of events after decay cut (dropping empty arrays): 8981
+# of events after isolation cut (dropping empty arrays): 1259
+# of events after Higgs cut (dropping empty arrays): 968
+# of events after topology cut (dropping empty arrays): 968
+# of events after b-jet cut (dropping empty arrays): 968
+Number of events after selection + Trigger: 507
+Number of events after Trigger + Selection (dropping empty arrays): 507
+=========!!!Weight Debugging!!!=========
+DYJetsToLL_Pt-250To400
+Luminosity Weight = 0.010214
+Cross section = 3.435181
+Number of events Processed: 20121253
+!!!=====Dataset=====!!!!
+<class 'str'>
+DYJetsToLL_Pt-100To250
+Number of events before selection + Trigger: 7836
+# of events after pT cut (dropping empty arrays): 7836
+# of events after eta cut (dropping empty arrays): 7836
+# of events after decay cut (dropping empty arrays): 7836
+# of events after isolation cut (dropping empty arrays): 1106
+# of events after Higgs cut (dropping empty arrays): 844
+# of events after topology cut (dropping empty arrays): 844
+# of events after b-jet cut (dropping empty arrays): 844
+Number of events after selection + Trigger: 417
+Number of events after Trigger + Selection (dropping empty arrays): 417
+=========!!!Weight Debugging!!!=========
+DYJetsToLL_Pt-100To250
+Luminosity Weight = 0.065519
+Cross section = 89.395097
+Number of events Processed: 81633326
+!!!=====Dataset=====!!!!
+<class 'str'>
+DYJetsToLL_Pt-50To100
+Number of events before selection + Trigger: 2633
+# of events after pT cut (dropping empty arrays): 2633
+# of events after eta cut (dropping empty arrays): 2633
+# of events after decay cut (dropping empty arrays): 2633
+# of events after isolation cut (dropping empty arrays): 367
+# of events after Higgs cut (dropping empty arrays): 296
+# of events after topology cut (dropping empty arrays): 296
+# of events after b-jet cut (dropping empty arrays): 296
+Number of events after selection + Trigger: 142
+Number of events after Trigger + Selection (dropping empty arrays): 142
+=========!!!Weight Debugging!!!=========
+DYJetsToLL_Pt-50To100
+Luminosity Weight = 0.192319
+Cross section = 387.130778
+Number of events Processed: 120435658
+!!!=====Dataset=====!!!!
+<class 'str'>
+WZ1l1nu2q
+Number of events before selection + Trigger: 757
+# of events after pT cut (dropping empty arrays): 757
+# of events after eta cut (dropping empty arrays): 757
+# of events after decay cut (dropping empty arrays): 757
+# of events after isolation cut (dropping empty arrays): 36
+# of events after Higgs cut (dropping empty arrays): 25
+# of events after topology cut (dropping empty arrays): 25
+# of events after b-jet cut (dropping empty arrays): 25
+Number of events after selection + Trigger: 10
+Number of events after Trigger + Selection (dropping empty arrays): 10
+=========!!!Weight Debugging!!!=========
+WZ1l1nu2q
+Luminosity Weight = 0.009416
+Cross section = 10.710000
+Number of events Processed: 68048958
+!!!=====Dataset=====!!!!
+<class 'str'>
+WZ2l2q
+Number of events before selection + Trigger: 3286
+# of events after pT cut (dropping empty arrays): 3286
+# of events after eta cut (dropping empty arrays): 3286
+# of events after decay cut (dropping empty arrays): 3286
+# of events after isolation cut (dropping empty arrays): 360
+# of events after Higgs cut (dropping empty arrays): 238
+# of events after topology cut (dropping empty arrays): 238
+# of events after b-jet cut (dropping empty arrays): 238
+Number of events after selection + Trigger: 111
+Number of events after Trigger + Selection (dropping empty arrays): 111
+=========!!!Weight Debugging!!!=========
+WZ2l2q
+Luminosity Weight = 0.011873
+Cross section = 5.595000
+Number of events Processed: 28193648
+!!!=====Dataset=====!!!!
+<class 'str'>
+ZZ2l2q
+Number of events before selection + Trigger: 5928
+# of events after pT cut (dropping empty arrays): 5928
+# of events after eta cut (dropping empty arrays): 5928
+# of events after decay cut (dropping empty arrays): 5928
+# of events after isolation cut (dropping empty arrays): 726
+# of events after Higgs cut (dropping empty arrays): 546
+# of events after topology cut (dropping empty arrays): 546
+# of events after b-jet cut (dropping empty arrays): 546
+Number of events after selection + Trigger: 250
+Number of events after Trigger + Selection (dropping empty arrays): 250
+=========!!!Weight Debugging!!!=========
+ZZ2l2q
+Luminosity Weight = 0.003512
+Cross section = 3.220000
+Number of events Processed: 54856689
+!!!=====Dataset=====!!!!
+<class 'str'>
+WZ3l1nu
+Number of events before selection + Trigger: 5222
+# of events after pT cut (dropping empty arrays): 5222
+# of events after eta cut (dropping empty arrays): 5222
+# of events after decay cut (dropping empty arrays): 5222
+# of events after isolation cut (dropping empty arrays): 1495
+# of events after Higgs cut (dropping empty arrays): 1123
+# of events after topology cut (dropping empty arrays): 1123
+# of events after b-jet cut (dropping empty arrays): 1123
+Number of events after selection + Trigger: 741
+Number of events after Trigger + Selection (dropping empty arrays): 741
+=========!!!Weight Debugging!!!=========
+WZ3l1nu
+Luminosity Weight = 0.012805
+Cross section = 4.708000
+Number of events Processed: 21997587
+!!!=====Dataset=====!!!!
+<class 'str'>
+WZ1l3nu
+Number of events before selection + Trigger: 4
+# of events after pT cut (dropping empty arrays): 4
+# of events after eta cut (dropping empty arrays): 4
+# of events after decay cut (dropping empty arrays): 4
+# of events after isolation cut (dropping empty arrays): 0
+# of events after b-jet cut (dropping empty arrays): 0
+Number of events after selection + Trigger: 0
+Number of events after Trigger + Selection (dropping empty arrays): 0
+=========!!!Weight Debugging!!!=========
+WZ1l3nu
+Luminosity Weight = 0.107973
+Cross section = 3.050000
+Number of events Processed: 1690064
+!!!=====Dataset=====!!!!
+<class 'str'>
+VV2l2nu
+Number of events before selection + Trigger: 164
+# of events after pT cut (dropping empty arrays): 164
+# of events after eta cut (dropping empty arrays): 164
+# of events after decay cut (dropping empty arrays): 164
+# of events after isolation cut (dropping empty arrays): 25
+# of events after Higgs cut (dropping empty arrays): 16
+# of events after topology cut (dropping empty arrays): 16
+# of events after b-jet cut (dropping empty arrays): 16
+Number of events after selection + Trigger: 10
+Number of events after Trigger + Selection (dropping empty arrays): 10
+=========!!!Weight Debugging!!!=========
+VV2l2nu
+Luminosity Weight = 0.072597
+Cross section = 11.950000
+Number of events Processed: 9848488
+!!!=====Dataset=====!!!!
+<class 'str'>
+ZZ4l
+Number of events before selection + Trigger: 29065
+# of events after pT cut (dropping empty arrays): 29065
+# of events after eta cut (dropping empty arrays): 29065
+# of events after decay cut (dropping empty arrays): 29065
+# of events after isolation cut (dropping empty arrays): 21792
+# of events after Higgs cut (dropping empty arrays): 19498
+# of events after topology cut (dropping empty arrays): 19498
+# of events after b-jet cut (dropping empty arrays): 19498
+Number of events after selection + Trigger: 13732
+Number of events after Trigger + Selection (dropping empty arrays): 13732
+=========!!!Weight Debugging!!!=========
+ZZ4l
+Luminosity Weight = 0.002750
+Cross section = 1.212000
+Number of events Processed: 26371225
+!!!=====Dataset=====!!!!
+<class 'str'>
+TTToHadronic
+Number of events before selection + Trigger: 11511
+# of events after pT cut (dropping empty arrays): 11511
+# of events after eta cut (dropping empty arrays): 11511
+# of events after decay cut (dropping empty arrays): 11511
+# of events after isolation cut (dropping empty arrays): 270
+# of events after Higgs cut (dropping empty arrays): 162
+# of events after topology cut (dropping empty arrays): 162
+# of events after b-jet cut (dropping empty arrays): 162
+Number of events after selection + Trigger: 3
+Number of events after Trigger + Selection (dropping empty arrays): 3
+=========!!!Weight Debugging!!!=========
+TTToHadronic
+Luminosity Weight = 0.071156
+Cross section = 377.951744
+Number of events Processed: 317792000
+!!!=====Dataset=====!!!!
+<class 'str'>
+TTTo2L2Nu
+Number of events before selection + Trigger: 15268
+# of events after pT cut (dropping empty arrays): 15268
+# of events after eta cut (dropping empty arrays): 15268
+# of events after decay cut (dropping empty arrays): 15268
+# of events after isolation cut (dropping empty arrays): 2006
+# of events after Higgs cut (dropping empty arrays): 1258
+# of events after topology cut (dropping empty arrays): 1258
+# of events after b-jet cut (dropping empty arrays): 1258
+Number of events after selection + Trigger: 698
+Number of events after Trigger + Selection (dropping empty arrays): 698
+=========!!!Weight Debugging!!!=========
+TTTo2L2Nu
+Luminosity Weight = 0.084751
+Cross section = 88.249736
+Number of events Processed: 62300000
+!!!=====Dataset=====!!!!
+<class 'str'>
+TTToSemiLeptonic
+Number of events before selection + Trigger: 24625
+# of events after pT cut (dropping empty arrays): 24625
+# of events after eta cut (dropping empty arrays): 24625
+# of events after decay cut (dropping empty arrays): 24625
+# of events after isolation cut (dropping empty arrays): 1250
+# of events after Higgs cut (dropping empty arrays): 764
+# of events after topology cut (dropping empty arrays): 764
+# of events after b-jet cut (dropping empty arrays): 764
+Number of events after selection + Trigger: 274
+Number of events after Trigger + Selection (dropping empty arrays): 274
+=========!!!Weight Debugging!!!=========
+TTToSemiLeptonic
+Luminosity Weight = 0.082258
+Cross section = 365.308992
+Number of events Processed: 265706999
+Processing 100% ━━━━━━━━━━━━━━━━━━━━━━━━ 35/35 [ 0:12:33 < 0:00:00 | ? chunk/s ]
+==================Hist FourTau_Mass_Arr================
+==================Hist HiggsDeltaPhi_Arr================
+==================Hist Higgs_DeltaR_Arr================
+==================Hist leading_dR_Arr================
+==================Hist subleading_dR_Arr================
+==================Hist LeadingHiggs_mass================
+==================Hist SubLeadingHiggs_mass================
+==================Hist radionPT_Arr================
+==================Hist tau_pt_Arr================
+==================Hist tau_eta_Arr================
+==================Hist ZMult_Arr================
+==================Hist BJet_Arr================
+==================Hist tau_lead_pt_Arr================
+==================Hist tau_sublead_pt_Arr================
+==================Hist tau_3rdlead_pt_Arr================
+==================Hist tau_4thlead_pt_Arr================
+==================Hist leading_dPhi_Arr================
+==================Hist subleading_dPhi_Arr================
+==================Hist radionMET_dPhi_Arr================
+==================Hist leadingHiggs_Rad_dR_Arr================
+==================Hist subleadingHiggs_Rad_dR_Arr================
+==================Hist leadingHiggs_MET_dPhi_Arr================
+==================Hist subleadingHiggs_MET_dPhi_Arr================
+==================Hist Radion_eta_Arr================
+==================Hist Radion_Charge_Arr================
