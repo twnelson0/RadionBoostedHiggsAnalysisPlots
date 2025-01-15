@@ -1,0 +1,4094 @@
+====================Radion Mass = 2.0 TeV====================
+Preprocessing 100% ━━━━━━━━━━━━━━━━━━━━ 35/35 [ 0:00:34 < 0:00:00 | 1.1 file/s ]
+!!!=====Dataset=====!!!!
+<class 'str'>
+Data_JetHT
+Number of events before selection + Trigger: 2532
+Jet Trigger
+Number of events after Online Trigger(dropping empty arrays): 191
+# of events after Trigger + Selection: 123
+# of events after Trigger + Selection (dropping empty arrays): 123
+# of events after pT cut (dropping empty arrays): 123
+# of events after eta cut (dropping empty arrays): 123
+# of events after decay cut (dropping empty arrays): 123
+# of events after isolation cut (dropping empty arrays): 7
+# of events after visible mass cut (dropping empty arrays): 7
+# of events after Higgs cut (dropping empty arrays): 5
+# of events after topology cut (dropping empty arrays): 5
+# of events after b-jet cut (dropping empty arrays): 5
+!!!=====Dataset=====!!!!
+<class 'str'>
+Data_JetHT
+Number of events before selection + Trigger: 522
+Jet Trigger
+Number of events after Online Trigger(dropping empty arrays): 39
+# of events after Trigger + Selection: 28
+# of events after Trigger + Selection (dropping empty arrays): 28
+# of events after pT cut (dropping empty arrays): 28
+# of events after eta cut (dropping empty arrays): 28
+# of events after decay cut (dropping empty arrays): 28
+# of events after isolation cut (dropping empty arrays): 1
+# of events after visible mass cut (dropping empty arrays): 0
+# of events after Higgs cut (dropping empty arrays): 0
+# of events after topology cut (dropping empty arrays): 0
+# of events after b-jet cut (dropping empty arrays): 0
+!!!=====Dataset=====!!!!
+<class 'str'>
+Data_JetHT
+Number of events before selection + Trigger: 611
+Jet Trigger
+Number of events after Online Trigger(dropping empty arrays): 37
+# of events after Trigger + Selection: 19
+# of events after Trigger + Selection (dropping empty arrays): 19
+# of events after pT cut (dropping empty arrays): 19
+# of events after eta cut (dropping empty arrays): 19
+# of events after decay cut (dropping empty arrays): 19
+# of events after isolation cut (dropping empty arrays): 3
+# of events after visible mass cut (dropping empty arrays): 2
+# of events after Higgs cut (dropping empty arrays): 1
+# of events after topology cut (dropping empty arrays): 1
+# of events after b-jet cut (dropping empty arrays): 1
+!!!=====Dataset=====!!!!
+<class 'str'>
+Data_JetHT
+Number of events before selection + Trigger: 1289
+Jet Trigger
+Number of events after Online Trigger(dropping empty arrays): 71
+# of events after Trigger + Selection: 42
+# of events after Trigger + Selection (dropping empty arrays): 42
+# of events after pT cut (dropping empty arrays): 42
+# of events after eta cut (dropping empty arrays): 42
+# of events after decay cut (dropping empty arrays): 42
+# of events after isolation cut (dropping empty arrays): 3
+# of events after visible mass cut (dropping empty arrays): 3
+# of events after Higgs cut (dropping empty arrays): 3
+# of events after topology cut (dropping empty arrays): 3
+# of events after b-jet cut (dropping empty arrays): 3
+!!!=====Dataset=====!!!!
+<class 'str'>
+Data_SingleMuon
+Number of events before selection + Trigger: 1905
+Single Muon Trigger
+# of events after Trigger + Selection: 1197
+# of events after Trigger + Selection (dropping empty arrays): 1197
+# of events after pT cut (dropping empty arrays): 1197
+# of events after eta cut (dropping empty arrays): 1197
+# of events after decay cut (dropping empty arrays): 1197
+# of events after isolation cut (dropping empty arrays): 138
+# of events after visible mass cut (dropping empty arrays): 66
+# of events after Higgs cut (dropping empty arrays): 52
+# of events after topology cut (dropping empty arrays): 52
+# of events after b-jet cut (dropping empty arrays): 52
+!!!=====Dataset=====!!!!
+<class 'str'>
+Data_SingleMuon
+Number of events before selection + Trigger: 469
+Single Muon Trigger
+# of events after Trigger + Selection: 302
+# of events after Trigger + Selection (dropping empty arrays): 302
+# of events after pT cut (dropping empty arrays): 302
+# of events after eta cut (dropping empty arrays): 302
+# of events after decay cut (dropping empty arrays): 302
+# of events after isolation cut (dropping empty arrays): 32
+# of events after visible mass cut (dropping empty arrays): 19
+# of events after Higgs cut (dropping empty arrays): 17
+# of events after topology cut (dropping empty arrays): 17
+# of events after b-jet cut (dropping empty arrays): 17
+!!!=====Dataset=====!!!!
+<class 'str'>
+Data_SingleMuon
+Number of events before selection + Trigger: 424
+Single Muon Trigger
+# of events after Trigger + Selection: 268
+# of events after Trigger + Selection (dropping empty arrays): 268
+# of events after pT cut (dropping empty arrays): 268
+# of events after eta cut (dropping empty arrays): 268
+# of events after decay cut (dropping empty arrays): 268
+# of events after isolation cut (dropping empty arrays): 31
+# of events after visible mass cut (dropping empty arrays): 20
+# of events after Higgs cut (dropping empty arrays): 15
+# of events after topology cut (dropping empty arrays): 15
+# of events after b-jet cut (dropping empty arrays): 15
+!!!=====Dataset=====!!!!
+<class 'str'>
+Data_SingleMuon
+Number of events before selection + Trigger: 1008
+Single Muon Trigger
+# of events after Trigger + Selection: 632
+# of events after Trigger + Selection (dropping empty arrays): 632
+# of events after pT cut (dropping empty arrays): 632
+# of events after eta cut (dropping empty arrays): 632
+# of events after decay cut (dropping empty arrays): 632
+# of events after isolation cut (dropping empty arrays): 79
+# of events after visible mass cut (dropping empty arrays): 55
+# of events after Higgs cut (dropping empty arrays): 42
+# of events after topology cut (dropping empty arrays): 42
+# of events after b-jet cut (dropping empty arrays): 42
+!!!=====Dataset=====!!!!
+<class 'str'>
+Signal
+Number of events before selection + Trigger: 14343
+Single Trigger: Mu Trigger (21)
+Number of events after selection + Trigger: 6494
+Number of events after Trigger + Selection (dropping empty arrays): 6494
+# of events after pT cut (dropping empty arrays): 6494
+# of events after eta cut (dropping empty arrays): 6494
+# of events after decay cut (dropping empty arrays): 6494
+# of events after isolation cut (dropping empty arrays): 5428
+# of events after visible mass cut (dropping empty arrays): 5426
+# of events after Higgs cut (dropping empty arrays): 5405
+# of events after topology cut (dropping empty arrays): 5405
+# of events after b-jet cut (dropping empty arrays): 5405
+=========!!!Weight Debugging!!!=========
+Signal
+Luminosity Weight = 0.006232
+Luminosity = 59830.000000
+Cross section = 0.010000
+Number of events Processed: 96000
+!!!=====Dataset=====!!!!
+<class 'str'>
+WJetsToLNu_HT-2500ToInf
+Number of events before selection + Trigger: 60
+Single Trigger: Mu Trigger (21)
+Number of events after selection + Trigger: 20
+Number of events after Trigger + Selection (dropping empty arrays): 20
+# of events after pT cut (dropping empty arrays): 20
+# of events after eta cut (dropping empty arrays): 20
+# of events after decay cut (dropping empty arrays): 20
+# of events after isolation cut (dropping empty arrays): 2
+# of events after visible mass cut (dropping empty arrays): 0
+# of events after Higgs cut (dropping empty arrays): 0
+# of events after topology cut (dropping empty arrays): 0
+# of events after b-jet cut (dropping empty arrays): 0
+=========!!!Weight Debugging!!!=========
+WJetsToLNu_HT-2500ToInf
+Luminosity Weight = 0.000711
+Luminosity = 59830.000000
+Cross section = 0.038914
+Number of events Processed: 3273980
+!!!=====Dataset=====!!!!
+<class 'str'>
+WJetsToLNu_HT-1200To2500
+Number of events before selection + Trigger: 167
+Single Trigger: Mu Trigger (21)
+Number of events after selection + Trigger: 47
+Number of events after Trigger + Selection (dropping empty arrays): 47
+# of events after pT cut (dropping empty arrays): 47
+# of events after eta cut (dropping empty arrays): 47
+# of events after decay cut (dropping empty arrays): 47
+# of events after isolation cut (dropping empty arrays): 0
+# of events after b-jet cut (dropping empty arrays): 0
+=========!!!Weight Debugging!!!=========
+WJetsToLNu_HT-1200To2500
+Luminosity Weight = 0.012603
+Luminosity = 59830.000000
+Cross section = 1.608090
+Number of events Processed: 7633949
+!!!=====Dataset=====!!!!
+<class 'str'>
+WJetsToLNu_HT-800To1200
+Number of events before selection + Trigger: 172
+Single Trigger: Mu Trigger (21)
+Number of events after selection + Trigger: 58
+Number of events after Trigger + Selection (dropping empty arrays): 58
+# of events after pT cut (dropping empty arrays): 58
+# of events after eta cut (dropping empty arrays): 58
+# of events after decay cut (dropping empty arrays): 58
+# of events after isolation cut (dropping empty arrays): 0
+# of events after b-jet cut (dropping empty arrays): 0
+=========!!!Weight Debugging!!!=========
+WJetsToLNu_HT-800To1200
+Luminosity Weight = 0.047394
+Luminosity = 59830.000000
+Cross section = 6.656210
+Number of events Processed: 8402687
+!!!=====Dataset=====!!!!
+<class 'str'>
+WJetsToLNu_HT-600To800
+Number of events before selection + Trigger: 452
+Single Trigger: Mu Trigger (21)
+Number of events after selection + Trigger: 161
+Number of events after Trigger + Selection (dropping empty arrays): 161
+# of events after pT cut (dropping empty arrays): 161
+# of events after eta cut (dropping empty arrays): 161
+# of events after decay cut (dropping empty arrays): 161
+# of events after isolation cut (dropping empty arrays): 10
+# of events after visible mass cut (dropping empty arrays): 9
+# of events after Higgs cut (dropping empty arrays): 7
+# of events after topology cut (dropping empty arrays): 7
+# of events after b-jet cut (dropping empty arrays): 7
+=========!!!Weight Debugging!!!=========
+WJetsToLNu_HT-600To800
+Luminosity Weight = 0.044218
+Luminosity = 59830.000000
+Cross section = 14.580500
+Number of events Processed: 19728401
+!!!=====Dataset=====!!!!
+<class 'str'>
+WJetsToLNu_HT-400To600
+Number of events before selection + Trigger: 120
+Single Trigger: Mu Trigger (21)
+Number of events after selection + Trigger: 42
+Number of events after Trigger + Selection (dropping empty arrays): 42
+# of events after pT cut (dropping empty arrays): 42
+# of events after eta cut (dropping empty arrays): 42
+# of events after decay cut (dropping empty arrays): 42
+# of events after isolation cut (dropping empty arrays): 4
+# of events after visible mass cut (dropping empty arrays): 3
+# of events after Higgs cut (dropping empty arrays): 3
+# of events after topology cut (dropping empty arrays): 3
+# of events after b-jet cut (dropping empty arrays): 3
+=========!!!Weight Debugging!!!=========
+WJetsToLNu_HT-400To600
+Luminosity Weight = 0.596829
+Luminosity = 59830.000000
+Cross section = 59.181100
+Number of events Processed: 5932701
+!!!=====Dataset=====!!!!
+<class 'str'>
+WJetsToLNu_HT-200To400
+Number of events before selection + Trigger: 235
+Single Trigger: Mu Trigger (21)
+Number of events after selection + Trigger: 73
+Number of events after Trigger + Selection (dropping empty arrays): 73
+# of events after pT cut (dropping empty arrays): 73
+# of events after eta cut (dropping empty arrays): 73
+# of events after decay cut (dropping empty arrays): 73
+# of events after isolation cut (dropping empty arrays): 9
+# of events after visible mass cut (dropping empty arrays): 2
+# of events after Higgs cut (dropping empty arrays): 2
+# of events after topology cut (dropping empty arrays): 2
+# of events after b-jet cut (dropping empty arrays): 2
+=========!!!Weight Debugging!!!=========
+WJetsToLNu_HT-200To400
+Luminosity Weight = 1.022431
+Luminosity = 59830.000000
+Cross section = 435.237000
+Number of events Processed: 25468933
+!!!=====Dataset=====!!!!
+<class 'str'>
+WJetsToLNu_HT-100To200
+Number of events before selection + Trigger: 40
+Single Trigger: Mu Trigger (21)
+Number of events after selection + Trigger: 14
+Number of events after Trigger + Selection (dropping empty arrays): 14
+# of events after pT cut (dropping empty arrays): 14
+# of events after eta cut (dropping empty arrays): 14
+# of events after decay cut (dropping empty arrays): 14
+# of events after isolation cut (dropping empty arrays): 3
+# of events after visible mass cut (dropping empty arrays): 1
+# of events after Higgs cut (dropping empty arrays): 1
+# of events after topology cut (dropping empty arrays): 1
+# of events after b-jet cut (dropping empty arrays): 1
+=========!!!Weight Debugging!!!=========
+WJetsToLNu_HT-100To200
+Luminosity Weight = 3.298324
+Luminosity = 59830.000000
+Cross section = 1627.450000
+Number of events Processed: 29521158
+!!!=====Dataset=====!!!!
+<class 'str'>
+T-tW
+Number of events before selection + Trigger: 405
+Single Trigger: Mu Trigger (21)
+Number of events after selection + Trigger: 137
+Number of events after Trigger + Selection (dropping empty arrays): 137
+# of events after pT cut (dropping empty arrays): 137
+# of events after eta cut (dropping empty arrays): 137
+# of events after decay cut (dropping empty arrays): 137
+# of events after isolation cut (dropping empty arrays): 12
+# of events after visible mass cut (dropping empty arrays): 6
+# of events after Higgs cut (dropping empty arrays): 5
+# of events after topology cut (dropping empty arrays): 5
+# of events after b-jet cut (dropping empty arrays): 5
+=========!!!Weight Debugging!!!=========
+T-tW
+Luminosity Weight = 0.230464
+Luminosity = 59830.000000
+Cross section = 35.600000
+Number of events Processed: 9242000
+!!!=====Dataset=====!!!!
+<class 'str'>
+Tbar-tW
+Number of events before selection + Trigger: 299
+Single Trigger: Mu Trigger (21)
+Number of events after selection + Trigger: 101
+Number of events after Trigger + Selection (dropping empty arrays): 101
+# of events after pT cut (dropping empty arrays): 101
+# of events after eta cut (dropping empty arrays): 101
+# of events after decay cut (dropping empty arrays): 101
+# of events after isolation cut (dropping empty arrays): 8
+# of events after visible mass cut (dropping empty arrays): 3
+# of events after Higgs cut (dropping empty arrays): 3
+# of events after topology cut (dropping empty arrays): 3
+# of events after b-jet cut (dropping empty arrays): 3
+=========!!!Weight Debugging!!!=========
+Tbar-tW
+Luminosity Weight = 0.279411
+Luminosity = 59830.000000
+Cross section = 35.600000
+Number of events Processed: 7623000
+!!!=====Dataset=====!!!!
+<class 'str'>
+T-tchan
+Number of events before selection + Trigger: 748
+Single Trigger: Mu Trigger (21)
+Number of events after selection + Trigger: 135
+Number of events after Trigger + Selection (dropping empty arrays): 135
+# of events after pT cut (dropping empty arrays): 135
+# of events after eta cut (dropping empty arrays): 135
+# of events after decay cut (dropping empty arrays): 135
+# of events after isolation cut (dropping empty arrays): 12
+# of events after visible mass cut (dropping empty arrays): 5
+# of events after Higgs cut (dropping empty arrays): 2
+# of events after topology cut (dropping empty arrays): 2
+# of events after b-jet cut (dropping empty arrays): 2
+=========!!!Weight Debugging!!!=========
+T-tchan
+Luminosity Weight = 0.017107
+Luminosity = 59830.000000
+Cross section = 44.070000
+Number of events Processed: 154130900
+!!!=====Dataset=====!!!!
+<class 'str'>
+Tbar-tchan
+Number of events before selection + Trigger: 450
+Single Trigger: Mu Trigger (21)
+Number of events after selection + Trigger: 85
+Number of events after Trigger + Selection (dropping empty arrays): 85
+# of events after pT cut (dropping empty arrays): 85
+# of events after eta cut (dropping empty arrays): 85
+# of events after decay cut (dropping empty arrays): 85
+# of events after isolation cut (dropping empty arrays): 6
+# of events after visible mass cut (dropping empty arrays): 2
+# of events after Higgs cut (dropping empty arrays): 2
+# of events after topology cut (dropping empty arrays): 2
+# of events after b-jet cut (dropping empty arrays): 2
+=========!!!Weight Debugging!!!=========
+Tbar-tchan
+Luminosity Weight = 0.019842
+Luminosity = 59830.000000
+Cross section = 26.230000
+Number of events Processed: 79090800
+!!!=====Dataset=====!!!!
+<class 'str'>
+DYJetsToLL_Pt-650ToInf
+Number of events before selection + Trigger: 1188
+Single Trigger: Mu Trigger (21)
+Number of events after selection + Trigger: 559
+Number of events after Trigger + Selection (dropping empty arrays): 559
+# of events after pT cut (dropping empty arrays): 559
+# of events after eta cut (dropping empty arrays): 559
+# of events after decay cut (dropping empty arrays): 559
+# of events after isolation cut (dropping empty arrays): 72
+# of events after visible mass cut (dropping empty arrays): 36
+# of events after Higgs cut (dropping empty arrays): 26
+# of events after topology cut (dropping empty arrays): 26
+# of events after b-jet cut (dropping empty arrays): 26
+=========!!!Weight Debugging!!!=========
+DYJetsToLL_Pt-650ToInf
+Luminosity Weight = 0.001376
+Luminosity = 59830.000000
+Cross section = 0.043602
+Number of events Processed: 1895998
+!!!=====Dataset=====!!!!
+<class 'str'>
+DYJetsToLL_Pt-400To650
+Number of events before selection + Trigger: 1209
+Single Trigger: Mu Trigger (21)
+Number of events after selection + Trigger: 604
+Number of events after Trigger + Selection (dropping empty arrays): 604
+# of events after pT cut (dropping empty arrays): 604
+# of events after eta cut (dropping empty arrays): 604
+# of events after decay cut (dropping empty arrays): 604
+# of events after isolation cut (dropping empty arrays): 71
+# of events after visible mass cut (dropping empty arrays): 33
+# of events after Higgs cut (dropping empty arrays): 25
+# of events after topology cut (dropping empty arrays): 25
+# of events after b-jet cut (dropping empty arrays): 25
+=========!!!Weight Debugging!!!=========
+DYJetsToLL_Pt-400To650
+Luminosity Weight = 0.014896
+Luminosity = 59830.000000
+Cross section = 0.464024
+Number of events Processed: 1863809
+!!!=====Dataset=====!!!!
+<class 'str'>
+DYJetsToLL_Pt-250To400
+Number of events before selection + Trigger: 8981
+Single Trigger: Mu Trigger (21)
+Number of events after selection + Trigger: 4497
+Number of events after Trigger + Selection (dropping empty arrays): 4497
+# of events after pT cut (dropping empty arrays): 4497
+# of events after eta cut (dropping empty arrays): 4497
+# of events after decay cut (dropping empty arrays): 4497
+# of events after isolation cut (dropping empty arrays): 632
+# of events after visible mass cut (dropping empty arrays): 244
+# of events after Higgs cut (dropping empty arrays): 191
+# of events after topology cut (dropping empty arrays): 191
+# of events after b-jet cut (dropping empty arrays): 191
+=========!!!Weight Debugging!!!=========
+DYJetsToLL_Pt-250To400
+Luminosity Weight = 0.010214
+Luminosity = 59830.000000
+Cross section = 3.435181
+Number of events Processed: 20121253
+!!!=====Dataset=====!!!!
+<class 'str'>
+DYJetsToLL_Pt-100To250
+Number of events before selection + Trigger: 7836
+Single Trigger: Mu Trigger (21)
+Number of events after selection + Trigger: 3916
+Number of events after Trigger + Selection (dropping empty arrays): 3916
+# of events after pT cut (dropping empty arrays): 3916
+# of events after eta cut (dropping empty arrays): 3916
+# of events after decay cut (dropping empty arrays): 3916
+# of events after isolation cut (dropping empty arrays): 535
+# of events after visible mass cut (dropping empty arrays): 295
+# of events after Higgs cut (dropping empty arrays): 236
+# of events after topology cut (dropping empty arrays): 236
+# of events after b-jet cut (dropping empty arrays): 236
+=========!!!Weight Debugging!!!=========
+DYJetsToLL_Pt-100To250
+Luminosity Weight = 0.065519
+Luminosity = 59830.000000
+Cross section = 89.395097
+Number of events Processed: 81633326
+!!!=====Dataset=====!!!!
+<class 'str'>
+DYJetsToLL_Pt-50To100
+Number of events before selection + Trigger: 2633
+Single Trigger: Mu Trigger (21)
+Number of events after selection + Trigger: 1245
+Number of events after Trigger + Selection (dropping empty arrays): 1245
+# of events after pT cut (dropping empty arrays): 1245
+# of events after eta cut (dropping empty arrays): 1245
+# of events after decay cut (dropping empty arrays): 1245
+# of events after isolation cut (dropping empty arrays): 173
+# of events after visible mass cut (dropping empty arrays): 138
+# of events after Higgs cut (dropping empty arrays): 131
+# of events after topology cut (dropping empty arrays): 131
+# of events after b-jet cut (dropping empty arrays): 131
+=========!!!Weight Debugging!!!=========
+DYJetsToLL_Pt-50To100
+Luminosity Weight = 0.192319
+Luminosity = 59830.000000
+Cross section = 387.130778
+Number of events Processed: 120435658
+!!!=====Dataset=====!!!!
+<class 'str'>
+WZ1l1nu2q
+Number of events before selection + Trigger: 757
+Single Trigger: Mu Trigger (21)
+Number of events after selection + Trigger: 257
+Number of events after Trigger + Selection (dropping empty arrays): 257
+# of events after pT cut (dropping empty arrays): 257
+# of events after eta cut (dropping empty arrays): 257
+# of events after decay cut (dropping empty arrays): 257
+# of events after isolation cut (dropping empty arrays): 13
+# of events after visible mass cut (dropping empty arrays): 6
+# of events after Higgs cut (dropping empty arrays): 3
+# of events after topology cut (dropping empty arrays): 3
+# of events after b-jet cut (dropping empty arrays): 3
+=========!!!Weight Debugging!!!=========
+WZ1l1nu2q
+Luminosity Weight = 0.009416
+Luminosity = 59830.000000
+Cross section = 10.710000
+Number of events Processed: 68048958
+!!!=====Dataset=====!!!!
+<class 'str'>
+WZ2l2q
+Number of events before selection + Trigger: 3286
+Single Trigger: Mu Trigger (21)
+Number of events after selection + Trigger: 1487
+Number of events after Trigger + Selection (dropping empty arrays): 1487
+# of events after pT cut (dropping empty arrays): 1487
+# of events after eta cut (dropping empty arrays): 1487
+# of events after decay cut (dropping empty arrays): 1487
+# of events after isolation cut (dropping empty arrays): 165
+# of events after visible mass cut (dropping empty arrays): 140
+# of events after Higgs cut (dropping empty arrays): 98
+# of events after topology cut (dropping empty arrays): 98
+# of events after b-jet cut (dropping empty arrays): 98
+=========!!!Weight Debugging!!!=========
+WZ2l2q
+Luminosity Weight = 0.011873
+Luminosity = 59830.000000
+Cross section = 5.595000
+Number of events Processed: 28193648
+!!!=====Dataset=====!!!!
+<class 'str'>
+ZZ2l2q
+Number of events before selection + Trigger: 5928
+Single Trigger: Mu Trigger (21)
+Number of events after selection + Trigger: 2635
+Number of events after Trigger + Selection (dropping empty arrays): 2635
+# of events after pT cut (dropping empty arrays): 2635
+# of events after eta cut (dropping empty arrays): 2635
+# of events after decay cut (dropping empty arrays): 2635
+# of events after isolation cut (dropping empty arrays): 318
+# of events after visible mass cut (dropping empty arrays): 238
+# of events after Higgs cut (dropping empty arrays): 200
+# of events after topology cut (dropping empty arrays): 200
+# of events after b-jet cut (dropping empty arrays): 200
+=========!!!Weight Debugging!!!=========
+ZZ2l2q
+Luminosity Weight = 0.003512
+Luminosity = 59830.000000
+Cross section = 3.220000
+Number of events Processed: 54856689
+!!!=====Dataset=====!!!!
+<class 'str'>
+WZ3l1nu
+Number of events before selection + Trigger: 5222
+Single Trigger: Mu Trigger (21)
+Number of events after selection + Trigger: 3273
+Number of events after Trigger + Selection (dropping empty arrays): 3273
+# of events after pT cut (dropping empty arrays): 3273
+# of events after eta cut (dropping empty arrays): 3273
+# of events after decay cut (dropping empty arrays): 3273
+# of events after isolation cut (dropping empty arrays): 959
+# of events after visible mass cut (dropping empty arrays): 899
+# of events after Higgs cut (dropping empty arrays): 741
+# of events after topology cut (dropping empty arrays): 741
+# of events after b-jet cut (dropping empty arrays): 741
+=========!!!Weight Debugging!!!=========
+WZ3l1nu
+Luminosity Weight = 0.012805
+Luminosity = 59830.000000
+Cross section = 4.708000
+Number of events Processed: 21997587
+!!!=====Dataset=====!!!!
+<class 'str'>
+WZ1l3nu
+Number of events before selection + Trigger: 4
+Single Trigger: Mu Trigger (21)
+Number of events after selection + Trigger: 2
+Number of events after Trigger + Selection (dropping empty arrays): 2
+# of events after pT cut (dropping empty arrays): 2
+# of events after eta cut (dropping empty arrays): 2
+# of events after decay cut (dropping empty arrays): 2
+# of events after isolation cut (dropping empty arrays): 0
+# of events after b-jet cut (dropping empty arrays): 0
+=========!!!Weight Debugging!!!=========
+WZ1l3nu
+Luminosity Weight = 0.107973
+Luminosity = 59830.000000
+Cross section = 3.050000
+Number of events Processed: 1690064
+!!!=====Dataset=====!!!!
+<class 'str'>
+VV2l2nu
+Number of events before selection + Trigger: 164
+Single Trigger: Mu Trigger (21)
+Number of events after selection + Trigger: 97
+Number of events after Trigger + Selection (dropping empty arrays): 97
+# of events after pT cut (dropping empty arrays): 97
+# of events after eta cut (dropping empty arrays): 97
+# of events after decay cut (dropping empty arrays): 97
+# of events after isolation cut (dropping empty arrays): 15
+# of events after visible mass cut (dropping empty arrays): 8
+# of events after Higgs cut (dropping empty arrays): 5
+# of events after topology cut (dropping empty arrays): 5
+# of events after b-jet cut (dropping empty arrays): 5
+=========!!!Weight Debugging!!!=========
+VV2l2nu
+Luminosity Weight = 0.072597
+Luminosity = 59830.000000
+Cross section = 11.950000
+Number of events Processed: 9848488
+!!!=====Dataset=====!!!!
+<class 'str'>
+ZZ4l
+Number of events before selection + Trigger: 29065
+Single Trigger: Mu Trigger (21)
+Number of events after selection + Trigger: 19846
+Number of events after Trigger + Selection (dropping empty arrays): 19846
+# of events after pT cut (dropping empty arrays): 19846
+# of events after eta cut (dropping empty arrays): 19846
+# of events after decay cut (dropping empty arrays): 19846
+# of events after isolation cut (dropping empty arrays): 15107
+# of events after visible mass cut (dropping empty arrays): 14736
+# of events after Higgs cut (dropping empty arrays): 13636
+# of events after topology cut (dropping empty arrays): 13636
+# of events after b-jet cut (dropping empty arrays): 13636
+=========!!!Weight Debugging!!!=========
+ZZ4l
+Luminosity Weight = 0.002750
+Luminosity = 59830.000000
+Cross section = 1.212000
+Number of events Processed: 26371225
+!!!=====Dataset=====!!!!
+<class 'str'>
+TTToHadronic
+Number of events before selection + Trigger: 11511
+Single Trigger: Mu Trigger (21)
+Number of events after selection + Trigger: 355
+Number of events after Trigger + Selection (dropping empty arrays): 355
+# of events after pT cut (dropping empty arrays): 355
+# of events after eta cut (dropping empty arrays): 355
+# of events after decay cut (dropping empty arrays): 355
+# of events after isolation cut (dropping empty arrays): 8
+# of events after visible mass cut (dropping empty arrays): 4
+# of events after Higgs cut (dropping empty arrays): 3
+# of events after topology cut (dropping empty arrays): 3
+# of events after b-jet cut (dropping empty arrays): 3
+=========!!!Weight Debugging!!!=========
+TTToHadronic
+Luminosity Weight = 0.071156
+Luminosity = 59830.000000
+Cross section = 377.951744
+Number of events Processed: 317792000
+!!!=====Dataset=====!!!!
+<class 'str'>
+TTTo2L2Nu
+Number of events before selection + Trigger: 15268
+Single Trigger: Mu Trigger (21)
+Number of events after selection + Trigger: 7658
+Number of events after Trigger + Selection (dropping empty arrays): 7658
+# of events after pT cut (dropping empty arrays): 7658
+# of events after eta cut (dropping empty arrays): 7658
+# of events after decay cut (dropping empty arrays): 7658
+# of events after isolation cut (dropping empty arrays): 1035
+# of events after visible mass cut (dropping empty arrays): 634
+# of events after Higgs cut (dropping empty arrays): 521
+# of events after topology cut (dropping empty arrays): 521
+# of events after b-jet cut (dropping empty arrays): 521
+=========!!!Weight Debugging!!!=========
+TTTo2L2Nu
+Luminosity Weight = 0.084751
+Luminosity = 59830.000000
+Cross section = 88.249736
+Number of events Processed: 62300000
+!!!=====Dataset=====!!!!
+<class 'str'>
+TTToSemiLeptonic
+Number of events before selection + Trigger: 24625
+Single Trigger: Mu Trigger (21)
+Number of events after selection + Trigger: 7358
+Number of events after Trigger + Selection (dropping empty arrays): 7358
+# of events after pT cut (dropping empty arrays): 7358
+# of events after eta cut (dropping empty arrays): 7358
+# of events after decay cut (dropping empty arrays): 7358
+# of events after isolation cut (dropping empty arrays): 386
+# of events after visible mass cut (dropping empty arrays): 245
+# of events after Higgs cut (dropping empty arrays): 201
+# of events after topology cut (dropping empty arrays): 201
+# of events after b-jet cut (dropping empty arrays): 201
+=========!!!Weight Debugging!!!=========
+TTToSemiLeptonic
+Luminosity Weight = 0.082258
+Luminosity = 59830.000000
+Cross section = 365.308992
+Number of events Processed: 265706999
+Processing 100% ━━━━━━━━━━━━━━━━━━━━━━━━ 35/35 [ 0:12:25 < 0:00:00 | ? chunk/s ]
+Background TTToSemiLeptonic added
+Background TTTo2L2Nu added
+Background TTToHadronic added
+Background DYJetsToLL_Pt-50To100 added
+Background DYJetsToLL_Pt-100To250 added
+Background DYJetsToLL_Pt-250To400 added
+Background DYJetsToLL_Pt-400To650 added
+Background DYJetsToLL_Pt-650ToInf added
+Background WZ3l1nu added
+Background WZ2l2q added
+Background WZ1l1nu2q added
+Background ZZ2l2q added
+Background WZ1l3nu added
+Background VV2l2nu added
+Background Tbar-tchan added
+Background T-tchan added
+Background Tbar-tW added
+Background T-tW added
+Background WJetsToLNu_HT-100To200 added
+Background WJetsToLNu_HT-200To400 added
+Background WJetsToLNu_HT-400To600 added
+Background WJetsToLNu_HT-600To800 added
+Background WJetsToLNu_HT-800To1200 added
+Background WJetsToLNu_HT-1200To2500 added
+Background WJetsToLNu_HT-2500ToInf added
+Background ZZ4l added
+==================Hist FourTau_Mass_Arr================
+Background TTToSemiLeptonic added
+Background TTTo2L2Nu added
+Background TTToHadronic added
+Background DYJetsToLL_Pt-50To100 added
+Background DYJetsToLL_Pt-100To250 added
+Background DYJetsToLL_Pt-250To400 added
+Background DYJetsToLL_Pt-400To650 added
+Background DYJetsToLL_Pt-650ToInf added
+Background WZ3l1nu added
+Background WZ2l2q added
+Background WZ1l1nu2q added
+Background ZZ2l2q added
+Background WZ1l3nu added
+Background VV2l2nu added
+Background Tbar-tchan added
+Background T-tchan added
+Background Tbar-tW added
+Background T-tW added
+Background WJetsToLNu_HT-100To200 added
+Background WJetsToLNu_HT-200To400 added
+Background WJetsToLNu_HT-400To600 added
+Background WJetsToLNu_HT-600To800 added
+Background WJetsToLNu_HT-800To1200 added
+Background WJetsToLNu_HT-1200To2500 added
+Background WJetsToLNu_HT-2500ToInf added
+Background ZZ4l added
+==================Hist HiggsDeltaPhi_Arr================
+Background TTToSemiLeptonic added
+Background TTTo2L2Nu added
+Background TTToHadronic added
+Background DYJetsToLL_Pt-50To100 added
+Background DYJetsToLL_Pt-100To250 added
+Background DYJetsToLL_Pt-250To400 added
+Background DYJetsToLL_Pt-400To650 added
+Background DYJetsToLL_Pt-650ToInf added
+Background WZ3l1nu added
+Background WZ2l2q added
+Background WZ1l1nu2q added
+Background ZZ2l2q added
+Background WZ1l3nu added
+Background VV2l2nu added
+Background Tbar-tchan added
+Background T-tchan added
+Background Tbar-tW added
+Background T-tW added
+Background WJetsToLNu_HT-100To200 added
+Background WJetsToLNu_HT-200To400 added
+Background WJetsToLNu_HT-400To600 added
+Background WJetsToLNu_HT-600To800 added
+Background WJetsToLNu_HT-800To1200 added
+Background WJetsToLNu_HT-1200To2500 added
+Background WJetsToLNu_HT-2500ToInf added
+Background ZZ4l added
+==================Hist Higgs_DeltaR_Arr================
+Background TTToSemiLeptonic added
+Background TTTo2L2Nu added
+Background TTToHadronic added
+Background DYJetsToLL_Pt-50To100 added
+Background DYJetsToLL_Pt-100To250 added
+Background DYJetsToLL_Pt-250To400 added
+Background DYJetsToLL_Pt-400To650 added
+Background DYJetsToLL_Pt-650ToInf added
+Background WZ3l1nu added
+Background WZ2l2q added
+Background WZ1l1nu2q added
+Background ZZ2l2q added
+Background WZ1l3nu added
+Background VV2l2nu added
+Background Tbar-tchan added
+Background T-tchan added
+Background Tbar-tW added
+Background T-tW added
+Background WJetsToLNu_HT-100To200 added
+Background WJetsToLNu_HT-200To400 added
+Background WJetsToLNu_HT-400To600 added
+Background WJetsToLNu_HT-600To800 added
+Background WJetsToLNu_HT-800To1200 added
+Background WJetsToLNu_HT-1200To2500 added
+Background WJetsToLNu_HT-2500ToInf added
+Background ZZ4l added
+==================Hist leading_dR_Arr================
+Background TTToSemiLeptonic added
+Background TTTo2L2Nu added
+Background TTToHadronic added
+Background DYJetsToLL_Pt-50To100 added
+Background DYJetsToLL_Pt-100To250 added
+Background DYJetsToLL_Pt-250To400 added
+Background DYJetsToLL_Pt-400To650 added
+Background DYJetsToLL_Pt-650ToInf added
+Background WZ3l1nu added
+Background WZ2l2q added
+Background WZ1l1nu2q added
+Background ZZ2l2q added
+Background WZ1l3nu added
+Background VV2l2nu added
+Background Tbar-tchan added
+Background T-tchan added
+Background Tbar-tW added
+Background T-tW added
+Background WJetsToLNu_HT-100To200 added
+Background WJetsToLNu_HT-200To400 added
+Background WJetsToLNu_HT-400To600 added
+Background WJetsToLNu_HT-600To800 added
+Background WJetsToLNu_HT-800To1200 added
+Background WJetsToLNu_HT-1200To2500 added
+Background WJetsToLNu_HT-2500ToInf added
+Background ZZ4l added
+==================Hist subleading_dR_Arr================
+Background TTToSemiLeptonic added
+Background TTTo2L2Nu added
+Background TTToHadronic added
+Background DYJetsToLL_Pt-50To100 added
+Background DYJetsToLL_Pt-100To250 added
+Background DYJetsToLL_Pt-250To400 added
+Background DYJetsToLL_Pt-400To650 added
+Background DYJetsToLL_Pt-650ToInf added
+Background WZ3l1nu added
+Background WZ2l2q added
+Background WZ1l1nu2q added
+Background ZZ2l2q added
+Background WZ1l3nu added
+Background VV2l2nu added
+Background Tbar-tchan added
+Background T-tchan added
+Background Tbar-tW added
+Background T-tW added
+Background WJetsToLNu_HT-100To200 added
+Background WJetsToLNu_HT-200To400 added
+Background WJetsToLNu_HT-400To600 added
+Background WJetsToLNu_HT-600To800 added
+Background WJetsToLNu_HT-800To1200 added
+Background WJetsToLNu_HT-1200To2500 added
+Background WJetsToLNu_HT-2500ToInf added
+Background ZZ4l added
+==================Hist LeadingHiggs_mass================
+Background TTToSemiLeptonic added
+Background TTTo2L2Nu added
+Background TTToHadronic added
+Background DYJetsToLL_Pt-50To100 added
+Background DYJetsToLL_Pt-100To250 added
+Background DYJetsToLL_Pt-250To400 added
+Background DYJetsToLL_Pt-400To650 added
+Background DYJetsToLL_Pt-650ToInf added
+Background WZ3l1nu added
+Background WZ2l2q added
+Background WZ1l1nu2q added
+Background ZZ2l2q added
+Background WZ1l3nu added
+Background VV2l2nu added
+Background Tbar-tchan added
+Background T-tchan added
+Background Tbar-tW added
+Background T-tW added
+Background WJetsToLNu_HT-100To200 added
+Background WJetsToLNu_HT-200To400 added
+Background WJetsToLNu_HT-400To600 added
+Background WJetsToLNu_HT-600To800 added
+Background WJetsToLNu_HT-800To1200 added
+Background WJetsToLNu_HT-1200To2500 added
+Background WJetsToLNu_HT-2500ToInf added
+Background ZZ4l added
+==================Hist SubLeadingHiggs_mass================
+Background TTToSemiLeptonic added
+Background TTTo2L2Nu added
+Background TTToHadronic added
+Background DYJetsToLL_Pt-50To100 added
+Background DYJetsToLL_Pt-100To250 added
+Background DYJetsToLL_Pt-250To400 added
+Background DYJetsToLL_Pt-400To650 added
+Background DYJetsToLL_Pt-650ToInf added
+Background WZ3l1nu added
+Background WZ2l2q added
+Background WZ1l1nu2q added
+Background ZZ2l2q added
+Background WZ1l3nu added
+Background VV2l2nu added
+Background Tbar-tchan added
+Background T-tchan added
+Background Tbar-tW added
+Background T-tW added
+Background WJetsToLNu_HT-100To200 added
+Background WJetsToLNu_HT-200To400 added
+Background WJetsToLNu_HT-400To600 added
+Background WJetsToLNu_HT-600To800 added
+Background WJetsToLNu_HT-800To1200 added
+Background WJetsToLNu_HT-1200To2500 added
+Background WJetsToLNu_HT-2500ToInf added
+Background ZZ4l added
+==================Hist radionPT_Arr================
+Background TTToSemiLeptonic added
+Background TTTo2L2Nu added
+Background TTToHadronic added
+Background DYJetsToLL_Pt-50To100 added
+Background DYJetsToLL_Pt-100To250 added
+Background DYJetsToLL_Pt-250To400 added
+Background DYJetsToLL_Pt-400To650 added
+Background DYJetsToLL_Pt-650ToInf added
+Background WZ3l1nu added
+Background WZ2l2q added
+Background WZ1l1nu2q added
+Background ZZ2l2q added
+Background WZ1l3nu added
+Background VV2l2nu added
+Background Tbar-tchan added
+Background T-tchan added
+Background Tbar-tW added
+Background T-tW added
+Background WJetsToLNu_HT-100To200 added
+Background WJetsToLNu_HT-200To400 added
+Background WJetsToLNu_HT-400To600 added
+Background WJetsToLNu_HT-600To800 added
+Background WJetsToLNu_HT-800To1200 added
+Background WJetsToLNu_HT-1200To2500 added
+Background WJetsToLNu_HT-2500ToInf added
+Background ZZ4l added
+==================Hist tau_pt_Arr================
+Background TTToSemiLeptonic added
+Background TTTo2L2Nu added
+Background TTToHadronic added
+Background DYJetsToLL_Pt-50To100 added
+Background DYJetsToLL_Pt-100To250 added
+Background DYJetsToLL_Pt-250To400 added
+Background DYJetsToLL_Pt-400To650 added
+Background DYJetsToLL_Pt-650ToInf added
+Background WZ3l1nu added
+Background WZ2l2q added
+Background WZ1l1nu2q added
+Background ZZ2l2q added
+Background WZ1l3nu added
+Background VV2l2nu added
+Background Tbar-tchan added
+Background T-tchan added
+Background Tbar-tW added
+Background T-tW added
+Background WJetsToLNu_HT-100To200 added
+Background WJetsToLNu_HT-200To400 added
+Background WJetsToLNu_HT-400To600 added
+Background WJetsToLNu_HT-600To800 added
+Background WJetsToLNu_HT-800To1200 added
+Background WJetsToLNu_HT-1200To2500 added
+Background WJetsToLNu_HT-2500ToInf added
+Background ZZ4l added
+==================Hist tau_eta_Arr================
+Background TTToSemiLeptonic added
+Background TTTo2L2Nu added
+Background TTToHadronic added
+Background DYJetsToLL_Pt-50To100 added
+Background DYJetsToLL_Pt-100To250 added
+Background DYJetsToLL_Pt-250To400 added
+Background DYJetsToLL_Pt-400To650 added
+Background DYJetsToLL_Pt-650ToInf added
+Background WZ3l1nu added
+Background WZ2l2q added
+Background WZ1l1nu2q added
+Background ZZ2l2q added
+Background WZ1l3nu added
+Background VV2l2nu added
+Background Tbar-tchan added
+Background T-tchan added
+Background Tbar-tW added
+Background T-tW added
+Background WJetsToLNu_HT-100To200 added
+Background WJetsToLNu_HT-200To400 added
+Background WJetsToLNu_HT-400To600 added
+Background WJetsToLNu_HT-600To800 added
+Background WJetsToLNu_HT-800To1200 added
+Background WJetsToLNu_HT-1200To2500 added
+Background WJetsToLNu_HT-2500ToInf added
+Background ZZ4l added
+==================Hist ZMult_Arr================
+Background TTToSemiLeptonic added
+Background TTTo2L2Nu added
+Background TTToHadronic added
+Background DYJetsToLL_Pt-50To100 added
+Background DYJetsToLL_Pt-100To250 added
+Background DYJetsToLL_Pt-250To400 added
+Background DYJetsToLL_Pt-400To650 added
+Background DYJetsToLL_Pt-650ToInf added
+Background WZ3l1nu added
+Background WZ2l2q added
+Background WZ1l1nu2q added
+Background ZZ2l2q added
+Background WZ1l3nu added
+Background VV2l2nu added
+Background Tbar-tchan added
+Background T-tchan added
+Background Tbar-tW added
+Background T-tW added
+Background WJetsToLNu_HT-100To200 added
+Background WJetsToLNu_HT-200To400 added
+Background WJetsToLNu_HT-400To600 added
+Background WJetsToLNu_HT-600To800 added
+Background WJetsToLNu_HT-800To1200 added
+Background WJetsToLNu_HT-1200To2500 added
+Background WJetsToLNu_HT-2500ToInf added
+Background ZZ4l added
+==================Hist BJet_Arr================
+Background TTToSemiLeptonic added
+Background TTTo2L2Nu added
+Background TTToHadronic added
+Background DYJetsToLL_Pt-50To100 added
+Background DYJetsToLL_Pt-100To250 added
+Background DYJetsToLL_Pt-250To400 added
+Background DYJetsToLL_Pt-400To650 added
+Background DYJetsToLL_Pt-650ToInf added
+Background WZ3l1nu added
+Background WZ2l2q added
+Background WZ1l1nu2q added
+Background ZZ2l2q added
+Background WZ1l3nu added
+Background VV2l2nu added
+Background Tbar-tchan added
+Background T-tchan added
+Background Tbar-tW added
+Background T-tW added
+Background WJetsToLNu_HT-100To200 added
+Background WJetsToLNu_HT-200To400 added
+Background WJetsToLNu_HT-400To600 added
+Background WJetsToLNu_HT-600To800 added
+Background WJetsToLNu_HT-800To1200 added
+Background WJetsToLNu_HT-1200To2500 added
+Background WJetsToLNu_HT-2500ToInf added
+Background ZZ4l added
+==================Hist tau_lead_pt_Arr================
+Background TTToSemiLeptonic added
+Background TTTo2L2Nu added
+Background TTToHadronic added
+Background DYJetsToLL_Pt-50To100 added
+Background DYJetsToLL_Pt-100To250 added
+Background DYJetsToLL_Pt-250To400 added
+Background DYJetsToLL_Pt-400To650 added
+Background DYJetsToLL_Pt-650ToInf added
+Background WZ3l1nu added
+Background WZ2l2q added
+Background WZ1l1nu2q added
+Background ZZ2l2q added
+Background WZ1l3nu added
+Background VV2l2nu added
+Background Tbar-tchan added
+Background T-tchan added
+Background Tbar-tW added
+Background T-tW added
+Background WJetsToLNu_HT-100To200 added
+Background WJetsToLNu_HT-200To400 added
+Background WJetsToLNu_HT-400To600 added
+Background WJetsToLNu_HT-600To800 added
+Background WJetsToLNu_HT-800To1200 added
+Background WJetsToLNu_HT-1200To2500 added
+Background WJetsToLNu_HT-2500ToInf added
+Background ZZ4l added
+==================Hist tau_sublead_pt_Arr================
+Background TTToSemiLeptonic added
+Background TTTo2L2Nu added
+Background TTToHadronic added
+Background DYJetsToLL_Pt-50To100 added
+Background DYJetsToLL_Pt-100To250 added
+Background DYJetsToLL_Pt-250To400 added
+Background DYJetsToLL_Pt-400To650 added
+Background DYJetsToLL_Pt-650ToInf added
+Background WZ3l1nu added
+Background WZ2l2q added
+Background WZ1l1nu2q added
+Background ZZ2l2q added
+Background WZ1l3nu added
+Background VV2l2nu added
+Background Tbar-tchan added
+Background T-tchan added
+Background Tbar-tW added
+Background T-tW added
+Background WJetsToLNu_HT-100To200 added
+Background WJetsToLNu_HT-200To400 added
+Background WJetsToLNu_HT-400To600 added
+Background WJetsToLNu_HT-600To800 added
+Background WJetsToLNu_HT-800To1200 added
+Background WJetsToLNu_HT-1200To2500 added
+Background WJetsToLNu_HT-2500ToInf added
+Background ZZ4l added
+==================Hist tau_3rdlead_pt_Arr================
+Background TTToSemiLeptonic added
+Background TTTo2L2Nu added
+Background TTToHadronic added
+Background DYJetsToLL_Pt-50To100 added
+Background DYJetsToLL_Pt-100To250 added
+Background DYJetsToLL_Pt-250To400 added
+Background DYJetsToLL_Pt-400To650 added
+Background DYJetsToLL_Pt-650ToInf added
+Background WZ3l1nu added
+Background WZ2l2q added
+Background WZ1l1nu2q added
+Background ZZ2l2q added
+Background WZ1l3nu added
+Background VV2l2nu added
+Background Tbar-tchan added
+Background T-tchan added
+Background Tbar-tW added
+Background T-tW added
+Background WJetsToLNu_HT-100To200 added
+Background WJetsToLNu_HT-200To400 added
+Background WJetsToLNu_HT-400To600 added
+Background WJetsToLNu_HT-600To800 added
+Background WJetsToLNu_HT-800To1200 added
+Background WJetsToLNu_HT-1200To2500 added
+Background WJetsToLNu_HT-2500ToInf added
+Background ZZ4l added
+==================Hist tau_4thlead_pt_Arr================
+Background TTToSemiLeptonic added
+Background TTTo2L2Nu added
+Background TTToHadronic added
+Background DYJetsToLL_Pt-50To100 added
+Background DYJetsToLL_Pt-100To250 added
+Background DYJetsToLL_Pt-250To400 added
+Background DYJetsToLL_Pt-400To650 added
+Background DYJetsToLL_Pt-650ToInf added
+Background WZ3l1nu added
+Background WZ2l2q added
+Background WZ1l1nu2q added
+Background ZZ2l2q added
+Background WZ1l3nu added
+Background VV2l2nu added
+Background Tbar-tchan added
+Background T-tchan added
+Background Tbar-tW added
+Background T-tW added
+Background WJetsToLNu_HT-100To200 added
+Background WJetsToLNu_HT-200To400 added
+Background WJetsToLNu_HT-400To600 added
+Background WJetsToLNu_HT-600To800 added
+Background WJetsToLNu_HT-800To1200 added
+Background WJetsToLNu_HT-1200To2500 added
+Background WJetsToLNu_HT-2500ToInf added
+Background ZZ4l added
+==================Hist leading_dPhi_Arr================
+Background TTToSemiLeptonic added
+Background TTTo2L2Nu added
+Background TTToHadronic added
+Background DYJetsToLL_Pt-50To100 added
+Background DYJetsToLL_Pt-100To250 added
+Background DYJetsToLL_Pt-250To400 added
+Background DYJetsToLL_Pt-400To650 added
+Background DYJetsToLL_Pt-650ToInf added
+Background WZ3l1nu added
+Background WZ2l2q added
+Background WZ1l1nu2q added
+Background ZZ2l2q added
+Background WZ1l3nu added
+Background VV2l2nu added
+Background Tbar-tchan added
+Background T-tchan added
+Background Tbar-tW added
+Background T-tW added
+Background WJetsToLNu_HT-100To200 added
+Background WJetsToLNu_HT-200To400 added
+Background WJetsToLNu_HT-400To600 added
+Background WJetsToLNu_HT-600To800 added
+Background WJetsToLNu_HT-800To1200 added
+Background WJetsToLNu_HT-1200To2500 added
+Background WJetsToLNu_HT-2500ToInf added
+Background ZZ4l added
+==================Hist subleading_dPhi_Arr================
+Background TTToSemiLeptonic added
+Background TTTo2L2Nu added
+Background TTToHadronic added
+Background DYJetsToLL_Pt-50To100 added
+Background DYJetsToLL_Pt-100To250 added
+Background DYJetsToLL_Pt-250To400 added
+Background DYJetsToLL_Pt-400To650 added
+Background DYJetsToLL_Pt-650ToInf added
+Background WZ3l1nu added
+Background WZ2l2q added
+Background WZ1l1nu2q added
+Background ZZ2l2q added
+Background WZ1l3nu added
+Background VV2l2nu added
+Background Tbar-tchan added
+Background T-tchan added
+Background Tbar-tW added
+Background T-tW added
+Background WJetsToLNu_HT-100To200 added
+Background WJetsToLNu_HT-200To400 added
+Background WJetsToLNu_HT-400To600 added
+Background WJetsToLNu_HT-600To800 added
+Background WJetsToLNu_HT-800To1200 added
+Background WJetsToLNu_HT-1200To2500 added
+Background WJetsToLNu_HT-2500ToInf added
+Background ZZ4l added
+==================Hist radionMET_dPhi_Arr================
+Background TTToSemiLeptonic added
+Background TTTo2L2Nu added
+Background TTToHadronic added
+Background DYJetsToLL_Pt-50To100 added
+Background DYJetsToLL_Pt-100To250 added
+Background DYJetsToLL_Pt-250To400 added
+Background DYJetsToLL_Pt-400To650 added
+Background DYJetsToLL_Pt-650ToInf added
+Background WZ3l1nu added
+Background WZ2l2q added
+Background WZ1l1nu2q added
+Background ZZ2l2q added
+Background WZ1l3nu added
+Background VV2l2nu added
+Background Tbar-tchan added
+Background T-tchan added
+Background Tbar-tW added
+Background T-tW added
+Background WJetsToLNu_HT-100To200 added
+Background WJetsToLNu_HT-200To400 added
+Background WJetsToLNu_HT-400To600 added
+Background WJetsToLNu_HT-600To800 added
+Background WJetsToLNu_HT-800To1200 added
+Background WJetsToLNu_HT-1200To2500 added
+Background WJetsToLNu_HT-2500ToInf added
+Background ZZ4l added
+==================Hist leadingHiggs_Rad_dR_Arr================
+Background TTToSemiLeptonic added
+Background TTTo2L2Nu added
+Background TTToHadronic added
+Background DYJetsToLL_Pt-50To100 added
+Background DYJetsToLL_Pt-100To250 added
+Background DYJetsToLL_Pt-250To400 added
+Background DYJetsToLL_Pt-400To650 added
+Background DYJetsToLL_Pt-650ToInf added
+Background WZ3l1nu added
+Background WZ2l2q added
+Background WZ1l1nu2q added
+Background ZZ2l2q added
+Background WZ1l3nu added
+Background VV2l2nu added
+Background Tbar-tchan added
+Background T-tchan added
+Background Tbar-tW added
+Background T-tW added
+Background WJetsToLNu_HT-100To200 added
+Background WJetsToLNu_HT-200To400 added
+Background WJetsToLNu_HT-400To600 added
+Background WJetsToLNu_HT-600To800 added
+Background WJetsToLNu_HT-800To1200 added
+Background WJetsToLNu_HT-1200To2500 added
+Background WJetsToLNu_HT-2500ToInf added
+Background ZZ4l added
+==================Hist subleadingHiggs_Rad_dR_Arr================
+Background TTToSemiLeptonic added
+Background TTTo2L2Nu added
+Background TTToHadronic added
+Background DYJetsToLL_Pt-50To100 added
+Background DYJetsToLL_Pt-100To250 added
+Background DYJetsToLL_Pt-250To400 added
+Background DYJetsToLL_Pt-400To650 added
+Background DYJetsToLL_Pt-650ToInf added
+Background WZ3l1nu added
+Background WZ2l2q added
+Background WZ1l1nu2q added
+Background ZZ2l2q added
+Background WZ1l3nu added
+Background VV2l2nu added
+Background Tbar-tchan added
+Background T-tchan added
+Background Tbar-tW added
+Background T-tW added
+Background WJetsToLNu_HT-100To200 added
+Background WJetsToLNu_HT-200To400 added
+Background WJetsToLNu_HT-400To600 added
+Background WJetsToLNu_HT-600To800 added
+Background WJetsToLNu_HT-800To1200 added
+Background WJetsToLNu_HT-1200To2500 added
+Background WJetsToLNu_HT-2500ToInf added
+Background ZZ4l added
+==================Hist leadingHiggs_MET_dPhi_Arr================
+Background TTToSemiLeptonic added
+Background TTTo2L2Nu added
+Background TTToHadronic added
+Background DYJetsToLL_Pt-50To100 added
+Background DYJetsToLL_Pt-100To250 added
+Background DYJetsToLL_Pt-250To400 added
+Background DYJetsToLL_Pt-400To650 added
+Background DYJetsToLL_Pt-650ToInf added
+Background WZ3l1nu added
+Background WZ2l2q added
+Background WZ1l1nu2q added
+Background ZZ2l2q added
+Background WZ1l3nu added
+Background VV2l2nu added
+Background Tbar-tchan added
+Background T-tchan added
+Background Tbar-tW added
+Background T-tW added
+Background WJetsToLNu_HT-100To200 added
+Background WJetsToLNu_HT-200To400 added
+Background WJetsToLNu_HT-400To600 added
+Background WJetsToLNu_HT-600To800 added
+Background WJetsToLNu_HT-800To1200 added
+Background WJetsToLNu_HT-1200To2500 added
+Background WJetsToLNu_HT-2500ToInf added
+Background ZZ4l added
+==================Hist subleadingHiggs_MET_dPhi_Arr================
+Background TTToSemiLeptonic added
+Background TTTo2L2Nu added
+Background TTToHadronic added
+Background DYJetsToLL_Pt-50To100 added
+Background DYJetsToLL_Pt-100To250 added
+Background DYJetsToLL_Pt-250To400 added
+Background DYJetsToLL_Pt-400To650 added
+Background DYJetsToLL_Pt-650ToInf added
+Background WZ3l1nu added
+Background WZ2l2q added
+Background WZ1l1nu2q added
+Background ZZ2l2q added
+Background WZ1l3nu added
+Background VV2l2nu added
+Background Tbar-tchan added
+Background T-tchan added
+Background Tbar-tW added
+Background T-tW added
+Background WJetsToLNu_HT-100To200 added
+Background WJetsToLNu_HT-200To400 added
+Background WJetsToLNu_HT-400To600 added
+Background WJetsToLNu_HT-600To800 added
+Background WJetsToLNu_HT-800To1200 added
+Background WJetsToLNu_HT-1200To2500 added
+Background WJetsToLNu_HT-2500ToInf added
+Background ZZ4l added
+==================Hist Radion_eta_Arr================
+Background TTToSemiLeptonic added
+Background TTTo2L2Nu added
+Background TTToHadronic added
+Background DYJetsToLL_Pt-50To100 added
+Background DYJetsToLL_Pt-100To250 added
+Background DYJetsToLL_Pt-250To400 added
+Background DYJetsToLL_Pt-400To650 added
+Background DYJetsToLL_Pt-650ToInf added
+Background WZ3l1nu added
+Background WZ2l2q added
+Background WZ1l1nu2q added
+Background ZZ2l2q added
+Background WZ1l3nu added
+Background VV2l2nu added
+Background Tbar-tchan added
+Background T-tchan added
+Background Tbar-tW added
+Background T-tW added
+Background WJetsToLNu_HT-100To200 added
+Background WJetsToLNu_HT-200To400 added
+Background WJetsToLNu_HT-400To600 added
+Background WJetsToLNu_HT-600To800 added
+Background WJetsToLNu_HT-800To1200 added
+Background WJetsToLNu_HT-1200To2500 added
+Background WJetsToLNu_HT-2500ToInf added
+Background ZZ4l added
+==================Hist Radion_Charge_Arr================
+!!!=====Dataset=====!!!!
+<class 'str'>
+Data_JetHT
+Number of events before selection + Trigger: 2532
+Jet Trigger
+Number of events after Online Trigger(dropping empty arrays): 191
+# of events after Trigger + Selection: 123
+# of events after Trigger + Selection (dropping empty arrays): 123
+# of events after pT cut (dropping empty arrays): 123
+# of events after eta cut (dropping empty arrays): 123
+# of events after decay cut (dropping empty arrays): 123
+# of events after isolation cut (dropping empty arrays): 7
+# of events after visible mass cut (dropping empty arrays): 7
+# of events after Higgs cut (dropping empty arrays): 5
+# of events after topology cut (dropping empty arrays): 5
+# of events after b-jet cut (dropping empty arrays): 5
+!!!=====Dataset=====!!!!
+<class 'str'>
+Data_JetHT
+Number of events before selection + Trigger: 522
+Jet Trigger
+Number of events after Online Trigger(dropping empty arrays): 39
+# of events after Trigger + Selection: 28
+# of events after Trigger + Selection (dropping empty arrays): 28
+# of events after pT cut (dropping empty arrays): 28
+# of events after eta cut (dropping empty arrays): 28
+# of events after decay cut (dropping empty arrays): 28
+# of events after isolation cut (dropping empty arrays): 1
+# of events after visible mass cut (dropping empty arrays): 0
+# of events after Higgs cut (dropping empty arrays): 0
+# of events after topology cut (dropping empty arrays): 0
+# of events after b-jet cut (dropping empty arrays): 0
+!!!=====Dataset=====!!!!
+<class 'str'>
+Data_JetHT
+Number of events before selection + Trigger: 611
+Jet Trigger
+Number of events after Online Trigger(dropping empty arrays): 37
+# of events after Trigger + Selection: 19
+# of events after Trigger + Selection (dropping empty arrays): 19
+# of events after pT cut (dropping empty arrays): 19
+# of events after eta cut (dropping empty arrays): 19
+# of events after decay cut (dropping empty arrays): 19
+# of events after isolation cut (dropping empty arrays): 3
+# of events after visible mass cut (dropping empty arrays): 2
+# of events after Higgs cut (dropping empty arrays): 1
+# of events after topology cut (dropping empty arrays): 1
+# of events after b-jet cut (dropping empty arrays): 1
+!!!=====Dataset=====!!!!
+<class 'str'>
+Data_JetHT
+Number of events before selection + Trigger: 1289
+Jet Trigger
+Number of events after Online Trigger(dropping empty arrays): 71
+# of events after Trigger + Selection: 42
+# of events after Trigger + Selection (dropping empty arrays): 42
+# of events after pT cut (dropping empty arrays): 42
+# of events after eta cut (dropping empty arrays): 42
+# of events after decay cut (dropping empty arrays): 42
+# of events after isolation cut (dropping empty arrays): 3
+# of events after visible mass cut (dropping empty arrays): 3
+# of events after Higgs cut (dropping empty arrays): 3
+# of events after topology cut (dropping empty arrays): 3
+# of events after b-jet cut (dropping empty arrays): 3
+!!!=====Dataset=====!!!!
+<class 'str'>
+Data_SingleMuon
+Number of events before selection + Trigger: 1905
+Single Muon Trigger
+# of events after Trigger + Selection: 1197
+# of events after Trigger + Selection (dropping empty arrays): 1197
+# of events after pT cut (dropping empty arrays): 1197
+# of events after eta cut (dropping empty arrays): 1197
+# of events after decay cut (dropping empty arrays): 1197
+# of events after isolation cut (dropping empty arrays): 138
+# of events after visible mass cut (dropping empty arrays): 66
+# of events after Higgs cut (dropping empty arrays): 52
+# of events after topology cut (dropping empty arrays): 52
+# of events after b-jet cut (dropping empty arrays): 52
+!!!=====Dataset=====!!!!
+<class 'str'>
+Data_SingleMuon
+Number of events before selection + Trigger: 469
+Single Muon Trigger
+# of events after Trigger + Selection: 302
+# of events after Trigger + Selection (dropping empty arrays): 302
+# of events after pT cut (dropping empty arrays): 302
+# of events after eta cut (dropping empty arrays): 302
+# of events after decay cut (dropping empty arrays): 302
+# of events after isolation cut (dropping empty arrays): 32
+# of events after visible mass cut (dropping empty arrays): 19
+# of events after Higgs cut (dropping empty arrays): 17
+# of events after topology cut (dropping empty arrays): 17
+# of events after b-jet cut (dropping empty arrays): 17
+!!!=====Dataset=====!!!!
+<class 'str'>
+Data_SingleMuon
+Number of events before selection + Trigger: 424
+Single Muon Trigger
+# of events after Trigger + Selection: 268
+# of events after Trigger + Selection (dropping empty arrays): 268
+# of events after pT cut (dropping empty arrays): 268
+# of events after eta cut (dropping empty arrays): 268
+# of events after decay cut (dropping empty arrays): 268
+# of events after isolation cut (dropping empty arrays): 31
+# of events after visible mass cut (dropping empty arrays): 20
+# of events after Higgs cut (dropping empty arrays): 15
+# of events after topology cut (dropping empty arrays): 15
+# of events after b-jet cut (dropping empty arrays): 15
+!!!=====Dataset=====!!!!
+<class 'str'>
+Data_SingleMuon
+Number of events before selection + Trigger: 1008
+Single Muon Trigger
+# of events after Trigger + Selection: 632
+# of events after Trigger + Selection (dropping empty arrays): 632
+# of events after pT cut (dropping empty arrays): 632
+# of events after eta cut (dropping empty arrays): 632
+# of events after decay cut (dropping empty arrays): 632
+# of events after isolation cut (dropping empty arrays): 79
+# of events after visible mass cut (dropping empty arrays): 55
+# of events after Higgs cut (dropping empty arrays): 42
+# of events after topology cut (dropping empty arrays): 42
+# of events after b-jet cut (dropping empty arrays): 42
+!!!=====Dataset=====!!!!
+<class 'str'>
+Signal
+Number of events before selection + Trigger: 14343
+Single Trigger: Jet Trigger (39)
+Number of events after Online Trigger(dropping empty arrays): 9391
+Number of events after selection + Trigger: 8632
+Number of events after Trigger + Selection (dropping empty arrays): 8632
+# of events after pT cut (dropping empty arrays): 8632
+# of events after eta cut (dropping empty arrays): 8632
+# of events after decay cut (dropping empty arrays): 8632
+# of events after isolation cut (dropping empty arrays): 6983
+# of events after visible mass cut (dropping empty arrays): 6977
+# of events after Higgs cut (dropping empty arrays): 6940
+# of events after topology cut (dropping empty arrays): 6940
+# of events after b-jet cut (dropping empty arrays): 6940
+=========!!!Weight Debugging!!!=========
+Signal
+Luminosity Weight = 0.006232
+Luminosity = 59830.000000
+Cross section = 0.010000
+Number of events Processed: 96000
+!!!=====Dataset=====!!!!
+<class 'str'>
+WJetsToLNu_HT-2500ToInf
+Number of events before selection + Trigger: 60
+Single Trigger: Jet Trigger (39)
+Number of events after Online Trigger(dropping empty arrays): 35
+Number of events after selection + Trigger: 28
+Number of events after Trigger + Selection (dropping empty arrays): 28
+# of events after pT cut (dropping empty arrays): 28
+# of events after eta cut (dropping empty arrays): 28
+# of events after decay cut (dropping empty arrays): 28
+# of events after isolation cut (dropping empty arrays): 1
+# of events after visible mass cut (dropping empty arrays): 0
+# of events after Higgs cut (dropping empty arrays): 0
+# of events after topology cut (dropping empty arrays): 0
+# of events after b-jet cut (dropping empty arrays): 0
+=========!!!Weight Debugging!!!=========
+WJetsToLNu_HT-2500ToInf
+Luminosity Weight = 0.000711
+Luminosity = 59830.000000
+Cross section = 0.038914
+Number of events Processed: 3273980
+!!!=====Dataset=====!!!!
+<class 'str'>
+WJetsToLNu_HT-1200To2500
+Number of events before selection + Trigger: 167
+Single Trigger: Jet Trigger (39)
+Number of events after Online Trigger(dropping empty arrays): 70
+Number of events after selection + Trigger: 64
+Number of events after Trigger + Selection (dropping empty arrays): 64
+# of events after pT cut (dropping empty arrays): 64
+# of events after eta cut (dropping empty arrays): 64
+# of events after decay cut (dropping empty arrays): 64
+# of events after isolation cut (dropping empty arrays): 0
+# of events after b-jet cut (dropping empty arrays): 0
+=========!!!Weight Debugging!!!=========
+WJetsToLNu_HT-1200To2500
+Luminosity Weight = 0.012603
+Luminosity = 59830.000000
+Cross section = 1.608090
+Number of events Processed: 7633949
+!!!=====Dataset=====!!!!
+<class 'str'>
+WJetsToLNu_HT-800To1200
+Number of events before selection + Trigger: 172
+Single Trigger: Jet Trigger (39)
+Number of events after Online Trigger(dropping empty arrays): 48
+Number of events after selection + Trigger: 39
+Number of events after Trigger + Selection (dropping empty arrays): 39
+# of events after pT cut (dropping empty arrays): 39
+# of events after eta cut (dropping empty arrays): 39
+# of events after decay cut (dropping empty arrays): 39
+# of events after isolation cut (dropping empty arrays): 1
+# of events after visible mass cut (dropping empty arrays): 1
+# of events after Higgs cut (dropping empty arrays): 1
+# of events after topology cut (dropping empty arrays): 1
+# of events after b-jet cut (dropping empty arrays): 1
+=========!!!Weight Debugging!!!=========
+WJetsToLNu_HT-800To1200
+Luminosity Weight = 0.047394
+Luminosity = 59830.000000
+Cross section = 6.656210
+Number of events Processed: 8402687
+!!!=====Dataset=====!!!!
+<class 'str'>
+WJetsToLNu_HT-600To800
+Number of events before selection + Trigger: 452
+Single Trigger: Jet Trigger (39)
+Number of events after Online Trigger(dropping empty arrays): 96
+Number of events after selection + Trigger: 82
+Number of events after Trigger + Selection (dropping empty arrays): 82
+# of events after pT cut (dropping empty arrays): 82
+# of events after eta cut (dropping empty arrays): 82
+# of events after decay cut (dropping empty arrays): 82
+# of events after isolation cut (dropping empty arrays): 5
+# of events after visible mass cut (dropping empty arrays): 4
+# of events after Higgs cut (dropping empty arrays): 2
+# of events after topology cut (dropping empty arrays): 2
+# of events after b-jet cut (dropping empty arrays): 2
+=========!!!Weight Debugging!!!=========
+WJetsToLNu_HT-600To800
+Luminosity Weight = 0.044218
+Luminosity = 59830.000000
+Cross section = 14.580500
+Number of events Processed: 19728401
+!!!=====Dataset=====!!!!
+<class 'str'>
+WJetsToLNu_HT-400To600
+Number of events before selection + Trigger: 120
+Single Trigger: Jet Trigger (39)
+Number of events after Online Trigger(dropping empty arrays): 13
+Number of events after selection + Trigger: 8
+Number of events after Trigger + Selection (dropping empty arrays): 8
+# of events after pT cut (dropping empty arrays): 8
+# of events after eta cut (dropping empty arrays): 8
+# of events after decay cut (dropping empty arrays): 8
+# of events after isolation cut (dropping empty arrays): 0
+# of events after b-jet cut (dropping empty arrays): 0
+=========!!!Weight Debugging!!!=========
+WJetsToLNu_HT-400To600
+Luminosity Weight = 0.596829
+Luminosity = 59830.000000
+Cross section = 59.181100
+Number of events Processed: 5932701
+!!!=====Dataset=====!!!!
+<class 'str'>
+WJetsToLNu_HT-200To400
+Number of events before selection + Trigger: 235
+Single Trigger: Jet Trigger (39)
+Number of events after Online Trigger(dropping empty arrays): 1
+Number of events after selection + Trigger: 0
+Number of events after Trigger + Selection (dropping empty arrays): 0
+# of events after pT cut (dropping empty arrays): 0
+# of events after eta cut (dropping empty arrays): 0
+# of events after decay cut (dropping empty arrays): 0
+# of events after isolation cut (dropping empty arrays): 0
+# of events after b-jet cut (dropping empty arrays): 0
+=========!!!Weight Debugging!!!=========
+WJetsToLNu_HT-200To400
+Luminosity Weight = 1.022431
+Luminosity = 59830.000000
+Cross section = 435.237000
+Number of events Processed: 25468933
+!!!=====Dataset=====!!!!
+<class 'str'>
+WJetsToLNu_HT-100To200
+Number of events before selection + Trigger: 40
+Single Trigger: Jet Trigger (39)
+Number of events after Online Trigger(dropping empty arrays): 0
+Number of events after selection + Trigger: 0
+Number of events after Trigger + Selection (dropping empty arrays): 0
+# of events after pT cut (dropping empty arrays): 0
+# of events after eta cut (dropping empty arrays): 0
+# of events after decay cut (dropping empty arrays): 0
+# of events after isolation cut (dropping empty arrays): 0
+# of events after b-jet cut (dropping empty arrays): 0
+=========!!!Weight Debugging!!!=========
+WJetsToLNu_HT-100To200
+Luminosity Weight = 3.298324
+Luminosity = 59830.000000
+Cross section = 1627.450000
+Number of events Processed: 29521158
+!!!=====Dataset=====!!!!
+<class 'str'>
+T-tW
+Number of events before selection + Trigger: 405
+Single Trigger: Jet Trigger (39)
+Number of events after Online Trigger(dropping empty arrays): 36
+Number of events after selection + Trigger: 30
+Number of events after Trigger + Selection (dropping empty arrays): 30
+# of events after pT cut (dropping empty arrays): 30
+# of events after eta cut (dropping empty arrays): 30
+# of events after decay cut (dropping empty arrays): 30
+# of events after isolation cut (dropping empty arrays): 3
+# of events after visible mass cut (dropping empty arrays): 1
+# of events after Higgs cut (dropping empty arrays): 1
+# of events after topology cut (dropping empty arrays): 1
+# of events after b-jet cut (dropping empty arrays): 1
+=========!!!Weight Debugging!!!=========
+T-tW
+Luminosity Weight = 0.230464
+Luminosity = 59830.000000
+Cross section = 35.600000
+Number of events Processed: 9242000
+!!!=====Dataset=====!!!!
+<class 'str'>
+Tbar-tW
+Number of events before selection + Trigger: 299
+Single Trigger: Jet Trigger (39)
+Number of events after Online Trigger(dropping empty arrays): 35
+Number of events after selection + Trigger: 23
+Number of events after Trigger + Selection (dropping empty arrays): 23
+# of events after pT cut (dropping empty arrays): 23
+# of events after eta cut (dropping empty arrays): 23
+# of events after decay cut (dropping empty arrays): 23
+# of events after isolation cut (dropping empty arrays): 3
+# of events after visible mass cut (dropping empty arrays): 1
+# of events after Higgs cut (dropping empty arrays): 0
+# of events after topology cut (dropping empty arrays): 0
+# of events after b-jet cut (dropping empty arrays): 0
+=========!!!Weight Debugging!!!=========
+Tbar-tW
+Luminosity Weight = 0.279411
+Luminosity = 59830.000000
+Cross section = 35.600000
+Number of events Processed: 7623000
+!!!=====Dataset=====!!!!
+<class 'str'>
+T-tchan
+Number of events before selection + Trigger: 748
+Single Trigger: Jet Trigger (39)
+Number of events after Online Trigger(dropping empty arrays): 28
+Number of events after selection + Trigger: 19
+Number of events after Trigger + Selection (dropping empty arrays): 19
+# of events after pT cut (dropping empty arrays): 19
+# of events after eta cut (dropping empty arrays): 19
+# of events after decay cut (dropping empty arrays): 19
+# of events after isolation cut (dropping empty arrays): 2
+# of events after visible mass cut (dropping empty arrays): 1
+# of events after Higgs cut (dropping empty arrays): 1
+# of events after topology cut (dropping empty arrays): 1
+# of events after b-jet cut (dropping empty arrays): 1
+=========!!!Weight Debugging!!!=========
+T-tchan
+Luminosity Weight = 0.017107
+Luminosity = 59830.000000
+Cross section = 44.070000
+Number of events Processed: 154130900
+!!!=====Dataset=====!!!!
+<class 'str'>
+Tbar-tchan
+Number of events before selection + Trigger: 450
+Single Trigger: Jet Trigger (39)
+Number of events after Online Trigger(dropping empty arrays): 9
+Number of events after selection + Trigger: 7
+Number of events after Trigger + Selection (dropping empty arrays): 7
+# of events after pT cut (dropping empty arrays): 7
+# of events after eta cut (dropping empty arrays): 7
+# of events after decay cut (dropping empty arrays): 7
+# of events after isolation cut (dropping empty arrays): 1
+# of events after visible mass cut (dropping empty arrays): 0
+# of events after Higgs cut (dropping empty arrays): 0
+# of events after topology cut (dropping empty arrays): 0
+# of events after b-jet cut (dropping empty arrays): 0
+=========!!!Weight Debugging!!!=========
+Tbar-tchan
+Luminosity Weight = 0.019842
+Luminosity = 59830.000000
+Cross section = 26.230000
+Number of events Processed: 79090800
+!!!=====Dataset=====!!!!
+<class 'str'>
+DYJetsToLL_Pt-650ToInf
+Number of events before selection + Trigger: 1188
+Single Trigger: Jet Trigger (39)
+Number of events after Online Trigger(dropping empty arrays): 531
+Number of events after selection + Trigger: 253
+Number of events after Trigger + Selection (dropping empty arrays): 253
+# of events after pT cut (dropping empty arrays): 253
+# of events after eta cut (dropping empty arrays): 253
+# of events after decay cut (dropping empty arrays): 253
+# of events after isolation cut (dropping empty arrays): 22
+# of events after visible mass cut (dropping empty arrays): 16
+# of events after Higgs cut (dropping empty arrays): 12
+# of events after topology cut (dropping empty arrays): 12
+# of events after b-jet cut (dropping empty arrays): 12
+=========!!!Weight Debugging!!!=========
+DYJetsToLL_Pt-650ToInf
+Luminosity Weight = 0.001376
+Luminosity = 59830.000000
+Cross section = 0.043602
+Number of events Processed: 1895998
+!!!=====Dataset=====!!!!
+<class 'str'>
+DYJetsToLL_Pt-400To650
+Number of events before selection + Trigger: 1209
+Single Trigger: Jet Trigger (39)
+Number of events after Online Trigger(dropping empty arrays): 314
+Number of events after selection + Trigger: 168
+Number of events after Trigger + Selection (dropping empty arrays): 168
+# of events after pT cut (dropping empty arrays): 168
+# of events after eta cut (dropping empty arrays): 168
+# of events after decay cut (dropping empty arrays): 168
+# of events after isolation cut (dropping empty arrays): 17
+# of events after visible mass cut (dropping empty arrays): 6
+# of events after Higgs cut (dropping empty arrays): 6
+# of events after topology cut (dropping empty arrays): 6
+# of events after b-jet cut (dropping empty arrays): 6
+=========!!!Weight Debugging!!!=========
+DYJetsToLL_Pt-400To650
+Luminosity Weight = 0.014896
+Luminosity = 59830.000000
+Cross section = 0.464024
+Number of events Processed: 1863809
+!!!=====Dataset=====!!!!
+<class 'str'>
+DYJetsToLL_Pt-250To400
+Number of events before selection + Trigger: 8981
+Single Trigger: Jet Trigger (39)
+Number of events after Online Trigger(dropping empty arrays): 702
+Number of events after selection + Trigger: 353
+Number of events after Trigger + Selection (dropping empty arrays): 353
+# of events after pT cut (dropping empty arrays): 353
+# of events after eta cut (dropping empty arrays): 353
+# of events after decay cut (dropping empty arrays): 353
+# of events after isolation cut (dropping empty arrays): 42
+# of events after visible mass cut (dropping empty arrays): 14
+# of events after Higgs cut (dropping empty arrays): 9
+# of events after topology cut (dropping empty arrays): 9
+# of events after b-jet cut (dropping empty arrays): 9
+=========!!!Weight Debugging!!!=========
+DYJetsToLL_Pt-250To400
+Luminosity Weight = 0.010214
+Luminosity = 59830.000000
+Cross section = 3.435181
+Number of events Processed: 20121253
+!!!=====Dataset=====!!!!
+<class 'str'>
+DYJetsToLL_Pt-100To250
+Number of events before selection + Trigger: 7836
+Single Trigger: Jet Trigger (39)
+Number of events after Online Trigger(dropping empty arrays): 27
+Number of events after selection + Trigger: 11
+Number of events after Trigger + Selection (dropping empty arrays): 11
+# of events after pT cut (dropping empty arrays): 11
+# of events after eta cut (dropping empty arrays): 11
+# of events after decay cut (dropping empty arrays): 11
+# of events after isolation cut (dropping empty arrays): 0
+# of events after b-jet cut (dropping empty arrays): 0
+=========!!!Weight Debugging!!!=========
+DYJetsToLL_Pt-100To250
+Luminosity Weight = 0.065519
+Luminosity = 59830.000000
+Cross section = 89.395097
+Number of events Processed: 81633326
+!!!=====Dataset=====!!!!
+<class 'str'>
+DYJetsToLL_Pt-50To100
+Number of events before selection + Trigger: 2633
+Single Trigger: Jet Trigger (39)
+Number of events after Online Trigger(dropping empty arrays): 3
+Number of events after selection + Trigger: 1
+Number of events after Trigger + Selection (dropping empty arrays): 1
+# of events after pT cut (dropping empty arrays): 1
+# of events after eta cut (dropping empty arrays): 1
+# of events after decay cut (dropping empty arrays): 1
+# of events after isolation cut (dropping empty arrays): 0
+# of events after b-jet cut (dropping empty arrays): 0
+=========!!!Weight Debugging!!!=========
+DYJetsToLL_Pt-50To100
+Luminosity Weight = 0.192319
+Luminosity = 59830.000000
+Cross section = 387.130778
+Number of events Processed: 120435658
+!!!=====Dataset=====!!!!
+<class 'str'>
+WZ1l1nu2q
+Number of events before selection + Trigger: 757
+Single Trigger: Jet Trigger (39)
+Number of events after Online Trigger(dropping empty arrays): 59
+Number of events after selection + Trigger: 41
+Number of events after Trigger + Selection (dropping empty arrays): 41
+# of events after pT cut (dropping empty arrays): 41
+# of events after eta cut (dropping empty arrays): 41
+# of events after decay cut (dropping empty arrays): 41
+# of events after isolation cut (dropping empty arrays): 1
+# of events after visible mass cut (dropping empty arrays): 1
+# of events after Higgs cut (dropping empty arrays): 1
+# of events after topology cut (dropping empty arrays): 1
+# of events after b-jet cut (dropping empty arrays): 1
+=========!!!Weight Debugging!!!=========
+WZ1l1nu2q
+Luminosity Weight = 0.009416
+Luminosity = 59830.000000
+Cross section = 10.710000
+Number of events Processed: 68048958
+!!!=====Dataset=====!!!!
+<class 'str'>
+WZ2l2q
+Number of events before selection + Trigger: 3286
+Single Trigger: Jet Trigger (39)
+Number of events after Online Trigger(dropping empty arrays): 108
+Number of events after selection + Trigger: 50
+Number of events after Trigger + Selection (dropping empty arrays): 50
+# of events after pT cut (dropping empty arrays): 50
+# of events after eta cut (dropping empty arrays): 50
+# of events after decay cut (dropping empty arrays): 50
+# of events after isolation cut (dropping empty arrays): 3
+# of events after visible mass cut (dropping empty arrays): 2
+# of events after Higgs cut (dropping empty arrays): 2
+# of events after topology cut (dropping empty arrays): 2
+# of events after b-jet cut (dropping empty arrays): 2
+=========!!!Weight Debugging!!!=========
+WZ2l2q
+Luminosity Weight = 0.011873
+Luminosity = 59830.000000
+Cross section = 5.595000
+Number of events Processed: 28193648
+!!!=====Dataset=====!!!!
+<class 'str'>
+ZZ2l2q
+Number of events before selection + Trigger: 5928
+Single Trigger: Jet Trigger (39)
+Number of events after Online Trigger(dropping empty arrays): 154
+Number of events after selection + Trigger: 71
+Number of events after Trigger + Selection (dropping empty arrays): 71
+# of events after pT cut (dropping empty arrays): 71
+# of events after eta cut (dropping empty arrays): 71
+# of events after decay cut (dropping empty arrays): 71
+# of events after isolation cut (dropping empty arrays): 5
+# of events after visible mass cut (dropping empty arrays): 5
+# of events after Higgs cut (dropping empty arrays): 5
+# of events after topology cut (dropping empty arrays): 5
+# of events after b-jet cut (dropping empty arrays): 5
+=========!!!Weight Debugging!!!=========
+ZZ2l2q
+Luminosity Weight = 0.003512
+Luminosity = 59830.000000
+Cross section = 3.220000
+Number of events Processed: 54856689
+!!!=====Dataset=====!!!!
+<class 'str'>
+WZ3l1nu
+Number of events before selection + Trigger: 5222
+Single Trigger: Jet Trigger (39)
+Number of events after Online Trigger(dropping empty arrays): 485
+Number of events after selection + Trigger: 353
+Number of events after Trigger + Selection (dropping empty arrays): 353
+# of events after pT cut (dropping empty arrays): 353
+# of events after eta cut (dropping empty arrays): 353
+# of events after decay cut (dropping empty arrays): 353
+# of events after isolation cut (dropping empty arrays): 86
+# of events after visible mass cut (dropping empty arrays): 80
+# of events after Higgs cut (dropping empty arrays): 54
+# of events after topology cut (dropping empty arrays): 54
+# of events after b-jet cut (dropping empty arrays): 54
+=========!!!Weight Debugging!!!=========
+WZ3l1nu
+Luminosity Weight = 0.012805
+Luminosity = 59830.000000
+Cross section = 4.708000
+Number of events Processed: 21997587
+!!!=====Dataset=====!!!!
+<class 'str'>
+WZ1l3nu
+Number of events before selection + Trigger: 4
+Single Trigger: Jet Trigger (39)
+Number of events after Online Trigger(dropping empty arrays): 1
+Number of events after selection + Trigger: 1
+Number of events after Trigger + Selection (dropping empty arrays): 1
+# of events after pT cut (dropping empty arrays): 1
+# of events after eta cut (dropping empty arrays): 1
+# of events after decay cut (dropping empty arrays): 1
+# of events after isolation cut (dropping empty arrays): 0
+# of events after b-jet cut (dropping empty arrays): 0
+=========!!!Weight Debugging!!!=========
+WZ1l3nu
+Luminosity Weight = 0.107973
+Luminosity = 59830.000000
+Cross section = 3.050000
+Number of events Processed: 1690064
+!!!=====Dataset=====!!!!
+<class 'str'>
+VV2l2nu
+Number of events before selection + Trigger: 164
+Single Trigger: Jet Trigger (39)
+Number of events after Online Trigger(dropping empty arrays): 20
+Number of events after selection + Trigger: 15
+Number of events after Trigger + Selection (dropping empty arrays): 15
+# of events after pT cut (dropping empty arrays): 15
+# of events after eta cut (dropping empty arrays): 15
+# of events after decay cut (dropping empty arrays): 15
+# of events after isolation cut (dropping empty arrays): 1
+# of events after visible mass cut (dropping empty arrays): 0
+# of events after Higgs cut (dropping empty arrays): 0
+# of events after topology cut (dropping empty arrays): 0
+# of events after b-jet cut (dropping empty arrays): 0
+=========!!!Weight Debugging!!!=========
+VV2l2nu
+Luminosity Weight = 0.072597
+Luminosity = 59830.000000
+Cross section = 11.950000
+Number of events Processed: 9848488
+!!!=====Dataset=====!!!!
+<class 'str'>
+ZZ4l
+Number of events before selection + Trigger: 29065
+Single Trigger: Jet Trigger (39)
+Number of events after Online Trigger(dropping empty arrays): 1258
+Number of events after selection + Trigger: 665
+Number of events after Trigger + Selection (dropping empty arrays): 665
+# of events after pT cut (dropping empty arrays): 665
+# of events after eta cut (dropping empty arrays): 665
+# of events after decay cut (dropping empty arrays): 665
+# of events after isolation cut (dropping empty arrays): 498
+# of events after visible mass cut (dropping empty arrays): 495
+# of events after Higgs cut (dropping empty arrays): 451
+# of events after topology cut (dropping empty arrays): 451
+# of events after b-jet cut (dropping empty arrays): 451
+=========!!!Weight Debugging!!!=========
+ZZ4l
+Luminosity Weight = 0.002750
+Luminosity = 59830.000000
+Cross section = 1.212000
+Number of events Processed: 26371225
+!!!=====Dataset=====!!!!
+<class 'str'>
+TTToHadronic
+Number of events before selection + Trigger: 11511
+Single Trigger: Jet Trigger (39)
+Number of events after Online Trigger(dropping empty arrays): 64
+Number of events after selection + Trigger: 32
+Number of events after Trigger + Selection (dropping empty arrays): 32
+# of events after pT cut (dropping empty arrays): 32
+# of events after eta cut (dropping empty arrays): 32
+# of events after decay cut (dropping empty arrays): 32
+# of events after isolation cut (dropping empty arrays): 0
+# of events after b-jet cut (dropping empty arrays): 0
+=========!!!Weight Debugging!!!=========
+TTToHadronic
+Luminosity Weight = 0.071156
+Luminosity = 59830.000000
+Cross section = 377.951744
+Number of events Processed: 317792000
+!!!=====Dataset=====!!!!
+<class 'str'>
+TTTo2L2Nu
+Number of events before selection + Trigger: 15268
+Single Trigger: Jet Trigger (39)
+Number of events after Online Trigger(dropping empty arrays): 1375
+Number of events after selection + Trigger: 1028
+Number of events after Trigger + Selection (dropping empty arrays): 1028
+# of events after pT cut (dropping empty arrays): 1028
+# of events after eta cut (dropping empty arrays): 1028
+# of events after decay cut (dropping empty arrays): 1028
+# of events after isolation cut (dropping empty arrays): 92
+# of events after visible mass cut (dropping empty arrays): 68
+# of events after Higgs cut (dropping empty arrays): 43
+# of events after topology cut (dropping empty arrays): 43
+# of events after b-jet cut (dropping empty arrays): 43
+=========!!!Weight Debugging!!!=========
+TTTo2L2Nu
+Luminosity Weight = 0.084751
+Luminosity = 59830.000000
+Cross section = 88.249736
+Number of events Processed: 62300000
+!!!=====Dataset=====!!!!
+<class 'str'>
+TTToSemiLeptonic
+Number of events before selection + Trigger: 24625
+Single Trigger: Jet Trigger (39)
+Number of events after Online Trigger(dropping empty arrays): 1466
+Number of events after selection + Trigger: 1079
+Number of events after Trigger + Selection (dropping empty arrays): 1079
+# of events after pT cut (dropping empty arrays): 1079
+# of events after eta cut (dropping empty arrays): 1079
+# of events after decay cut (dropping empty arrays): 1079
+# of events after isolation cut (dropping empty arrays): 36
+# of events after visible mass cut (dropping empty arrays): 23
+# of events after Higgs cut (dropping empty arrays): 18
+# of events after topology cut (dropping empty arrays): 18
+# of events after b-jet cut (dropping empty arrays): 18
+=========!!!Weight Debugging!!!=========
+TTToSemiLeptonic
+Luminosity Weight = 0.082258
+Luminosity = 59830.000000
+Cross section = 365.308992
+Number of events Processed: 265706999
+Processing 100% ━━━━━━━━━━━━━━━━━━━━━━━━ 35/35 [ 0:11:53 < 0:00:00 | ? chunk/s ]
+Background TTToSemiLeptonic added
+Background TTTo2L2Nu added
+Background TTToHadronic added
+Background DYJetsToLL_Pt-50To100 added
+Background DYJetsToLL_Pt-100To250 added
+Background DYJetsToLL_Pt-250To400 added
+Background DYJetsToLL_Pt-400To650 added
+Background DYJetsToLL_Pt-650ToInf added
+Background WZ3l1nu added
+Background WZ2l2q added
+Background WZ1l1nu2q added
+Background ZZ2l2q added
+Background WZ1l3nu added
+Background VV2l2nu added
+Background Tbar-tchan added
+Background T-tchan added
+Background Tbar-tW added
+Background T-tW added
+Background WJetsToLNu_HT-100To200 added
+Background WJetsToLNu_HT-200To400 added
+Background WJetsToLNu_HT-400To600 added
+Background WJetsToLNu_HT-600To800 added
+Background WJetsToLNu_HT-800To1200 added
+Background WJetsToLNu_HT-1200To2500 added
+Background WJetsToLNu_HT-2500ToInf added
+Background ZZ4l added
+==================Hist FourTau_Mass_Arr================
+Background TTToSemiLeptonic added
+Background TTTo2L2Nu added
+Background TTToHadronic added
+Background DYJetsToLL_Pt-50To100 added
+Background DYJetsToLL_Pt-100To250 added
+Background DYJetsToLL_Pt-250To400 added
+Background DYJetsToLL_Pt-400To650 added
+Background DYJetsToLL_Pt-650ToInf added
+Background WZ3l1nu added
+Background WZ2l2q added
+Background WZ1l1nu2q added
+Background ZZ2l2q added
+Background WZ1l3nu added
+Background VV2l2nu added
+Background Tbar-tchan added
+Background T-tchan added
+Background Tbar-tW added
+Background T-tW added
+Background WJetsToLNu_HT-100To200 added
+Background WJetsToLNu_HT-200To400 added
+Background WJetsToLNu_HT-400To600 added
+Background WJetsToLNu_HT-600To800 added
+Background WJetsToLNu_HT-800To1200 added
+Background WJetsToLNu_HT-1200To2500 added
+Background WJetsToLNu_HT-2500ToInf added
+Background ZZ4l added
+==================Hist HiggsDeltaPhi_Arr================
+Background TTToSemiLeptonic added
+Background TTTo2L2Nu added
+Background TTToHadronic added
+Background DYJetsToLL_Pt-50To100 added
+Background DYJetsToLL_Pt-100To250 added
+Background DYJetsToLL_Pt-250To400 added
+Background DYJetsToLL_Pt-400To650 added
+Background DYJetsToLL_Pt-650ToInf added
+Background WZ3l1nu added
+Background WZ2l2q added
+Background WZ1l1nu2q added
+Background ZZ2l2q added
+Background WZ1l3nu added
+Background VV2l2nu added
+Background Tbar-tchan added
+Background T-tchan added
+Background Tbar-tW added
+Background T-tW added
+Background WJetsToLNu_HT-100To200 added
+Background WJetsToLNu_HT-200To400 added
+Background WJetsToLNu_HT-400To600 added
+Background WJetsToLNu_HT-600To800 added
+Background WJetsToLNu_HT-800To1200 added
+Background WJetsToLNu_HT-1200To2500 added
+Background WJetsToLNu_HT-2500ToInf added
+Background ZZ4l added
+==================Hist Higgs_DeltaR_Arr================
+Background TTToSemiLeptonic added
+Background TTTo2L2Nu added
+Background TTToHadronic added
+Background DYJetsToLL_Pt-50To100 added
+Background DYJetsToLL_Pt-100To250 added
+Background DYJetsToLL_Pt-250To400 added
+Background DYJetsToLL_Pt-400To650 added
+Background DYJetsToLL_Pt-650ToInf added
+Background WZ3l1nu added
+Background WZ2l2q added
+Background WZ1l1nu2q added
+Background ZZ2l2q added
+Background WZ1l3nu added
+Background VV2l2nu added
+Background Tbar-tchan added
+Background T-tchan added
+Background Tbar-tW added
+Background T-tW added
+Background WJetsToLNu_HT-100To200 added
+Background WJetsToLNu_HT-200To400 added
+Background WJetsToLNu_HT-400To600 added
+Background WJetsToLNu_HT-600To800 added
+Background WJetsToLNu_HT-800To1200 added
+Background WJetsToLNu_HT-1200To2500 added
+Background WJetsToLNu_HT-2500ToInf added
+Background ZZ4l added
+==================Hist leading_dR_Arr================
+Background TTToSemiLeptonic added
+Background TTTo2L2Nu added
+Background TTToHadronic added
+Background DYJetsToLL_Pt-50To100 added
+Background DYJetsToLL_Pt-100To250 added
+Background DYJetsToLL_Pt-250To400 added
+Background DYJetsToLL_Pt-400To650 added
+Background DYJetsToLL_Pt-650ToInf added
+Background WZ3l1nu added
+Background WZ2l2q added
+Background WZ1l1nu2q added
+Background ZZ2l2q added
+Background WZ1l3nu added
+Background VV2l2nu added
+Background Tbar-tchan added
+Background T-tchan added
+Background Tbar-tW added
+Background T-tW added
+Background WJetsToLNu_HT-100To200 added
+Background WJetsToLNu_HT-200To400 added
+Background WJetsToLNu_HT-400To600 added
+Background WJetsToLNu_HT-600To800 added
+Background WJetsToLNu_HT-800To1200 added
+Background WJetsToLNu_HT-1200To2500 added
+Background WJetsToLNu_HT-2500ToInf added
+Background ZZ4l added
+==================Hist subleading_dR_Arr================
+Background TTToSemiLeptonic added
+Background TTTo2L2Nu added
+Background TTToHadronic added
+Background DYJetsToLL_Pt-50To100 added
+Background DYJetsToLL_Pt-100To250 added
+Background DYJetsToLL_Pt-250To400 added
+Background DYJetsToLL_Pt-400To650 added
+Background DYJetsToLL_Pt-650ToInf added
+Background WZ3l1nu added
+Background WZ2l2q added
+Background WZ1l1nu2q added
+Background ZZ2l2q added
+Background WZ1l3nu added
+Background VV2l2nu added
+Background Tbar-tchan added
+Background T-tchan added
+Background Tbar-tW added
+Background T-tW added
+Background WJetsToLNu_HT-100To200 added
+Background WJetsToLNu_HT-200To400 added
+Background WJetsToLNu_HT-400To600 added
+Background WJetsToLNu_HT-600To800 added
+Background WJetsToLNu_HT-800To1200 added
+Background WJetsToLNu_HT-1200To2500 added
+Background WJetsToLNu_HT-2500ToInf added
+Background ZZ4l added
+==================Hist LeadingHiggs_mass================
+Background TTToSemiLeptonic added
+Background TTTo2L2Nu added
+Background TTToHadronic added
+Background DYJetsToLL_Pt-50To100 added
+Background DYJetsToLL_Pt-100To250 added
+Background DYJetsToLL_Pt-250To400 added
+Background DYJetsToLL_Pt-400To650 added
+Background DYJetsToLL_Pt-650ToInf added
+Background WZ3l1nu added
+Background WZ2l2q added
+Background WZ1l1nu2q added
+Background ZZ2l2q added
+Background WZ1l3nu added
+Background VV2l2nu added
+Background Tbar-tchan added
+Background T-tchan added
+Background Tbar-tW added
+Background T-tW added
+Background WJetsToLNu_HT-100To200 added
+Background WJetsToLNu_HT-200To400 added
+Background WJetsToLNu_HT-400To600 added
+Background WJetsToLNu_HT-600To800 added
+Background WJetsToLNu_HT-800To1200 added
+Background WJetsToLNu_HT-1200To2500 added
+Background WJetsToLNu_HT-2500ToInf added
+Background ZZ4l added
+==================Hist SubLeadingHiggs_mass================
+Background TTToSemiLeptonic added
+Background TTTo2L2Nu added
+Background TTToHadronic added
+Background DYJetsToLL_Pt-50To100 added
+Background DYJetsToLL_Pt-100To250 added
+Background DYJetsToLL_Pt-250To400 added
+Background DYJetsToLL_Pt-400To650 added
+Background DYJetsToLL_Pt-650ToInf added
+Background WZ3l1nu added
+Background WZ2l2q added
+Background WZ1l1nu2q added
+Background ZZ2l2q added
+Background WZ1l3nu added
+Background VV2l2nu added
+Background Tbar-tchan added
+Background T-tchan added
+Background Tbar-tW added
+Background T-tW added
+Background WJetsToLNu_HT-100To200 added
+Background WJetsToLNu_HT-200To400 added
+Background WJetsToLNu_HT-400To600 added
+Background WJetsToLNu_HT-600To800 added
+Background WJetsToLNu_HT-800To1200 added
+Background WJetsToLNu_HT-1200To2500 added
+Background WJetsToLNu_HT-2500ToInf added
+Background ZZ4l added
+==================Hist radionPT_Arr================
+Background TTToSemiLeptonic added
+Background TTTo2L2Nu added
+Background TTToHadronic added
+Background DYJetsToLL_Pt-50To100 added
+Background DYJetsToLL_Pt-100To250 added
+Background DYJetsToLL_Pt-250To400 added
+Background DYJetsToLL_Pt-400To650 added
+Background DYJetsToLL_Pt-650ToInf added
+Background WZ3l1nu added
+Background WZ2l2q added
+Background WZ1l1nu2q added
+Background ZZ2l2q added
+Background WZ1l3nu added
+Background VV2l2nu added
+Background Tbar-tchan added
+Background T-tchan added
+Background Tbar-tW added
+Background T-tW added
+Background WJetsToLNu_HT-100To200 added
+Background WJetsToLNu_HT-200To400 added
+Background WJetsToLNu_HT-400To600 added
+Background WJetsToLNu_HT-600To800 added
+Background WJetsToLNu_HT-800To1200 added
+Background WJetsToLNu_HT-1200To2500 added
+Background WJetsToLNu_HT-2500ToInf added
+Background ZZ4l added
+==================Hist tau_pt_Arr================
+Background TTToSemiLeptonic added
+Background TTTo2L2Nu added
+Background TTToHadronic added
+Background DYJetsToLL_Pt-50To100 added
+Background DYJetsToLL_Pt-100To250 added
+Background DYJetsToLL_Pt-250To400 added
+Background DYJetsToLL_Pt-400To650 added
+Background DYJetsToLL_Pt-650ToInf added
+Background WZ3l1nu added
+Background WZ2l2q added
+Background WZ1l1nu2q added
+Background ZZ2l2q added
+Background WZ1l3nu added
+Background VV2l2nu added
+Background Tbar-tchan added
+Background T-tchan added
+Background Tbar-tW added
+Background T-tW added
+Background WJetsToLNu_HT-100To200 added
+Background WJetsToLNu_HT-200To400 added
+Background WJetsToLNu_HT-400To600 added
+Background WJetsToLNu_HT-600To800 added
+Background WJetsToLNu_HT-800To1200 added
+Background WJetsToLNu_HT-1200To2500 added
+Background WJetsToLNu_HT-2500ToInf added
+Background ZZ4l added
+==================Hist tau_eta_Arr================
+Background TTToSemiLeptonic added
+Background TTTo2L2Nu added
+Background TTToHadronic added
+Background DYJetsToLL_Pt-50To100 added
+Background DYJetsToLL_Pt-100To250 added
+Background DYJetsToLL_Pt-250To400 added
+Background DYJetsToLL_Pt-400To650 added
+Background DYJetsToLL_Pt-650ToInf added
+Background WZ3l1nu added
+Background WZ2l2q added
+Background WZ1l1nu2q added
+Background ZZ2l2q added
+Background WZ1l3nu added
+Background VV2l2nu added
+Background Tbar-tchan added
+Background T-tchan added
+Background Tbar-tW added
+Background T-tW added
+Background WJetsToLNu_HT-100To200 added
+Background WJetsToLNu_HT-200To400 added
+Background WJetsToLNu_HT-400To600 added
+Background WJetsToLNu_HT-600To800 added
+Background WJetsToLNu_HT-800To1200 added
+Background WJetsToLNu_HT-1200To2500 added
+Background WJetsToLNu_HT-2500ToInf added
+Background ZZ4l added
+==================Hist ZMult_Arr================
+Background TTToSemiLeptonic added
+Background TTTo2L2Nu added
+Background TTToHadronic added
+Background DYJetsToLL_Pt-50To100 added
+Background DYJetsToLL_Pt-100To250 added
+Background DYJetsToLL_Pt-250To400 added
+Background DYJetsToLL_Pt-400To650 added
+Background DYJetsToLL_Pt-650ToInf added
+Background WZ3l1nu added
+Background WZ2l2q added
+Background WZ1l1nu2q added
+Background ZZ2l2q added
+Background WZ1l3nu added
+Background VV2l2nu added
+Background Tbar-tchan added
+Background T-tchan added
+Background Tbar-tW added
+Background T-tW added
+Background WJetsToLNu_HT-100To200 added
+Background WJetsToLNu_HT-200To400 added
+Background WJetsToLNu_HT-400To600 added
+Background WJetsToLNu_HT-600To800 added
+Background WJetsToLNu_HT-800To1200 added
+Background WJetsToLNu_HT-1200To2500 added
+Background WJetsToLNu_HT-2500ToInf added
+Background ZZ4l added
+==================Hist BJet_Arr================
+Background TTToSemiLeptonic added
+Background TTTo2L2Nu added
+Background TTToHadronic added
+Background DYJetsToLL_Pt-50To100 added
+Background DYJetsToLL_Pt-100To250 added
+Background DYJetsToLL_Pt-250To400 added
+Background DYJetsToLL_Pt-400To650 added
+Background DYJetsToLL_Pt-650ToInf added
+Background WZ3l1nu added
+Background WZ2l2q added
+Background WZ1l1nu2q added
+Background ZZ2l2q added
+Background WZ1l3nu added
+Background VV2l2nu added
+Background Tbar-tchan added
+Background T-tchan added
+Background Tbar-tW added
+Background T-tW added
+Background WJetsToLNu_HT-100To200 added
+Background WJetsToLNu_HT-200To400 added
+Background WJetsToLNu_HT-400To600 added
+Background WJetsToLNu_HT-600To800 added
+Background WJetsToLNu_HT-800To1200 added
+Background WJetsToLNu_HT-1200To2500 added
+Background WJetsToLNu_HT-2500ToInf added
+Background ZZ4l added
+==================Hist tau_lead_pt_Arr================
+Background TTToSemiLeptonic added
+Background TTTo2L2Nu added
+Background TTToHadronic added
+Background DYJetsToLL_Pt-50To100 added
+Background DYJetsToLL_Pt-100To250 added
+Background DYJetsToLL_Pt-250To400 added
+Background DYJetsToLL_Pt-400To650 added
+Background DYJetsToLL_Pt-650ToInf added
+Background WZ3l1nu added
+Background WZ2l2q added
+Background WZ1l1nu2q added
+Background ZZ2l2q added
+Background WZ1l3nu added
+Background VV2l2nu added
+Background Tbar-tchan added
+Background T-tchan added
+Background Tbar-tW added
+Background T-tW added
+Background WJetsToLNu_HT-100To200 added
+Background WJetsToLNu_HT-200To400 added
+Background WJetsToLNu_HT-400To600 added
+Background WJetsToLNu_HT-600To800 added
+Background WJetsToLNu_HT-800To1200 added
+Background WJetsToLNu_HT-1200To2500 added
+Background WJetsToLNu_HT-2500ToInf added
+Background ZZ4l added
+==================Hist tau_sublead_pt_Arr================
+Background TTToSemiLeptonic added
+Background TTTo2L2Nu added
+Background TTToHadronic added
+Background DYJetsToLL_Pt-50To100 added
+Background DYJetsToLL_Pt-100To250 added
+Background DYJetsToLL_Pt-250To400 added
+Background DYJetsToLL_Pt-400To650 added
+Background DYJetsToLL_Pt-650ToInf added
+Background WZ3l1nu added
+Background WZ2l2q added
+Background WZ1l1nu2q added
+Background ZZ2l2q added
+Background WZ1l3nu added
+Background VV2l2nu added
+Background Tbar-tchan added
+Background T-tchan added
+Background Tbar-tW added
+Background T-tW added
+Background WJetsToLNu_HT-100To200 added
+Background WJetsToLNu_HT-200To400 added
+Background WJetsToLNu_HT-400To600 added
+Background WJetsToLNu_HT-600To800 added
+Background WJetsToLNu_HT-800To1200 added
+Background WJetsToLNu_HT-1200To2500 added
+Background WJetsToLNu_HT-2500ToInf added
+Background ZZ4l added
+==================Hist tau_3rdlead_pt_Arr================
+Background TTToSemiLeptonic added
+Background TTTo2L2Nu added
+Background TTToHadronic added
+Background DYJetsToLL_Pt-50To100 added
+Background DYJetsToLL_Pt-100To250 added
+Background DYJetsToLL_Pt-250To400 added
+Background DYJetsToLL_Pt-400To650 added
+Background DYJetsToLL_Pt-650ToInf added
+Background WZ3l1nu added
+Background WZ2l2q added
+Background WZ1l1nu2q added
+Background ZZ2l2q added
+Background WZ1l3nu added
+Background VV2l2nu added
+Background Tbar-tchan added
+Background T-tchan added
+Background Tbar-tW added
+Background T-tW added
+Background WJetsToLNu_HT-100To200 added
+Background WJetsToLNu_HT-200To400 added
+Background WJetsToLNu_HT-400To600 added
+Background WJetsToLNu_HT-600To800 added
+Background WJetsToLNu_HT-800To1200 added
+Background WJetsToLNu_HT-1200To2500 added
+Background WJetsToLNu_HT-2500ToInf added
+Background ZZ4l added
+==================Hist tau_4thlead_pt_Arr================
+Background TTToSemiLeptonic added
+Background TTTo2L2Nu added
+Background TTToHadronic added
+Background DYJetsToLL_Pt-50To100 added
+Background DYJetsToLL_Pt-100To250 added
+Background DYJetsToLL_Pt-250To400 added
+Background DYJetsToLL_Pt-400To650 added
+Background DYJetsToLL_Pt-650ToInf added
+Background WZ3l1nu added
+Background WZ2l2q added
+Background WZ1l1nu2q added
+Background ZZ2l2q added
+Background WZ1l3nu added
+Background VV2l2nu added
+Background Tbar-tchan added
+Background T-tchan added
+Background Tbar-tW added
+Background T-tW added
+Background WJetsToLNu_HT-100To200 added
+Background WJetsToLNu_HT-200To400 added
+Background WJetsToLNu_HT-400To600 added
+Background WJetsToLNu_HT-600To800 added
+Background WJetsToLNu_HT-800To1200 added
+Background WJetsToLNu_HT-1200To2500 added
+Background WJetsToLNu_HT-2500ToInf added
+Background ZZ4l added
+==================Hist leading_dPhi_Arr================
+Background TTToSemiLeptonic added
+Background TTTo2L2Nu added
+Background TTToHadronic added
+Background DYJetsToLL_Pt-50To100 added
+Background DYJetsToLL_Pt-100To250 added
+Background DYJetsToLL_Pt-250To400 added
+Background DYJetsToLL_Pt-400To650 added
+Background DYJetsToLL_Pt-650ToInf added
+Background WZ3l1nu added
+Background WZ2l2q added
+Background WZ1l1nu2q added
+Background ZZ2l2q added
+Background WZ1l3nu added
+Background VV2l2nu added
+Background Tbar-tchan added
+Background T-tchan added
+Background Tbar-tW added
+Background T-tW added
+Background WJetsToLNu_HT-100To200 added
+Background WJetsToLNu_HT-200To400 added
+Background WJetsToLNu_HT-400To600 added
+Background WJetsToLNu_HT-600To800 added
+Background WJetsToLNu_HT-800To1200 added
+Background WJetsToLNu_HT-1200To2500 added
+Background WJetsToLNu_HT-2500ToInf added
+Background ZZ4l added
+==================Hist subleading_dPhi_Arr================
+Background TTToSemiLeptonic added
+Background TTTo2L2Nu added
+Background TTToHadronic added
+Background DYJetsToLL_Pt-50To100 added
+Background DYJetsToLL_Pt-100To250 added
+Background DYJetsToLL_Pt-250To400 added
+Background DYJetsToLL_Pt-400To650 added
+Background DYJetsToLL_Pt-650ToInf added
+Background WZ3l1nu added
+Background WZ2l2q added
+Background WZ1l1nu2q added
+Background ZZ2l2q added
+Background WZ1l3nu added
+Background VV2l2nu added
+Background Tbar-tchan added
+Background T-tchan added
+Background Tbar-tW added
+Background T-tW added
+Background WJetsToLNu_HT-100To200 added
+Background WJetsToLNu_HT-200To400 added
+Background WJetsToLNu_HT-400To600 added
+Background WJetsToLNu_HT-600To800 added
+Background WJetsToLNu_HT-800To1200 added
+Background WJetsToLNu_HT-1200To2500 added
+Background WJetsToLNu_HT-2500ToInf added
+Background ZZ4l added
+==================Hist radionMET_dPhi_Arr================
+Background TTToSemiLeptonic added
+Background TTTo2L2Nu added
+Background TTToHadronic added
+Background DYJetsToLL_Pt-50To100 added
+Background DYJetsToLL_Pt-100To250 added
+Background DYJetsToLL_Pt-250To400 added
+Background DYJetsToLL_Pt-400To650 added
+Background DYJetsToLL_Pt-650ToInf added
+Background WZ3l1nu added
+Background WZ2l2q added
+Background WZ1l1nu2q added
+Background ZZ2l2q added
+Background WZ1l3nu added
+Background VV2l2nu added
+Background Tbar-tchan added
+Background T-tchan added
+Background Tbar-tW added
+Background T-tW added
+Background WJetsToLNu_HT-100To200 added
+Background WJetsToLNu_HT-200To400 added
+Background WJetsToLNu_HT-400To600 added
+Background WJetsToLNu_HT-600To800 added
+Background WJetsToLNu_HT-800To1200 added
+Background WJetsToLNu_HT-1200To2500 added
+Background WJetsToLNu_HT-2500ToInf added
+Background ZZ4l added
+==================Hist leadingHiggs_Rad_dR_Arr================
+Background TTToSemiLeptonic added
+Background TTTo2L2Nu added
+Background TTToHadronic added
+Background DYJetsToLL_Pt-50To100 added
+Background DYJetsToLL_Pt-100To250 added
+Background DYJetsToLL_Pt-250To400 added
+Background DYJetsToLL_Pt-400To650 added
+Background DYJetsToLL_Pt-650ToInf added
+Background WZ3l1nu added
+Background WZ2l2q added
+Background WZ1l1nu2q added
+Background ZZ2l2q added
+Background WZ1l3nu added
+Background VV2l2nu added
+Background Tbar-tchan added
+Background T-tchan added
+Background Tbar-tW added
+Background T-tW added
+Background WJetsToLNu_HT-100To200 added
+Background WJetsToLNu_HT-200To400 added
+Background WJetsToLNu_HT-400To600 added
+Background WJetsToLNu_HT-600To800 added
+Background WJetsToLNu_HT-800To1200 added
+Background WJetsToLNu_HT-1200To2500 added
+Background WJetsToLNu_HT-2500ToInf added
+Background ZZ4l added
+==================Hist subleadingHiggs_Rad_dR_Arr================
+Background TTToSemiLeptonic added
+Background TTTo2L2Nu added
+Background TTToHadronic added
+Background DYJetsToLL_Pt-50To100 added
+Background DYJetsToLL_Pt-100To250 added
+Background DYJetsToLL_Pt-250To400 added
+Background DYJetsToLL_Pt-400To650 added
+Background DYJetsToLL_Pt-650ToInf added
+Background WZ3l1nu added
+Background WZ2l2q added
+Background WZ1l1nu2q added
+Background ZZ2l2q added
+Background WZ1l3nu added
+Background VV2l2nu added
+Background Tbar-tchan added
+Background T-tchan added
+Background Tbar-tW added
+Background T-tW added
+Background WJetsToLNu_HT-100To200 added
+Background WJetsToLNu_HT-200To400 added
+Background WJetsToLNu_HT-400To600 added
+Background WJetsToLNu_HT-600To800 added
+Background WJetsToLNu_HT-800To1200 added
+Background WJetsToLNu_HT-1200To2500 added
+Background WJetsToLNu_HT-2500ToInf added
+Background ZZ4l added
+==================Hist leadingHiggs_MET_dPhi_Arr================
+Background TTToSemiLeptonic added
+Background TTTo2L2Nu added
+Background TTToHadronic added
+Background DYJetsToLL_Pt-50To100 added
+Background DYJetsToLL_Pt-100To250 added
+Background DYJetsToLL_Pt-250To400 added
+Background DYJetsToLL_Pt-400To650 added
+Background DYJetsToLL_Pt-650ToInf added
+Background WZ3l1nu added
+Background WZ2l2q added
+Background WZ1l1nu2q added
+Background ZZ2l2q added
+Background WZ1l3nu added
+Background VV2l2nu added
+Background Tbar-tchan added
+Background T-tchan added
+Background Tbar-tW added
+Background T-tW added
+Background WJetsToLNu_HT-100To200 added
+Background WJetsToLNu_HT-200To400 added
+Background WJetsToLNu_HT-400To600 added
+Background WJetsToLNu_HT-600To800 added
+Background WJetsToLNu_HT-800To1200 added
+Background WJetsToLNu_HT-1200To2500 added
+Background WJetsToLNu_HT-2500ToInf added
+Background ZZ4l added
+==================Hist subleadingHiggs_MET_dPhi_Arr================
+Background TTToSemiLeptonic added
+Background TTTo2L2Nu added
+Background TTToHadronic added
+Background DYJetsToLL_Pt-50To100 added
+Background DYJetsToLL_Pt-100To250 added
+Background DYJetsToLL_Pt-250To400 added
+Background DYJetsToLL_Pt-400To650 added
+Background DYJetsToLL_Pt-650ToInf added
+Background WZ3l1nu added
+Background WZ2l2q added
+Background WZ1l1nu2q added
+Background ZZ2l2q added
+Background WZ1l3nu added
+Background VV2l2nu added
+Background Tbar-tchan added
+Background T-tchan added
+Background Tbar-tW added
+Background T-tW added
+Background WJetsToLNu_HT-100To200 added
+Background WJetsToLNu_HT-200To400 added
+Background WJetsToLNu_HT-400To600 added
+Background WJetsToLNu_HT-600To800 added
+Background WJetsToLNu_HT-800To1200 added
+Background WJetsToLNu_HT-1200To2500 added
+Background WJetsToLNu_HT-2500ToInf added
+Background ZZ4l added
+==================Hist Radion_eta_Arr================
+Background TTToSemiLeptonic added
+Background TTTo2L2Nu added
+Background TTToHadronic added
+Background DYJetsToLL_Pt-50To100 added
+Background DYJetsToLL_Pt-100To250 added
+Background DYJetsToLL_Pt-250To400 added
+Background DYJetsToLL_Pt-400To650 added
+Background DYJetsToLL_Pt-650ToInf added
+Background WZ3l1nu added
+Background WZ2l2q added
+Background WZ1l1nu2q added
+Background ZZ2l2q added
+Background WZ1l3nu added
+Background VV2l2nu added
+Background Tbar-tchan added
+Background T-tchan added
+Background Tbar-tW added
+Background T-tW added
+Background WJetsToLNu_HT-100To200 added
+Background WJetsToLNu_HT-200To400 added
+Background WJetsToLNu_HT-400To600 added
+Background WJetsToLNu_HT-600To800 added
+Background WJetsToLNu_HT-800To1200 added
+Background WJetsToLNu_HT-1200To2500 added
+Background WJetsToLNu_HT-2500ToInf added
+Background ZZ4l added
+==================Hist Radion_Charge_Arr================
+!!!=====Dataset=====!!!!
+<class 'str'>
+Data_JetHT
+Number of events before selection + Trigger: 2532
+Jet Trigger
+Number of events after Online Trigger(dropping empty arrays): 191
+# of events after Trigger + Selection: 123
+# of events after Trigger + Selection (dropping empty arrays): 123
+# of events after pT cut (dropping empty arrays): 123
+# of events after eta cut (dropping empty arrays): 123
+# of events after decay cut (dropping empty arrays): 123
+# of events after isolation cut (dropping empty arrays): 7
+# of events after visible mass cut (dropping empty arrays): 7
+# of events after Higgs cut (dropping empty arrays): 5
+# of events after topology cut (dropping empty arrays): 5
+# of events after b-jet cut (dropping empty arrays): 5
+!!!=====Dataset=====!!!!
+<class 'str'>
+Data_JetHT
+Number of events before selection + Trigger: 522
+Jet Trigger
+Number of events after Online Trigger(dropping empty arrays): 39
+# of events after Trigger + Selection: 28
+# of events after Trigger + Selection (dropping empty arrays): 28
+# of events after pT cut (dropping empty arrays): 28
+# of events after eta cut (dropping empty arrays): 28
+# of events after decay cut (dropping empty arrays): 28
+# of events after isolation cut (dropping empty arrays): 1
+# of events after visible mass cut (dropping empty arrays): 0
+# of events after Higgs cut (dropping empty arrays): 0
+# of events after topology cut (dropping empty arrays): 0
+# of events after b-jet cut (dropping empty arrays): 0
+!!!=====Dataset=====!!!!
+<class 'str'>
+Data_JetHT
+Number of events before selection + Trigger: 611
+Jet Trigger
+Number of events after Online Trigger(dropping empty arrays): 37
+# of events after Trigger + Selection: 19
+# of events after Trigger + Selection (dropping empty arrays): 19
+# of events after pT cut (dropping empty arrays): 19
+# of events after eta cut (dropping empty arrays): 19
+# of events after decay cut (dropping empty arrays): 19
+# of events after isolation cut (dropping empty arrays): 3
+# of events after visible mass cut (dropping empty arrays): 2
+# of events after Higgs cut (dropping empty arrays): 1
+# of events after topology cut (dropping empty arrays): 1
+# of events after b-jet cut (dropping empty arrays): 1
+!!!=====Dataset=====!!!!
+<class 'str'>
+Data_JetHT
+Number of events before selection + Trigger: 1289
+Jet Trigger
+Number of events after Online Trigger(dropping empty arrays): 71
+# of events after Trigger + Selection: 42
+# of events after Trigger + Selection (dropping empty arrays): 42
+# of events after pT cut (dropping empty arrays): 42
+# of events after eta cut (dropping empty arrays): 42
+# of events after decay cut (dropping empty arrays): 42
+# of events after isolation cut (dropping empty arrays): 3
+# of events after visible mass cut (dropping empty arrays): 3
+# of events after Higgs cut (dropping empty arrays): 3
+# of events after topology cut (dropping empty arrays): 3
+# of events after b-jet cut (dropping empty arrays): 3
+!!!=====Dataset=====!!!!
+<class 'str'>
+Data_SingleMuon
+Number of events before selection + Trigger: 1905
+Single Muon Trigger
+# of events after Trigger + Selection: 1197
+# of events after Trigger + Selection (dropping empty arrays): 1197
+# of events after pT cut (dropping empty arrays): 1197
+# of events after eta cut (dropping empty arrays): 1197
+# of events after decay cut (dropping empty arrays): 1197
+# of events after isolation cut (dropping empty arrays): 138
+# of events after visible mass cut (dropping empty arrays): 66
+# of events after Higgs cut (dropping empty arrays): 52
+# of events after topology cut (dropping empty arrays): 52
+# of events after b-jet cut (dropping empty arrays): 52
+!!!=====Dataset=====!!!!
+<class 'str'>
+Data_SingleMuon
+Number of events before selection + Trigger: 469
+Single Muon Trigger
+# of events after Trigger + Selection: 302
+# of events after Trigger + Selection (dropping empty arrays): 302
+# of events after pT cut (dropping empty arrays): 302
+# of events after eta cut (dropping empty arrays): 302
+# of events after decay cut (dropping empty arrays): 302
+# of events after isolation cut (dropping empty arrays): 32
+# of events after visible mass cut (dropping empty arrays): 19
+# of events after Higgs cut (dropping empty arrays): 17
+# of events after topology cut (dropping empty arrays): 17
+# of events after b-jet cut (dropping empty arrays): 17
+!!!=====Dataset=====!!!!
+<class 'str'>
+Data_SingleMuon
+Number of events before selection + Trigger: 424
+Single Muon Trigger
+# of events after Trigger + Selection: 268
+# of events after Trigger + Selection (dropping empty arrays): 268
+# of events after pT cut (dropping empty arrays): 268
+# of events after eta cut (dropping empty arrays): 268
+# of events after decay cut (dropping empty arrays): 268
+# of events after isolation cut (dropping empty arrays): 31
+# of events after visible mass cut (dropping empty arrays): 20
+# of events after Higgs cut (dropping empty arrays): 15
+# of events after topology cut (dropping empty arrays): 15
+# of events after b-jet cut (dropping empty arrays): 15
+!!!=====Dataset=====!!!!
+<class 'str'>
+Data_SingleMuon
+Number of events before selection + Trigger: 1008
+Single Muon Trigger
+# of events after Trigger + Selection: 632
+# of events after Trigger + Selection (dropping empty arrays): 632
+# of events after pT cut (dropping empty arrays): 632
+# of events after eta cut (dropping empty arrays): 632
+# of events after decay cut (dropping empty arrays): 632
+# of events after isolation cut (dropping empty arrays): 79
+# of events after visible mass cut (dropping empty arrays): 55
+# of events after Higgs cut (dropping empty arrays): 42
+# of events after topology cut (dropping empty arrays): 42
+# of events after b-jet cut (dropping empty arrays): 42
+!!!=====Dataset=====!!!!
+<class 'str'>
+Signal
+Number of events before selection + Trigger: 14343
+Both Triggers
+Number of events after selection + Trigger: 11125
+Number of events after Trigger + Selection (dropping empty arrays): 11125
+# of events after pT cut (dropping empty arrays): 11125
+# of events after eta cut (dropping empty arrays): 11125
+# of events after decay cut (dropping empty arrays): 11125
+# of events after isolation cut (dropping empty arrays): 9115
+# of events after visible mass cut (dropping empty arrays): 9105
+# of events after Higgs cut (dropping empty arrays): 9064
+# of events after topology cut (dropping empty arrays): 9064
+# of events after b-jet cut (dropping empty arrays): 9064
+=========!!!Weight Debugging!!!=========
+Signal
+Luminosity Weight = 0.006232
+Luminosity = 59830.000000
+Cross section = 0.010000
+Number of events Processed: 96000
+!!!=====Dataset=====!!!!
+<class 'str'>
+WJetsToLNu_HT-2500ToInf
+Number of events before selection + Trigger: 60
+Both Triggers
+Number of events after selection + Trigger: 53
+Number of events after Trigger + Selection (dropping empty arrays): 53
+# of events after pT cut (dropping empty arrays): 53
+# of events after eta cut (dropping empty arrays): 53
+# of events after decay cut (dropping empty arrays): 53
+# of events after isolation cut (dropping empty arrays): 2
+# of events after visible mass cut (dropping empty arrays): 0
+# of events after Higgs cut (dropping empty arrays): 0
+# of events after topology cut (dropping empty arrays): 0
+# of events after b-jet cut (dropping empty arrays): 0
+=========!!!Weight Debugging!!!=========
+WJetsToLNu_HT-2500ToInf
+Luminosity Weight = 0.000711
+Luminosity = 59830.000000
+Cross section = 0.038914
+Number of events Processed: 3273980
+!!!=====Dataset=====!!!!
+<class 'str'>
+WJetsToLNu_HT-1200To2500
+Number of events before selection + Trigger: 167
+Both Triggers
+Number of events after selection + Trigger: 140
+Number of events after Trigger + Selection (dropping empty arrays): 140
+# of events after pT cut (dropping empty arrays): 140
+# of events after eta cut (dropping empty arrays): 140
+# of events after decay cut (dropping empty arrays): 140
+# of events after isolation cut (dropping empty arrays): 3
+# of events after visible mass cut (dropping empty arrays): 2
+# of events after Higgs cut (dropping empty arrays): 2
+# of events after topology cut (dropping empty arrays): 2
+# of events after b-jet cut (dropping empty arrays): 2
+=========!!!Weight Debugging!!!=========
+WJetsToLNu_HT-1200To2500
+Luminosity Weight = 0.012603
+Luminosity = 59830.000000
+Cross section = 1.608090
+Number of events Processed: 7633949
+!!!=====Dataset=====!!!!
+<class 'str'>
+WJetsToLNu_HT-800To1200
+Number of events before selection + Trigger: 172
+Both Triggers
+Number of events after selection + Trigger: 136
+Number of events after Trigger + Selection (dropping empty arrays): 136
+# of events after pT cut (dropping empty arrays): 136
+# of events after eta cut (dropping empty arrays): 136
+# of events after decay cut (dropping empty arrays): 136
+# of events after isolation cut (dropping empty arrays): 2
+# of events after visible mass cut (dropping empty arrays): 2
+# of events after Higgs cut (dropping empty arrays): 2
+# of events after topology cut (dropping empty arrays): 2
+# of events after b-jet cut (dropping empty arrays): 2
+=========!!!Weight Debugging!!!=========
+WJetsToLNu_HT-800To1200
+Luminosity Weight = 0.047394
+Luminosity = 59830.000000
+Cross section = 6.656210
+Number of events Processed: 8402687
+!!!=====Dataset=====!!!!
+<class 'str'>
+WJetsToLNu_HT-600To800
+Number of events before selection + Trigger: 452
+Both Triggers
+Number of events after selection + Trigger: 337
+Number of events after Trigger + Selection (dropping empty arrays): 337
+# of events after pT cut (dropping empty arrays): 337
+# of events after eta cut (dropping empty arrays): 337
+# of events after decay cut (dropping empty arrays): 337
+# of events after isolation cut (dropping empty arrays): 17
+# of events after visible mass cut (dropping empty arrays): 13
+# of events after Higgs cut (dropping empty arrays): 9
+# of events after topology cut (dropping empty arrays): 9
+# of events after b-jet cut (dropping empty arrays): 9
+=========!!!Weight Debugging!!!=========
+WJetsToLNu_HT-600To800
+Luminosity Weight = 0.044218
+Luminosity = 59830.000000
+Cross section = 14.580500
+Number of events Processed: 19728401
+!!!=====Dataset=====!!!!
+<class 'str'>
+WJetsToLNu_HT-400To600
+Number of events before selection + Trigger: 120
+Both Triggers
+Number of events after selection + Trigger: 90
+Number of events after Trigger + Selection (dropping empty arrays): 90
+# of events after pT cut (dropping empty arrays): 90
+# of events after eta cut (dropping empty arrays): 90
+# of events after decay cut (dropping empty arrays): 90
+# of events after isolation cut (dropping empty arrays): 7
+# of events after visible mass cut (dropping empty arrays): 5
+# of events after Higgs cut (dropping empty arrays): 5
+# of events after topology cut (dropping empty arrays): 5
+# of events after b-jet cut (dropping empty arrays): 5
+=========!!!Weight Debugging!!!=========
+WJetsToLNu_HT-400To600
+Luminosity Weight = 0.596829
+Luminosity = 59830.000000
+Cross section = 59.181100
+Number of events Processed: 5932701
+!!!=====Dataset=====!!!!
+<class 'str'>
+WJetsToLNu_HT-200To400
+Number of events before selection + Trigger: 235
+Both Triggers
+Number of events after selection + Trigger: 149
+Number of events after Trigger + Selection (dropping empty arrays): 149
+# of events after pT cut (dropping empty arrays): 149
+# of events after eta cut (dropping empty arrays): 149
+# of events after decay cut (dropping empty arrays): 149
+# of events after isolation cut (dropping empty arrays): 13
+# of events after visible mass cut (dropping empty arrays): 3
+# of events after Higgs cut (dropping empty arrays): 3
+# of events after topology cut (dropping empty arrays): 3
+# of events after b-jet cut (dropping empty arrays): 3
+=========!!!Weight Debugging!!!=========
+WJetsToLNu_HT-200To400
+Luminosity Weight = 1.022431
+Luminosity = 59830.000000
+Cross section = 435.237000
+Number of events Processed: 25468933
+!!!=====Dataset=====!!!!
+<class 'str'>
+WJetsToLNu_HT-100To200
+Number of events before selection + Trigger: 40
+Both Triggers
+Number of events after selection + Trigger: 31
+Number of events after Trigger + Selection (dropping empty arrays): 31
+# of events after pT cut (dropping empty arrays): 31
+# of events after eta cut (dropping empty arrays): 31
+# of events after decay cut (dropping empty arrays): 31
+# of events after isolation cut (dropping empty arrays): 4
+# of events after visible mass cut (dropping empty arrays): 2
+# of events after Higgs cut (dropping empty arrays): 2
+# of events after topology cut (dropping empty arrays): 2
+# of events after b-jet cut (dropping empty arrays): 2
+=========!!!Weight Debugging!!!=========
+WJetsToLNu_HT-100To200
+Luminosity Weight = 3.298324
+Luminosity = 59830.000000
+Cross section = 1627.450000
+Number of events Processed: 29521158
+!!!=====Dataset=====!!!!
+<class 'str'>
+T-tW
+Number of events before selection + Trigger: 405
+Both Triggers
+Number of events after selection + Trigger: 314
+Number of events after Trigger + Selection (dropping empty arrays): 314
+# of events after pT cut (dropping empty arrays): 314
+# of events after eta cut (dropping empty arrays): 314
+# of events after decay cut (dropping empty arrays): 314
+# of events after isolation cut (dropping empty arrays): 24
+# of events after visible mass cut (dropping empty arrays): 12
+# of events after Higgs cut (dropping empty arrays): 11
+# of events after topology cut (dropping empty arrays): 11
+# of events after b-jet cut (dropping empty arrays): 11
+=========!!!Weight Debugging!!!=========
+T-tW
+Luminosity Weight = 0.230464
+Luminosity = 59830.000000
+Cross section = 35.600000
+Number of events Processed: 9242000
+!!!=====Dataset=====!!!!
+<class 'str'>
+Tbar-tW
+Number of events before selection + Trigger: 299
+Both Triggers
+Number of events after selection + Trigger: 240
+Number of events after Trigger + Selection (dropping empty arrays): 240
+# of events after pT cut (dropping empty arrays): 240
+# of events after eta cut (dropping empty arrays): 240
+# of events after decay cut (dropping empty arrays): 240
+# of events after isolation cut (dropping empty arrays): 23
+# of events after visible mass cut (dropping empty arrays): 10
+# of events after Higgs cut (dropping empty arrays): 9
+# of events after topology cut (dropping empty arrays): 9
+# of events after b-jet cut (dropping empty arrays): 9
+=========!!!Weight Debugging!!!=========
+Tbar-tW
+Luminosity Weight = 0.279411
+Luminosity = 59830.000000
+Cross section = 35.600000
+Number of events Processed: 7623000
+!!!=====Dataset=====!!!!
+<class 'str'>
+T-tchan
+Number of events before selection + Trigger: 748
+Both Triggers
+Number of events after selection + Trigger: 563
+Number of events after Trigger + Selection (dropping empty arrays): 563
+# of events after pT cut (dropping empty arrays): 563
+# of events after eta cut (dropping empty arrays): 563
+# of events after decay cut (dropping empty arrays): 563
+# of events after isolation cut (dropping empty arrays): 31
+# of events after visible mass cut (dropping empty arrays): 11
+# of events after Higgs cut (dropping empty arrays): 7
+# of events after topology cut (dropping empty arrays): 7
+# of events after b-jet cut (dropping empty arrays): 7
+=========!!!Weight Debugging!!!=========
+T-tchan
+Luminosity Weight = 0.017107
+Luminosity = 59830.000000
+Cross section = 44.070000
+Number of events Processed: 154130900
+!!!=====Dataset=====!!!!
+<class 'str'>
+Tbar-tchan
+Number of events before selection + Trigger: 450
+Both Triggers
+Number of events after selection + Trigger: 334
+Number of events after Trigger + Selection (dropping empty arrays): 334
+# of events after pT cut (dropping empty arrays): 334
+# of events after eta cut (dropping empty arrays): 334
+# of events after decay cut (dropping empty arrays): 334
+# of events after isolation cut (dropping empty arrays): 16
+# of events after visible mass cut (dropping empty arrays): 7
+# of events after Higgs cut (dropping empty arrays): 7
+# of events after topology cut (dropping empty arrays): 7
+# of events after b-jet cut (dropping empty arrays): 7
+=========!!!Weight Debugging!!!=========
+Tbar-tchan
+Luminosity Weight = 0.019842
+Luminosity = 59830.000000
+Cross section = 26.230000
+Number of events Processed: 79090800
+!!!=====Dataset=====!!!!
+<class 'str'>
+DYJetsToLL_Pt-650ToInf
+Number of events before selection + Trigger: 1188
+Both Triggers
+Number of events after selection + Trigger: 965
+Number of events after Trigger + Selection (dropping empty arrays): 965
+# of events after pT cut (dropping empty arrays): 965
+# of events after eta cut (dropping empty arrays): 965
+# of events after decay cut (dropping empty arrays): 965
+# of events after isolation cut (dropping empty arrays): 114
+# of events after visible mass cut (dropping empty arrays): 59
+# of events after Higgs cut (dropping empty arrays): 38
+# of events after topology cut (dropping empty arrays): 38
+# of events after b-jet cut (dropping empty arrays): 38
+=========!!!Weight Debugging!!!=========
+DYJetsToLL_Pt-650ToInf
+Luminosity Weight = 0.001376
+Luminosity = 59830.000000
+Cross section = 0.043602
+Number of events Processed: 1895998
+!!!=====Dataset=====!!!!
+<class 'str'>
+DYJetsToLL_Pt-400To650
+Number of events before selection + Trigger: 1209
+Both Triggers
+Number of events after selection + Trigger: 955
+Number of events after Trigger + Selection (dropping empty arrays): 955
+# of events after pT cut (dropping empty arrays): 955
+# of events after eta cut (dropping empty arrays): 955
+# of events after decay cut (dropping empty arrays): 955
+# of events after isolation cut (dropping empty arrays): 113
+# of events after visible mass cut (dropping empty arrays): 56
+# of events after Higgs cut (dropping empty arrays): 42
+# of events after topology cut (dropping empty arrays): 42
+# of events after b-jet cut (dropping empty arrays): 42
+=========!!!Weight Debugging!!!=========
+DYJetsToLL_Pt-400To650
+Luminosity Weight = 0.014896
+Luminosity = 59830.000000
+Cross section = 0.464024
+Number of events Processed: 1863809
+!!!=====Dataset=====!!!!
+<class 'str'>
+DYJetsToLL_Pt-250To400
+Number of events before selection + Trigger: 8981
+Both Triggers
+Number of events after selection + Trigger: 6609
+Number of events after Trigger + Selection (dropping empty arrays): 6609
+# of events after pT cut (dropping empty arrays): 6609
+# of events after eta cut (dropping empty arrays): 6609
+# of events after decay cut (dropping empty arrays): 6609
+# of events after isolation cut (dropping empty arrays): 899
+# of events after visible mass cut (dropping empty arrays): 370
+# of events after Higgs cut (dropping empty arrays): 293
+# of events after topology cut (dropping empty arrays): 293
+# of events after b-jet cut (dropping empty arrays): 293
+=========!!!Weight Debugging!!!=========
+DYJetsToLL_Pt-250To400
+Luminosity Weight = 0.010214
+Luminosity = 59830.000000
+Cross section = 3.435181
+Number of events Processed: 20121253
+!!!=====Dataset=====!!!!
+<class 'str'>
+DYJetsToLL_Pt-100To250
+Number of events before selection + Trigger: 7836
+Both Triggers
+Number of events after selection + Trigger: 5674
+Number of events after Trigger + Selection (dropping empty arrays): 5674
+# of events after pT cut (dropping empty arrays): 5674
+# of events after eta cut (dropping empty arrays): 5674
+# of events after decay cut (dropping empty arrays): 5674
+# of events after isolation cut (dropping empty arrays): 769
+# of events after visible mass cut (dropping empty arrays): 445
+# of events after Higgs cut (dropping empty arrays): 356
+# of events after topology cut (dropping empty arrays): 356
+# of events after b-jet cut (dropping empty arrays): 356
+=========!!!Weight Debugging!!!=========
+DYJetsToLL_Pt-100To250
+Luminosity Weight = 0.065519
+Luminosity = 59830.000000
+Cross section = 89.395097
+Number of events Processed: 81633326
+!!!=====Dataset=====!!!!
+<class 'str'>
+DYJetsToLL_Pt-50To100
+Number of events before selection + Trigger: 2633
+Both Triggers
+Number of events after selection + Trigger: 1952
+Number of events after Trigger + Selection (dropping empty arrays): 1952
+# of events after pT cut (dropping empty arrays): 1952
+# of events after eta cut (dropping empty arrays): 1952
+# of events after decay cut (dropping empty arrays): 1952
+# of events after isolation cut (dropping empty arrays): 289
+# of events after visible mass cut (dropping empty arrays): 227
+# of events after Higgs cut (dropping empty arrays): 210
+# of events after topology cut (dropping empty arrays): 210
+# of events after b-jet cut (dropping empty arrays): 210
+=========!!!Weight Debugging!!!=========
+DYJetsToLL_Pt-50To100
+Luminosity Weight = 0.192319
+Luminosity = 59830.000000
+Cross section = 387.130778
+Number of events Processed: 120435658
+!!!=====Dataset=====!!!!
+<class 'str'>
+WZ1l1nu2q
+Number of events before selection + Trigger: 757
+Both Triggers
+Number of events after selection + Trigger: 553
+Number of events after Trigger + Selection (dropping empty arrays): 553
+# of events after pT cut (dropping empty arrays): 553
+# of events after eta cut (dropping empty arrays): 553
+# of events after decay cut (dropping empty arrays): 553
+# of events after isolation cut (dropping empty arrays): 31
+# of events after visible mass cut (dropping empty arrays): 18
+# of events after Higgs cut (dropping empty arrays): 13
+# of events after topology cut (dropping empty arrays): 13
+# of events after b-jet cut (dropping empty arrays): 13
+=========!!!Weight Debugging!!!=========
+WZ1l1nu2q
+Luminosity Weight = 0.009416
+Luminosity = 59830.000000
+Cross section = 10.710000
+Number of events Processed: 68048958
+!!!=====Dataset=====!!!!
+<class 'str'>
+WZ2l2q
+Number of events before selection + Trigger: 3286
+Both Triggers
+Number of events after selection + Trigger: 2389
+Number of events after Trigger + Selection (dropping empty arrays): 2389
+# of events after pT cut (dropping empty arrays): 2389
+# of events after eta cut (dropping empty arrays): 2389
+# of events after decay cut (dropping empty arrays): 2389
+# of events after isolation cut (dropping empty arrays): 264
+# of events after visible mass cut (dropping empty arrays): 223
+# of events after Higgs cut (dropping empty arrays): 154
+# of events after topology cut (dropping empty arrays): 154
+# of events after b-jet cut (dropping empty arrays): 154
+=========!!!Weight Debugging!!!=========
+WZ2l2q
+Luminosity Weight = 0.011873
+Luminosity = 59830.000000
+Cross section = 5.595000
+Number of events Processed: 28193648
+!!!=====Dataset=====!!!!
+<class 'str'>
+ZZ2l2q
+Number of events before selection + Trigger: 5928
+Both Triggers
+Number of events after selection + Trigger: 4408
+Number of events after Trigger + Selection (dropping empty arrays): 4408
+# of events after pT cut (dropping empty arrays): 4408
+# of events after eta cut (dropping empty arrays): 4408
+# of events after decay cut (dropping empty arrays): 4408
+# of events after isolation cut (dropping empty arrays): 546
+# of events after visible mass cut (dropping empty arrays): 423
+# of events after Higgs cut (dropping empty arrays): 350
+# of events after topology cut (dropping empty arrays): 350
+# of events after b-jet cut (dropping empty arrays): 350
+=========!!!Weight Debugging!!!=========
+ZZ2l2q
+Luminosity Weight = 0.003512
+Luminosity = 59830.000000
+Cross section = 3.220000
+Number of events Processed: 54856689
+!!!=====Dataset=====!!!!
+<class 'str'>
+WZ3l1nu
+Number of events before selection + Trigger: 5222
+Both Triggers
+Number of events after selection + Trigger: 4379
+Number of events after Trigger + Selection (dropping empty arrays): 4379
+# of events after pT cut (dropping empty arrays): 4379
+# of events after eta cut (dropping empty arrays): 4379
+# of events after decay cut (dropping empty arrays): 4379
+# of events after isolation cut (dropping empty arrays): 1254
+# of events after visible mass cut (dropping empty arrays): 1174
+# of events after Higgs cut (dropping empty arrays): 974
+# of events after topology cut (dropping empty arrays): 974
+# of events after b-jet cut (dropping empty arrays): 974
+=========!!!Weight Debugging!!!=========
+WZ3l1nu
+Luminosity Weight = 0.012805
+Luminosity = 59830.000000
+Cross section = 4.708000
+Number of events Processed: 21997587
+!!!=====Dataset=====!!!!
+<class 'str'>
+WZ1l3nu
+Number of events before selection + Trigger: 4
+Both Triggers
+Number of events after selection + Trigger: 2
+Number of events after Trigger + Selection (dropping empty arrays): 2
+# of events after pT cut (dropping empty arrays): 2
+# of events after eta cut (dropping empty arrays): 2
+# of events after decay cut (dropping empty arrays): 2
+# of events after isolation cut (dropping empty arrays): 0
+# of events after b-jet cut (dropping empty arrays): 0
+=========!!!Weight Debugging!!!=========
+WZ1l3nu
+Luminosity Weight = 0.107973
+Luminosity = 59830.000000
+Cross section = 3.050000
+Number of events Processed: 1690064
+!!!=====Dataset=====!!!!
+<class 'str'>
+VV2l2nu
+Number of events before selection + Trigger: 164
+Both Triggers
+Number of events after selection + Trigger: 143
+Number of events after Trigger + Selection (dropping empty arrays): 143
+# of events after pT cut (dropping empty arrays): 143
+# of events after eta cut (dropping empty arrays): 143
+# of events after decay cut (dropping empty arrays): 143
+# of events after isolation cut (dropping empty arrays): 23
+# of events after visible mass cut (dropping empty arrays): 13
+# of events after Higgs cut (dropping empty arrays): 10
+# of events after topology cut (dropping empty arrays): 10
+# of events after b-jet cut (dropping empty arrays): 10
+=========!!!Weight Debugging!!!=========
+VV2l2nu
+Luminosity Weight = 0.072597
+Luminosity = 59830.000000
+Cross section = 11.950000
+Number of events Processed: 9848488
+!!!=====Dataset=====!!!!
+<class 'str'>
+ZZ4l
+Number of events before selection + Trigger: 29065
+Both Triggers
+Number of events after selection + Trigger: 24568
+Number of events after Trigger + Selection (dropping empty arrays): 24568
+# of events after pT cut (dropping empty arrays): 24568
+# of events after eta cut (dropping empty arrays): 24568
+# of events after decay cut (dropping empty arrays): 24568
+# of events after isolation cut (dropping empty arrays): 18419
+# of events after visible mass cut (dropping empty arrays): 17953
+# of events after Higgs cut (dropping empty arrays): 16610
+# of events after topology cut (dropping empty arrays): 16610
+# of events after b-jet cut (dropping empty arrays): 16610
+=========!!!Weight Debugging!!!=========
+ZZ4l
+Luminosity Weight = 0.002750
+Luminosity = 59830.000000
+Cross section = 1.212000
+Number of events Processed: 26371225
+!!!=====Dataset=====!!!!
+<class 'str'>
+TTToHadronic
+Number of events before selection + Trigger: 11511
+Both Triggers
+Number of events after selection + Trigger: 7968
+Number of events after Trigger + Selection (dropping empty arrays): 7968
+# of events after pT cut (dropping empty arrays): 7968
+# of events after eta cut (dropping empty arrays): 7968
+# of events after decay cut (dropping empty arrays): 7968
+# of events after isolation cut (dropping empty arrays): 190
+# of events after visible mass cut (dropping empty arrays): 98
+# of events after Higgs cut (dropping empty arrays): 74
+# of events after topology cut (dropping empty arrays): 74
+# of events after b-jet cut (dropping empty arrays): 74
+=========!!!Weight Debugging!!!=========
+TTToHadronic
+Luminosity Weight = 0.071156
+Luminosity = 59830.000000
+Cross section = 377.951744
+Number of events Processed: 317792000
+!!!=====Dataset=====!!!!
+<class 'str'>
+TTTo2L2Nu
+Number of events before selection + Trigger: 15268
+Both Triggers
+Number of events after selection + Trigger: 13634
+Number of events after Trigger + Selection (dropping empty arrays): 13634
+# of events after pT cut (dropping empty arrays): 13634
+# of events after eta cut (dropping empty arrays): 13634
+# of events after decay cut (dropping empty arrays): 13634
+# of events after isolation cut (dropping empty arrays): 1794
+# of events after visible mass cut (dropping empty arrays): 1112
+# of events after Higgs cut (dropping empty arrays): 912
+# of events after topology cut (dropping empty arrays): 912
+# of events after b-jet cut (dropping empty arrays): 912
+=========!!!Weight Debugging!!!=========
+TTTo2L2Nu
+Luminosity Weight = 0.084751
+Luminosity = 59830.000000
+Cross section = 88.249736
+Number of events Processed: 62300000
+!!!=====Dataset=====!!!!
+<class 'str'>
+TTToSemiLeptonic
+Number of events before selection + Trigger: 24625
+Both Triggers
+Number of events after selection + Trigger: 19978
+Number of events after Trigger + Selection (dropping empty arrays): 19978
+# of events after pT cut (dropping empty arrays): 19978
+# of events after eta cut (dropping empty arrays): 19978
+# of events after decay cut (dropping empty arrays): 19978
+# of events after isolation cut (dropping empty arrays): 1009
+# of events after visible mass cut (dropping empty arrays): 622
+# of events after Higgs cut (dropping empty arrays): 481
+# of events after topology cut (dropping empty arrays): 481
+# of events after b-jet cut (dropping empty arrays): 481
+=========!!!Weight Debugging!!!=========
+TTToSemiLeptonic
+Luminosity Weight = 0.082258
+Luminosity = 59830.000000
+Cross section = 365.308992
+Number of events Processed: 265706999
+Processing 100% ━━━━━━━━━━━━━━━━━━━━━━━━ 35/35 [ 0:11:31 < 0:00:00 | ? chunk/s ]
+Background TTToSemiLeptonic added
+Background TTTo2L2Nu added
+Background TTToHadronic added
+Background DYJetsToLL_Pt-50To100 added
+Background DYJetsToLL_Pt-100To250 added
+Background DYJetsToLL_Pt-250To400 added
+Background DYJetsToLL_Pt-400To650 added
+Background DYJetsToLL_Pt-650ToInf added
+Background WZ3l1nu added
+Background WZ2l2q added
+Background WZ1l1nu2q added
+Background ZZ2l2q added
+Background WZ1l3nu added
+Background VV2l2nu added
+Background Tbar-tchan added
+Background T-tchan added
+Background Tbar-tW added
+Background T-tW added
+Background WJetsToLNu_HT-100To200 added
+Background WJetsToLNu_HT-200To400 added
+Background WJetsToLNu_HT-400To600 added
+Background WJetsToLNu_HT-600To800 added
+Background WJetsToLNu_HT-800To1200 added
+Background WJetsToLNu_HT-1200To2500 added
+Background WJetsToLNu_HT-2500ToInf added
+Background ZZ4l added
+==================Hist FourTau_Mass_Arr================
+Background TTToSemiLeptonic added
+Background TTTo2L2Nu added
+Background TTToHadronic added
+Background DYJetsToLL_Pt-50To100 added
+Background DYJetsToLL_Pt-100To250 added
+Background DYJetsToLL_Pt-250To400 added
+Background DYJetsToLL_Pt-400To650 added
+Background DYJetsToLL_Pt-650ToInf added
+Background WZ3l1nu added
+Background WZ2l2q added
+Background WZ1l1nu2q added
+Background ZZ2l2q added
+Background WZ1l3nu added
+Background VV2l2nu added
+Background Tbar-tchan added
+Background T-tchan added
+Background Tbar-tW added
+Background T-tW added
+Background WJetsToLNu_HT-100To200 added
+Background WJetsToLNu_HT-200To400 added
+Background WJetsToLNu_HT-400To600 added
+Background WJetsToLNu_HT-600To800 added
+Background WJetsToLNu_HT-800To1200 added
+Background WJetsToLNu_HT-1200To2500 added
+Background WJetsToLNu_HT-2500ToInf added
+Background ZZ4l added
+==================Hist HiggsDeltaPhi_Arr================
+Background TTToSemiLeptonic added
+Background TTTo2L2Nu added
+Background TTToHadronic added
+Background DYJetsToLL_Pt-50To100 added
+Background DYJetsToLL_Pt-100To250 added
+Background DYJetsToLL_Pt-250To400 added
+Background DYJetsToLL_Pt-400To650 added
+Background DYJetsToLL_Pt-650ToInf added
+Background WZ3l1nu added
+Background WZ2l2q added
+Background WZ1l1nu2q added
+Background ZZ2l2q added
+Background WZ1l3nu added
+Background VV2l2nu added
+Background Tbar-tchan added
+Background T-tchan added
+Background Tbar-tW added
+Background T-tW added
+Background WJetsToLNu_HT-100To200 added
+Background WJetsToLNu_HT-200To400 added
+Background WJetsToLNu_HT-400To600 added
+Background WJetsToLNu_HT-600To800 added
+Background WJetsToLNu_HT-800To1200 added
+Background WJetsToLNu_HT-1200To2500 added
+Background WJetsToLNu_HT-2500ToInf added
+Background ZZ4l added
+==================Hist Higgs_DeltaR_Arr================
+Background TTToSemiLeptonic added
+Background TTTo2L2Nu added
+Background TTToHadronic added
+Background DYJetsToLL_Pt-50To100 added
+Background DYJetsToLL_Pt-100To250 added
+Background DYJetsToLL_Pt-250To400 added
+Background DYJetsToLL_Pt-400To650 added
+Background DYJetsToLL_Pt-650ToInf added
+Background WZ3l1nu added
+Background WZ2l2q added
+Background WZ1l1nu2q added
+Background ZZ2l2q added
+Background WZ1l3nu added
+Background VV2l2nu added
+Background Tbar-tchan added
+Background T-tchan added
+Background Tbar-tW added
+Background T-tW added
+Background WJetsToLNu_HT-100To200 added
+Background WJetsToLNu_HT-200To400 added
+Background WJetsToLNu_HT-400To600 added
+Background WJetsToLNu_HT-600To800 added
+Background WJetsToLNu_HT-800To1200 added
+Background WJetsToLNu_HT-1200To2500 added
+Background WJetsToLNu_HT-2500ToInf added
+Background ZZ4l added
+==================Hist leading_dR_Arr================
+Background TTToSemiLeptonic added
+Background TTTo2L2Nu added
+Background TTToHadronic added
+Background DYJetsToLL_Pt-50To100 added
+Background DYJetsToLL_Pt-100To250 added
+Background DYJetsToLL_Pt-250To400 added
+Background DYJetsToLL_Pt-400To650 added
+Background DYJetsToLL_Pt-650ToInf added
+Background WZ3l1nu added
+Background WZ2l2q added
+Background WZ1l1nu2q added
+Background ZZ2l2q added
+Background WZ1l3nu added
+Background VV2l2nu added
+Background Tbar-tchan added
+Background T-tchan added
+Background Tbar-tW added
+Background T-tW added
+Background WJetsToLNu_HT-100To200 added
+Background WJetsToLNu_HT-200To400 added
+Background WJetsToLNu_HT-400To600 added
+Background WJetsToLNu_HT-600To800 added
+Background WJetsToLNu_HT-800To1200 added
+Background WJetsToLNu_HT-1200To2500 added
+Background WJetsToLNu_HT-2500ToInf added
+Background ZZ4l added
+==================Hist subleading_dR_Arr================
+Background TTToSemiLeptonic added
+Background TTTo2L2Nu added
+Background TTToHadronic added
+Background DYJetsToLL_Pt-50To100 added
+Background DYJetsToLL_Pt-100To250 added
+Background DYJetsToLL_Pt-250To400 added
+Background DYJetsToLL_Pt-400To650 added
+Background DYJetsToLL_Pt-650ToInf added
+Background WZ3l1nu added
+Background WZ2l2q added
+Background WZ1l1nu2q added
+Background ZZ2l2q added
+Background WZ1l3nu added
+Background VV2l2nu added
+Background Tbar-tchan added
+Background T-tchan added
+Background Tbar-tW added
+Background T-tW added
+Background WJetsToLNu_HT-100To200 added
+Background WJetsToLNu_HT-200To400 added
+Background WJetsToLNu_HT-400To600 added
+Background WJetsToLNu_HT-600To800 added
+Background WJetsToLNu_HT-800To1200 added
+Background WJetsToLNu_HT-1200To2500 added
+Background WJetsToLNu_HT-2500ToInf added
+Background ZZ4l added
+==================Hist LeadingHiggs_mass================
+Background TTToSemiLeptonic added
+Background TTTo2L2Nu added
+Background TTToHadronic added
+Background DYJetsToLL_Pt-50To100 added
+Background DYJetsToLL_Pt-100To250 added
+Background DYJetsToLL_Pt-250To400 added
+Background DYJetsToLL_Pt-400To650 added
+Background DYJetsToLL_Pt-650ToInf added
+Background WZ3l1nu added
+Background WZ2l2q added
+Background WZ1l1nu2q added
+Background ZZ2l2q added
+Background WZ1l3nu added
+Background VV2l2nu added
+Background Tbar-tchan added
+Background T-tchan added
+Background Tbar-tW added
+Background T-tW added
+Background WJetsToLNu_HT-100To200 added
+Background WJetsToLNu_HT-200To400 added
+Background WJetsToLNu_HT-400To600 added
+Background WJetsToLNu_HT-600To800 added
+Background WJetsToLNu_HT-800To1200 added
+Background WJetsToLNu_HT-1200To2500 added
+Background WJetsToLNu_HT-2500ToInf added
+Background ZZ4l added
+==================Hist SubLeadingHiggs_mass================
+Background TTToSemiLeptonic added
+Background TTTo2L2Nu added
+Background TTToHadronic added
+Background DYJetsToLL_Pt-50To100 added
+Background DYJetsToLL_Pt-100To250 added
+Background DYJetsToLL_Pt-250To400 added
+Background DYJetsToLL_Pt-400To650 added
+Background DYJetsToLL_Pt-650ToInf added
+Background WZ3l1nu added
+Background WZ2l2q added
+Background WZ1l1nu2q added
+Background ZZ2l2q added
+Background WZ1l3nu added
+Background VV2l2nu added
+Background Tbar-tchan added
+Background T-tchan added
+Background Tbar-tW added
+Background T-tW added
+Background WJetsToLNu_HT-100To200 added
+Background WJetsToLNu_HT-200To400 added
+Background WJetsToLNu_HT-400To600 added
+Background WJetsToLNu_HT-600To800 added
+Background WJetsToLNu_HT-800To1200 added
+Background WJetsToLNu_HT-1200To2500 added
+Background WJetsToLNu_HT-2500ToInf added
+Background ZZ4l added
+==================Hist radionPT_Arr================
+Background TTToSemiLeptonic added
+Background TTTo2L2Nu added
+Background TTToHadronic added
+Background DYJetsToLL_Pt-50To100 added
+Background DYJetsToLL_Pt-100To250 added
+Background DYJetsToLL_Pt-250To400 added
+Background DYJetsToLL_Pt-400To650 added
+Background DYJetsToLL_Pt-650ToInf added
+Background WZ3l1nu added
+Background WZ2l2q added
+Background WZ1l1nu2q added
+Background ZZ2l2q added
+Background WZ1l3nu added
+Background VV2l2nu added
+Background Tbar-tchan added
+Background T-tchan added
+Background Tbar-tW added
+Background T-tW added
+Background WJetsToLNu_HT-100To200 added
+Background WJetsToLNu_HT-200To400 added
+Background WJetsToLNu_HT-400To600 added
+Background WJetsToLNu_HT-600To800 added
+Background WJetsToLNu_HT-800To1200 added
+Background WJetsToLNu_HT-1200To2500 added
+Background WJetsToLNu_HT-2500ToInf added
+Background ZZ4l added
+==================Hist tau_pt_Arr================
+Background TTToSemiLeptonic added
+Background TTTo2L2Nu added
+Background TTToHadronic added
+Background DYJetsToLL_Pt-50To100 added
+Background DYJetsToLL_Pt-100To250 added
+Background DYJetsToLL_Pt-250To400 added
+Background DYJetsToLL_Pt-400To650 added
+Background DYJetsToLL_Pt-650ToInf added
+Background WZ3l1nu added
+Background WZ2l2q added
+Background WZ1l1nu2q added
+Background ZZ2l2q added
+Background WZ1l3nu added
+Background VV2l2nu added
+Background Tbar-tchan added
+Background T-tchan added
+Background Tbar-tW added
+Background T-tW added
+Background WJetsToLNu_HT-100To200 added
+Background WJetsToLNu_HT-200To400 added
+Background WJetsToLNu_HT-400To600 added
+Background WJetsToLNu_HT-600To800 added
+Background WJetsToLNu_HT-800To1200 added
+Background WJetsToLNu_HT-1200To2500 added
+Background WJetsToLNu_HT-2500ToInf added
+Background ZZ4l added
+==================Hist tau_eta_Arr================
+Background TTToSemiLeptonic added
+Background TTTo2L2Nu added
+Background TTToHadronic added
+Background DYJetsToLL_Pt-50To100 added
+Background DYJetsToLL_Pt-100To250 added
+Background DYJetsToLL_Pt-250To400 added
+Background DYJetsToLL_Pt-400To650 added
+Background DYJetsToLL_Pt-650ToInf added
+Background WZ3l1nu added
+Background WZ2l2q added
+Background WZ1l1nu2q added
+Background ZZ2l2q added
+Background WZ1l3nu added
+Background VV2l2nu added
+Background Tbar-tchan added
+Background T-tchan added
+Background Tbar-tW added
+Background T-tW added
+Background WJetsToLNu_HT-100To200 added
+Background WJetsToLNu_HT-200To400 added
+Background WJetsToLNu_HT-400To600 added
+Background WJetsToLNu_HT-600To800 added
+Background WJetsToLNu_HT-800To1200 added
+Background WJetsToLNu_HT-1200To2500 added
+Background WJetsToLNu_HT-2500ToInf added
+Background ZZ4l added
+==================Hist ZMult_Arr================
+Background TTToSemiLeptonic added
+Background TTTo2L2Nu added
+Background TTToHadronic added
+Background DYJetsToLL_Pt-50To100 added
+Background DYJetsToLL_Pt-100To250 added
+Background DYJetsToLL_Pt-250To400 added
+Background DYJetsToLL_Pt-400To650 added
+Background DYJetsToLL_Pt-650ToInf added
+Background WZ3l1nu added
+Background WZ2l2q added
+Background WZ1l1nu2q added
+Background ZZ2l2q added
+Background WZ1l3nu added
+Background VV2l2nu added
+Background Tbar-tchan added
+Background T-tchan added
+Background Tbar-tW added
+Background T-tW added
+Background WJetsToLNu_HT-100To200 added
+Background WJetsToLNu_HT-200To400 added
+Background WJetsToLNu_HT-400To600 added
+Background WJetsToLNu_HT-600To800 added
+Background WJetsToLNu_HT-800To1200 added
+Background WJetsToLNu_HT-1200To2500 added
+Background WJetsToLNu_HT-2500ToInf added
+Background ZZ4l added
+==================Hist BJet_Arr================
+Background TTToSemiLeptonic added
+Background TTTo2L2Nu added
+Background TTToHadronic added
+Background DYJetsToLL_Pt-50To100 added
+Background DYJetsToLL_Pt-100To250 added
+Background DYJetsToLL_Pt-250To400 added
+Background DYJetsToLL_Pt-400To650 added
+Background DYJetsToLL_Pt-650ToInf added
+Background WZ3l1nu added
+Background WZ2l2q added
+Background WZ1l1nu2q added
+Background ZZ2l2q added
+Background WZ1l3nu added
+Background VV2l2nu added
+Background Tbar-tchan added
+Background T-tchan added
+Background Tbar-tW added
+Background T-tW added
+Background WJetsToLNu_HT-100To200 added
+Background WJetsToLNu_HT-200To400 added
+Background WJetsToLNu_HT-400To600 added
+Background WJetsToLNu_HT-600To800 added
+Background WJetsToLNu_HT-800To1200 added
+Background WJetsToLNu_HT-1200To2500 added
+Background WJetsToLNu_HT-2500ToInf added
+Background ZZ4l added
+==================Hist tau_lead_pt_Arr================
+Background TTToSemiLeptonic added
+Background TTTo2L2Nu added
+Background TTToHadronic added
+Background DYJetsToLL_Pt-50To100 added
+Background DYJetsToLL_Pt-100To250 added
+Background DYJetsToLL_Pt-250To400 added
+Background DYJetsToLL_Pt-400To650 added
+Background DYJetsToLL_Pt-650ToInf added
+Background WZ3l1nu added
+Background WZ2l2q added
+Background WZ1l1nu2q added
+Background ZZ2l2q added
+Background WZ1l3nu added
+Background VV2l2nu added
+Background Tbar-tchan added
+Background T-tchan added
+Background Tbar-tW added
+Background T-tW added
+Background WJetsToLNu_HT-100To200 added
+Background WJetsToLNu_HT-200To400 added
+Background WJetsToLNu_HT-400To600 added
+Background WJetsToLNu_HT-600To800 added
+Background WJetsToLNu_HT-800To1200 added
+Background WJetsToLNu_HT-1200To2500 added
+Background WJetsToLNu_HT-2500ToInf added
+Background ZZ4l added
+==================Hist tau_sublead_pt_Arr================
+Background TTToSemiLeptonic added
+Background TTTo2L2Nu added
+Background TTToHadronic added
+Background DYJetsToLL_Pt-50To100 added
+Background DYJetsToLL_Pt-100To250 added
+Background DYJetsToLL_Pt-250To400 added
+Background DYJetsToLL_Pt-400To650 added
+Background DYJetsToLL_Pt-650ToInf added
+Background WZ3l1nu added
+Background WZ2l2q added
+Background WZ1l1nu2q added
+Background ZZ2l2q added
+Background WZ1l3nu added
+Background VV2l2nu added
+Background Tbar-tchan added
+Background T-tchan added
+Background Tbar-tW added
+Background T-tW added
+Background WJetsToLNu_HT-100To200 added
+Background WJetsToLNu_HT-200To400 added
+Background WJetsToLNu_HT-400To600 added
+Background WJetsToLNu_HT-600To800 added
+Background WJetsToLNu_HT-800To1200 added
+Background WJetsToLNu_HT-1200To2500 added
+Background WJetsToLNu_HT-2500ToInf added
+Background ZZ4l added
+==================Hist tau_3rdlead_pt_Arr================
+Background TTToSemiLeptonic added
+Background TTTo2L2Nu added
+Background TTToHadronic added
+Background DYJetsToLL_Pt-50To100 added
+Background DYJetsToLL_Pt-100To250 added
+Background DYJetsToLL_Pt-250To400 added
+Background DYJetsToLL_Pt-400To650 added
+Background DYJetsToLL_Pt-650ToInf added
+Background WZ3l1nu added
+Background WZ2l2q added
+Background WZ1l1nu2q added
+Background ZZ2l2q added
+Background WZ1l3nu added
+Background VV2l2nu added
+Background Tbar-tchan added
+Background T-tchan added
+Background Tbar-tW added
+Background T-tW added
+Background WJetsToLNu_HT-100To200 added
+Background WJetsToLNu_HT-200To400 added
+Background WJetsToLNu_HT-400To600 added
+Background WJetsToLNu_HT-600To800 added
+Background WJetsToLNu_HT-800To1200 added
+Background WJetsToLNu_HT-1200To2500 added
+Background WJetsToLNu_HT-2500ToInf added
+Background ZZ4l added
+==================Hist tau_4thlead_pt_Arr================
+Background TTToSemiLeptonic added
+Background TTTo2L2Nu added
+Background TTToHadronic added
+Background DYJetsToLL_Pt-50To100 added
+Background DYJetsToLL_Pt-100To250 added
+Background DYJetsToLL_Pt-250To400 added
+Background DYJetsToLL_Pt-400To650 added
+Background DYJetsToLL_Pt-650ToInf added
+Background WZ3l1nu added
+Background WZ2l2q added
+Background WZ1l1nu2q added
+Background ZZ2l2q added
+Background WZ1l3nu added
+Background VV2l2nu added
+Background Tbar-tchan added
+Background T-tchan added
+Background Tbar-tW added
+Background T-tW added
+Background WJetsToLNu_HT-100To200 added
+Background WJetsToLNu_HT-200To400 added
+Background WJetsToLNu_HT-400To600 added
+Background WJetsToLNu_HT-600To800 added
+Background WJetsToLNu_HT-800To1200 added
+Background WJetsToLNu_HT-1200To2500 added
+Background WJetsToLNu_HT-2500ToInf added
+Background ZZ4l added
+==================Hist leading_dPhi_Arr================
+Background TTToSemiLeptonic added
+Background TTTo2L2Nu added
+Background TTToHadronic added
+Background DYJetsToLL_Pt-50To100 added
+Background DYJetsToLL_Pt-100To250 added
+Background DYJetsToLL_Pt-250To400 added
+Background DYJetsToLL_Pt-400To650 added
+Background DYJetsToLL_Pt-650ToInf added
+Background WZ3l1nu added
+Background WZ2l2q added
+Background WZ1l1nu2q added
+Background ZZ2l2q added
+Background WZ1l3nu added
+Background VV2l2nu added
+Background Tbar-tchan added
+Background T-tchan added
+Background Tbar-tW added
+Background T-tW added
+Background WJetsToLNu_HT-100To200 added
+Background WJetsToLNu_HT-200To400 added
+Background WJetsToLNu_HT-400To600 added
+Background WJetsToLNu_HT-600To800 added
+Background WJetsToLNu_HT-800To1200 added
+Background WJetsToLNu_HT-1200To2500 added
+Background WJetsToLNu_HT-2500ToInf added
+Background ZZ4l added
+==================Hist subleading_dPhi_Arr================
+Background TTToSemiLeptonic added
+Background TTTo2L2Nu added
+Background TTToHadronic added
+Background DYJetsToLL_Pt-50To100 added
+Background DYJetsToLL_Pt-100To250 added
+Background DYJetsToLL_Pt-250To400 added
+Background DYJetsToLL_Pt-400To650 added
+Background DYJetsToLL_Pt-650ToInf added
+Background WZ3l1nu added
+Background WZ2l2q added
+Background WZ1l1nu2q added
+Background ZZ2l2q added
+Background WZ1l3nu added
+Background VV2l2nu added
+Background Tbar-tchan added
+Background T-tchan added
+Background Tbar-tW added
+Background T-tW added
+Background WJetsToLNu_HT-100To200 added
+Background WJetsToLNu_HT-200To400 added
+Background WJetsToLNu_HT-400To600 added
+Background WJetsToLNu_HT-600To800 added
+Background WJetsToLNu_HT-800To1200 added
+Background WJetsToLNu_HT-1200To2500 added
+Background WJetsToLNu_HT-2500ToInf added
+Background ZZ4l added
+==================Hist radionMET_dPhi_Arr================
+Background TTToSemiLeptonic added
+Background TTTo2L2Nu added
+Background TTToHadronic added
+Background DYJetsToLL_Pt-50To100 added
+Background DYJetsToLL_Pt-100To250 added
+Background DYJetsToLL_Pt-250To400 added
+Background DYJetsToLL_Pt-400To650 added
+Background DYJetsToLL_Pt-650ToInf added
+Background WZ3l1nu added
+Background WZ2l2q added
+Background WZ1l1nu2q added
+Background ZZ2l2q added
+Background WZ1l3nu added
+Background VV2l2nu added
+Background Tbar-tchan added
+Background T-tchan added
+Background Tbar-tW added
+Background T-tW added
+Background WJetsToLNu_HT-100To200 added
+Background WJetsToLNu_HT-200To400 added
+Background WJetsToLNu_HT-400To600 added
+Background WJetsToLNu_HT-600To800 added
+Background WJetsToLNu_HT-800To1200 added
+Background WJetsToLNu_HT-1200To2500 added
+Background WJetsToLNu_HT-2500ToInf added
+Background ZZ4l added
+==================Hist leadingHiggs_Rad_dR_Arr================
+Background TTToSemiLeptonic added
+Background TTTo2L2Nu added
+Background TTToHadronic added
+Background DYJetsToLL_Pt-50To100 added
+Background DYJetsToLL_Pt-100To250 added
+Background DYJetsToLL_Pt-250To400 added
+Background DYJetsToLL_Pt-400To650 added
+Background DYJetsToLL_Pt-650ToInf added
+Background WZ3l1nu added
+Background WZ2l2q added
+Background WZ1l1nu2q added
+Background ZZ2l2q added
+Background WZ1l3nu added
+Background VV2l2nu added
+Background Tbar-tchan added
+Background T-tchan added
+Background Tbar-tW added
+Background T-tW added
+Background WJetsToLNu_HT-100To200 added
+Background WJetsToLNu_HT-200To400 added
+Background WJetsToLNu_HT-400To600 added
+Background WJetsToLNu_HT-600To800 added
+Background WJetsToLNu_HT-800To1200 added
+Background WJetsToLNu_HT-1200To2500 added
+Background WJetsToLNu_HT-2500ToInf added
+Background ZZ4l added
+==================Hist subleadingHiggs_Rad_dR_Arr================
+Background TTToSemiLeptonic added
+Background TTTo2L2Nu added
+Background TTToHadronic added
+Background DYJetsToLL_Pt-50To100 added
+Background DYJetsToLL_Pt-100To250 added
+Background DYJetsToLL_Pt-250To400 added
+Background DYJetsToLL_Pt-400To650 added
+Background DYJetsToLL_Pt-650ToInf added
+Background WZ3l1nu added
+Background WZ2l2q added
+Background WZ1l1nu2q added
+Background ZZ2l2q added
+Background WZ1l3nu added
+Background VV2l2nu added
+Background Tbar-tchan added
+Background T-tchan added
+Background Tbar-tW added
+Background T-tW added
+Background WJetsToLNu_HT-100To200 added
+Background WJetsToLNu_HT-200To400 added
+Background WJetsToLNu_HT-400To600 added
+Background WJetsToLNu_HT-600To800 added
+Background WJetsToLNu_HT-800To1200 added
+Background WJetsToLNu_HT-1200To2500 added
+Background WJetsToLNu_HT-2500ToInf added
+Background ZZ4l added
+==================Hist leadingHiggs_MET_dPhi_Arr================
+Background TTToSemiLeptonic added
+Background TTTo2L2Nu added
+Background TTToHadronic added
+Background DYJetsToLL_Pt-50To100 added
+Background DYJetsToLL_Pt-100To250 added
+Background DYJetsToLL_Pt-250To400 added
+Background DYJetsToLL_Pt-400To650 added
+Background DYJetsToLL_Pt-650ToInf added
+Background WZ3l1nu added
+Background WZ2l2q added
+Background WZ1l1nu2q added
+Background ZZ2l2q added
+Background WZ1l3nu added
+Background VV2l2nu added
+Background Tbar-tchan added
+Background T-tchan added
+Background Tbar-tW added
+Background T-tW added
+Background WJetsToLNu_HT-100To200 added
+Background WJetsToLNu_HT-200To400 added
+Background WJetsToLNu_HT-400To600 added
+Background WJetsToLNu_HT-600To800 added
+Background WJetsToLNu_HT-800To1200 added
+Background WJetsToLNu_HT-1200To2500 added
+Background WJetsToLNu_HT-2500ToInf added
+Background ZZ4l added
+==================Hist subleadingHiggs_MET_dPhi_Arr================
+Background TTToSemiLeptonic added
+Background TTTo2L2Nu added
+Background TTToHadronic added
+Background DYJetsToLL_Pt-50To100 added
+Background DYJetsToLL_Pt-100To250 added
+Background DYJetsToLL_Pt-250To400 added
+Background DYJetsToLL_Pt-400To650 added
+Background DYJetsToLL_Pt-650ToInf added
+Background WZ3l1nu added
+Background WZ2l2q added
+Background WZ1l1nu2q added
+Background ZZ2l2q added
+Background WZ1l3nu added
+Background VV2l2nu added
+Background Tbar-tchan added
+Background T-tchan added
+Background Tbar-tW added
+Background T-tW added
+Background WJetsToLNu_HT-100To200 added
+Background WJetsToLNu_HT-200To400 added
+Background WJetsToLNu_HT-400To600 added
+Background WJetsToLNu_HT-600To800 added
+Background WJetsToLNu_HT-800To1200 added
+Background WJetsToLNu_HT-1200To2500 added
+Background WJetsToLNu_HT-2500ToInf added
+Background ZZ4l added
+==================Hist Radion_eta_Arr================
+Background TTToSemiLeptonic added
+Background TTTo2L2Nu added
+Background TTToHadronic added
+Background DYJetsToLL_Pt-50To100 added
+Background DYJetsToLL_Pt-100To250 added
+Background DYJetsToLL_Pt-250To400 added
+Background DYJetsToLL_Pt-400To650 added
+Background DYJetsToLL_Pt-650ToInf added
+Background WZ3l1nu added
+Background WZ2l2q added
+Background WZ1l1nu2q added
+Background ZZ2l2q added
+Background WZ1l3nu added
+Background VV2l2nu added
+Background Tbar-tchan added
+Background T-tchan added
+Background Tbar-tW added
+Background T-tW added
+Background WJetsToLNu_HT-100To200 added
+Background WJetsToLNu_HT-200To400 added
+Background WJetsToLNu_HT-400To600 added
+Background WJetsToLNu_HT-600To800 added
+Background WJetsToLNu_HT-800To1200 added
+Background WJetsToLNu_HT-1200To2500 added
+Background WJetsToLNu_HT-2500ToInf added
+Background ZZ4l added
+==================Hist Radion_Charge_Arr================
