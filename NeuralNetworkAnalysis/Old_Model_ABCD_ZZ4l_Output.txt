@@ -1,0 +1,9 @@
+There are 0.291473 ZZ4l in high purity region (sans ABCD)
+0.29147313005525777
+ZZ4l background estimate for 1000 mass point: 0.122878
+There are 0.291473 ZZ4l in high purity region (sans ABCD)
+0.29147313005525777
+ZZ4l background estimate for 2000 mass point: 0.122878
+There are 0.291473 ZZ4l in high purity region (sans ABCD)
+0.29147313005525777
+ZZ4l background estimate for 3000 mass point: 0.122878

@@ -1,0 +1,9 @@
+There are 0.000000 ttBar in high purity region (sans ABCD)
+0.0
+ttBar background estimate for 1000 mass point: 0.517593
+There are 0.000000 ttBar in high purity region (sans ABCD)
+0.0
+ttBar background estimate for 2000 mass point: 0.517593
+There are 0.000000 ttBar in high purity region (sans ABCD)
+0.0
+ttBar background estimate for 3000 mass point: 0.517593

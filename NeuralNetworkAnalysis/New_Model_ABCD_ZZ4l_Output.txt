@@ -1,0 +1,15 @@
+There are 1.589 events in region B +/- 0.058
+There are 1.623 events in region C +/- 0.059
+There are 18.299 events in region D +/- 0.195
+There are 0.276 events in region A +/- 0.023
+ZZ4l background estimate for 1000 mass point: 0.141 pm 0.012
+There are 1.589 events in region B +/- 0.058
+There are 1.623 events in region C +/- 0.059
+There are 18.299 events in region D +/- 0.195
+There are 0.276 events in region A +/- 0.023
+ZZ4l background estimate for 2000 mass point: 0.141 pm 0.012
+There are 1.589 events in region B +/- 0.058
+There are 1.623 events in region C +/- 0.059
+There are 18.299 events in region D +/- 0.195
+There are 0.276 events in region A +/- 0.023
+ZZ4l background estimate for 3000 mass point: 0.141 pm 0.012

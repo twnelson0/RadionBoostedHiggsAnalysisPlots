@@ -1,0 +1,15 @@
+There are 0.390 events in region B +/- 0.174
+There are 4.675 events in region C +/- 0.533
+There are 9.649 events in region D +/- 9.649
+There are 0.000 events in region A +/- 0.000
+ttBar background estimate for 1000 mass point: 0.189 pm 0.295
+There are 0.390 events in region B +/- 0.174
+There are 4.675 events in region C +/- 0.533
+There are 9.649 events in region D +/- 9.649
+There are 0.000 events in region A +/- 0.000
+ttBar background estimate for 2000 mass point: 0.189 pm 0.295
+There are 0.390 events in region B +/- 0.174
+There are 4.675 events in region C +/- 0.533
+There are 9.649 events in region D +/- 9.649
+There are 0.000 events in region A +/- 0.000
+ttBar background estimate for 3000 mass point: 0.189 pm 0.295
