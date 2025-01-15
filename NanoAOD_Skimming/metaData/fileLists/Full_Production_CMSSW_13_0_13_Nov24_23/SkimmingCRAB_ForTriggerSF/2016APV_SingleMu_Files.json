@@ -1,0 +1,8 @@
+{
+    "SingleMu_Run2016B-ver1_HIPM": "/hdfs/store/user/gparida/HHbbtt/Full_Production_CMSSW_13_0_13_Nov24_23/2016APV/Data/SingleMu/SingleMuon/Run2016B-ver1_HIPM_UL2016_MiniAODv2-v2/231125_220922/*/*.root",
+    "SingleMu_Run2016B-ver2_HIPM": "/hdfs/store/user/gparida/HHbbtt/Full_Production_CMSSW_13_0_13_Nov24_23/2016APV/Data/SingleMu/SingleMuon/Run2016B-ver2_HIPM_UL2016_MiniAODv2-v2/231125_220936/*/*.root",
+    "SingleMu_Run2016C-HIPM": "/hdfs/store/user/gparida/HHbbtt/Full_Production_CMSSW_13_0_13_Nov24_23/2016APV/Data/SingleMu/SingleMuon/Run2016C-HIPM_UL2016_MiniAODv2-v2/231125_220951/*/*.root",
+    "SingleMu_Run2016D-HIPM": "/hdfs/store/user/gparida/HHbbtt/Full_Production_CMSSW_13_0_13_Nov24_23/2016APV/Data/SingleMu/SingleMuon/Run2016D-HIPM_UL2016_MiniAODv2-v2/231125_221005/*/*.root",
+    "SingleMu_Run2016E-HIPM": "/hdfs/store/user/gparida/HHbbtt/Full_Production_CMSSW_13_0_13_Nov24_23/2016APV/Data/SingleMu/SingleMuon/Run2016E-HIPM_UL2016_MiniAODv2-v2/231125_221020/*/*.root",
+    "SingleMu_Run2016F-HIPM": "/hdfs/store/user/gparida/HHbbtt/Full_Production_CMSSW_13_0_13_Nov24_23/2016APV/Data/SingleMu/SingleMuon/Run2016F-HIPM_UL2016_MiniAODv2-v2/231125_221034/*/*.root"
+}

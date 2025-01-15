@@ -1,0 +1,8 @@
+{
+    "Run2016B_ver1": "/hdfs/store/user/gparida/HHbbtt/Full_Production/2016APV_Data/MET/Run2016B-21Feb2020_ver1_UL2016_HIPM-v1/220905_133823/*/*.root",
+    "Run2016B_ver2": "/hdfs/store/user/gparida/HHbbtt/Full_Production/2016APV_Data/MET/Run2016B-21Feb2020_ver2_UL2016_HIPM-v1/220905_134040/*/*.root",
+    "Run2016C": "/hdfs/store/user/gparida/HHbbtt/Full_Production/2016APV_Data/MET/Run2016C-21Feb2020_UL2016_HIPM-v1/220905_133752/*/*.root",
+    "Run2016D": "/hdfs/store/user/gparida/HHbbtt/Full_Production/2016APV_Data/MET/Run2016D-21Feb2020_UL2016_HIPM-v1/220905_133856/*/*.root",
+    "Run2016E": "/hdfs/store/user/gparida/HHbbtt/Full_Production/2016APV_Data/MET/Run2016E-21Feb2020_UL2016_HIPM-v1/220905_134001/*/*.root",
+    "Run2016F": "/hdfs/store/user/gparida/HHbbtt/Full_Production/2016APV_Data/MET/Run2016F-21Feb2020_UL2016_HIPM-v1/220905_133931/*/*.root"
+}

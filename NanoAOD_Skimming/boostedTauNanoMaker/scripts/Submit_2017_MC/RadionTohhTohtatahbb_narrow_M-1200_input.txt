@@ -1,0 +1,1 @@
+/hdfs/store/user/gparida/HHbbtt/Full_Production_CMSSW_13_0_13_Nov24_23/2017/MC/RadionTohhTohtatahbb_narrow_M-1200_TuneCP5_13TeV-madgraph-pythia8/RadionTohhTohtatahbb_narrow_M-1200_TuneCP5_13TeV-madgraph-pythia8/240220_224415/0000/NANO_NANO_1.root

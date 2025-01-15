@@ -1,0 +1,5 @@
+{
+    "N Tau Requirement":"nboostedTau > 1 || nTau > 1",
+    "N AK8 Jet Requirement":"nFatJet > 1",
+    "MET Window":"(MET_pt > 50) && (MET_pt < 100)"
+}

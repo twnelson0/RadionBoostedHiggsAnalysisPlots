@@ -1,0 +1,8 @@
+{
+    "FatJet Requirement":"nFatJet > 0",
+    "MET Threshold":"MET_pt > 80",
+    "MET Filters":"Flag_goodVertices && Flag_globalSuperTightHalo2016Filter && Flag_HBHENoiseFilter && Flag_HBHENoiseIsoFilter && Flag_EcalDeadCellTriggerPrimitiveFilter && Flag_BadPFMuonFilter && Flag_BadPFMuonDzFilter && Flag_hfNoisyHitsFilter && Flag_eeBadScFilter && Flag_ecalBadCalibFilter",
+    "PV Conds":"(PV_ndof > 4) && (abs(PV_z) < 24) && (sqrt(PV_x*PV_x+PV_y*PV_y) < 2)"
+}
+
+

@@ -1,0 +1,101 @@
+Will recalculate the following discriminators on AK8 jets: pfParticleNetMassRegressionJetTags:mass
+                         : Booking "muonMVATTH" of type "BDT" from /cvmfs/cms.cern.ch/slc7_amd64_gcc820/cms/cmssw/CMSSW_10_6_27/external/slc7_amd64_gcc820/data/PhysicsTools/NanoAOD/data/mu_BDTG_2016.weights.xml.
+                         : Reading weight file: /cvmfs/cms.cern.ch/slc7_amd64_gcc820/cms/cmssw/CMSSW_10_6_27/external/slc7_amd64_gcc820/data/PhysicsTools/NanoAOD/data/mu_BDTG_2016.weights.xml
+<HEADER> DataSetInfo              : [Default] : Added class "Signal"
+<HEADER> DataSetInfo              : [Default] : Added class "Background"
+                         : Booked classifier "BDTG" of type: "BDT"
+                         : Booking "muonMVALowPt" of type "BDT" from /cvmfs/cms.cern.ch/slc7_amd64_gcc820/cms/cmssw/CMSSW_10_6_27/external/slc7_amd64_gcc820/data/PhysicsTools/NanoAOD/data/mu_BDTG_lowpt.weights.xml.
+                         : Reading weight file: /cvmfs/cms.cern.ch/slc7_amd64_gcc820/cms/cmssw/CMSSW_10_6_27/external/slc7_amd64_gcc820/data/PhysicsTools/NanoAOD/data/mu_BDTG_lowpt.weights.xml
+<HEADER> DataSetInfo              : [Default] : Added class "Signal"
+<HEADER> DataSetInfo              : [Default] : Added class "Background"
+                         : Booked classifier "BDTG" of type: "BDT"
+                         : Booking "electronMVATTH" of type "BDT" from /cvmfs/cms.cern.ch/slc7_amd64_gcc820/cms/cmssw/CMSSW_10_6_27/external/slc7_amd64_gcc820/data/PhysicsTools/NanoAOD/data/el_BDTG_2016.weights.xml.
+                         : Reading weight file: /cvmfs/cms.cern.ch/slc7_amd64_gcc820/cms/cmssw/CMSSW_10_6_27/external/slc7_amd64_gcc820/data/PhysicsTools/NanoAOD/data/el_BDTG_2016.weights.xml
+<HEADER> DataSetInfo              : [Default] : Added class "Signal"
+<HEADER> DataSetInfo              : [Default] : Added class "Background"
+                         : Booked classifier "BDTG" of type: "BDT"
+Rivet.Analysis.Handler: WARN  Analysis 'HiggsTemplateCrossSections' is unvalidated: be careful, it may be broken!
+==============================================================
+========     HiggsTemplateCrossSections Initialization     =========
+==============================================================
+Rivet.Analysis.HiggsTemplateCrossSections: WARN  No HIGGSPRODMODE shell variable found. Needed when running Rivet stand-alone.
+==============================================================
+========             Higgs prod mode 0              =========
+========          Sucessful Initialization           =========
+==============================================================
+Rivet.Analysis.HiggsTemplateCrossSections: WARN  Unkown Higgs production mechanism. Cannot classify event. Classification for all events will most likely fail.
+pfNET plugin inserted by MEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+Rivet.Analysis.HiggsTemplateCrossSections: WARN  Unkown Higgs production mechanism. Cannot classify event. Classification for all events will most likely fail.
+pfNET plugin inserted by MEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+Rivet.Analysis.HiggsTemplateCrossSections: WARN  Unkown Higgs production mechanism. Cannot classify event. Classification for all events will most likely fail.
+pfNET plugin inserted by MEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+Rivet.Analysis.HiggsTemplateCrossSections: WARN  Unkown Higgs production mechanism. Cannot classify event. Classification for all events will most likely fail.
+pfNET plugin inserted by MEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+Rivet.Analysis.HiggsTemplateCrossSections: WARN  Unkown Higgs production mechanism. Cannot classify event. Classification for all events will most likely fail.
+pfNET plugin inserted by MEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+Rivet.Analysis.HiggsTemplateCrossSections: WARN  Unkown Higgs production mechanism. Cannot classify event. Classification for all events will most likely fail.
+pfNET plugin inserted by MEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+Rivet.Analysis.HiggsTemplateCrossSections: WARN  Unkown Higgs production mechanism. Cannot classify event. Classification for all events will most likely fail.
+pfNET plugin inserted by MEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+Rivet.Analysis.HiggsTemplateCrossSections: WARN  Unkown Higgs production mechanism. Cannot classify event. Classification for all events will most likely fail.
+pfNET plugin inserted by MEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+Rivet.Analysis.HiggsTemplateCrossSections: WARN  Unkown Higgs production mechanism. Cannot classify event. Classification for all events will most likely fail.
+pfNET plugin inserted by MEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+Rivet.Analysis.HiggsTemplateCrossSections: WARN  Unkown Higgs production mechanism. Cannot classify event. Classification for all events will most likely fail.
+pfNET plugin inserted by MEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+Rivet.Analysis.HiggsTemplateCrossSections: WARN  Unkown Higgs production mechanism. Cannot classify event. Classification for all events will most likely fail.
+pfNET plugin inserted by MEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+Rivet.Analysis.HiggsTemplateCrossSections: WARN  Unkown Higgs production mechanism. Cannot classify event. Classification for all events will most likely fail.
+pfNET plugin inserted by MEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+Rivet.Analysis.HiggsTemplateCrossSections: WARN  Unkown Higgs production mechanism. Cannot classify event. Classification for all events will most likely fail.
+pfNET plugin inserted by MEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+Rivet.Analysis.HiggsTemplateCrossSections: WARN  Unkown Higgs production mechanism. Cannot classify event. Classification for all events will most likely fail.
+pfNET plugin inserted by MEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+Rivet.Analysis.HiggsTemplateCrossSections: WARN  Unkown Higgs production mechanism. Cannot classify event. Classification for all events will most likely fail.
+pfNET plugin inserted by MEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+Rivet.Analysis.HiggsTemplateCrossSections: WARN  Unkown Higgs production mechanism. Cannot classify event. Classification for all events will most likely fail.
+pfNET plugin inserted by MEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+Rivet.Analysis.HiggsTemplateCrossSections: WARN  Unkown Higgs production mechanism. Cannot classify event. Classification for all events will most likely fail.
+pfNET plugin inserted by MEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+Rivet.Analysis.HiggsTemplateCrossSections: WARN  Unkown Higgs production mechanism. Cannot classify event. Classification for all events will most likely fail.
+pfNET plugin inserted by MEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+Rivet.Analysis.HiggsTemplateCrossSections: WARN  Unkown Higgs production mechanism. Cannot classify event. Classification for all events will most likely fail.
+pfNET plugin inserted by MEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+pfNET plugin inserted by MEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+pfNET plugin inserted by MEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+pfNET plugin inserted by MEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+pfNET plugin inserted by MEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+pfNET plugin inserted by MEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+pfNET plugin inserted by MEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+pfNET plugin inserted by MEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+pfNET plugin inserted by MEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+pfNET plugin inserted by MEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+pfNET plugin inserted by MEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+pfNET plugin inserted by MEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+pfNET plugin inserted by MEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+pfNET plugin inserted by MEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+pfNET plugin inserted by MEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+pfNET plugin inserted by MEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+pfNET plugin inserted by MEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+pfNET plugin inserted by MEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+pfNET plugin inserted by MEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+pfNET plugin inserted by MEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+pfNET plugin inserted by MEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+pfNET plugin inserted by MEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+pfNET plugin inserted by MEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+pfNET plugin inserted by MEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+pfNET plugin inserted by MEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+pfNET plugin inserted by MEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+pfNET plugin inserted by MEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+pfNET plugin inserted by MEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+pfNET plugin inserted by MEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+pfNET plugin inserted by MEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+pfNET plugin inserted by MEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+pfNET plugin inserted by MEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+Rivet.Analysis.HiggsTemplateCrossSections: INFO   ====================================================== 
+Rivet.Analysis.HiggsTemplateCrossSections: INFO        Higgs Template X-Sec Categorization Tool          
+Rivet.Analysis.HiggsTemplateCrossSections: INFO                  Status Code Summary                     
+Rivet.Analysis.HiggsTemplateCrossSections: INFO   ====================================================== 
+Rivet.Analysis.HiggsTemplateCrossSections: INFO       >>>> All 0 events successfully categorized!
+Rivet.Analysis.HiggsTemplateCrossSections: INFO   ====================================================== 
+Rivet.Analysis.HiggsTemplateCrossSections: INFO   ====================================================== 

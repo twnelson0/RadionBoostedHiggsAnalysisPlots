@@ -1,0 +1,4 @@
+{
+    "Jet and Taus Requirement":"nFatJet > 0 || nTau > 0 || nboostedTau > 0",
+    "MET Threshold":"MET_pt > 150"
+}

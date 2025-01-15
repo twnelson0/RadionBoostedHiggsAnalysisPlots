@@ -1,0 +1,16 @@
+/hdfs/store/user/gparida/HHbbtt/Full_Production_CMSSW_13_0_13_Nov24_23/2016/Data/MET/MET/Run2016F-UL2016_MiniAODv2-v2/231124_093245/0000/NANO_NANO_1.root
+/hdfs/store/user/gparida/HHbbtt/Full_Production_CMSSW_13_0_13_Nov24_23/2016/Data/MET/MET/Run2016F-UL2016_MiniAODv2-v2/231124_093245/0000/NANO_NANO_10.root
+/hdfs/store/user/gparida/HHbbtt/Full_Production_CMSSW_13_0_13_Nov24_23/2016/Data/MET/MET/Run2016F-UL2016_MiniAODv2-v2/231124_093245/0000/NANO_NANO_11.root
+/hdfs/store/user/gparida/HHbbtt/Full_Production_CMSSW_13_0_13_Nov24_23/2016/Data/MET/MET/Run2016F-UL2016_MiniAODv2-v2/231124_093245/0000/NANO_NANO_12.root
+/hdfs/store/user/gparida/HHbbtt/Full_Production_CMSSW_13_0_13_Nov24_23/2016/Data/MET/MET/Run2016F-UL2016_MiniAODv2-v2/231124_093245/0000/NANO_NANO_13.root
+/hdfs/store/user/gparida/HHbbtt/Full_Production_CMSSW_13_0_13_Nov24_23/2016/Data/MET/MET/Run2016F-UL2016_MiniAODv2-v2/231124_093245/0000/NANO_NANO_14.root
+/hdfs/store/user/gparida/HHbbtt/Full_Production_CMSSW_13_0_13_Nov24_23/2016/Data/MET/MET/Run2016F-UL2016_MiniAODv2-v2/231124_093245/0000/NANO_NANO_15.root
+/hdfs/store/user/gparida/HHbbtt/Full_Production_CMSSW_13_0_13_Nov24_23/2016/Data/MET/MET/Run2016F-UL2016_MiniAODv2-v2/231124_093245/0000/NANO_NANO_16.root
+/hdfs/store/user/gparida/HHbbtt/Full_Production_CMSSW_13_0_13_Nov24_23/2016/Data/MET/MET/Run2016F-UL2016_MiniAODv2-v2/231124_093245/0000/NANO_NANO_2.root
+/hdfs/store/user/gparida/HHbbtt/Full_Production_CMSSW_13_0_13_Nov24_23/2016/Data/MET/MET/Run2016F-UL2016_MiniAODv2-v2/231124_093245/0000/NANO_NANO_3.root
+/hdfs/store/user/gparida/HHbbtt/Full_Production_CMSSW_13_0_13_Nov24_23/2016/Data/MET/MET/Run2016F-UL2016_MiniAODv2-v2/231124_093245/0000/NANO_NANO_4.root
+/hdfs/store/user/gparida/HHbbtt/Full_Production_CMSSW_13_0_13_Nov24_23/2016/Data/MET/MET/Run2016F-UL2016_MiniAODv2-v2/231124_093245/0000/NANO_NANO_5.root
+/hdfs/store/user/gparida/HHbbtt/Full_Production_CMSSW_13_0_13_Nov24_23/2016/Data/MET/MET/Run2016F-UL2016_MiniAODv2-v2/231124_093245/0000/NANO_NANO_6.root
+/hdfs/store/user/gparida/HHbbtt/Full_Production_CMSSW_13_0_13_Nov24_23/2016/Data/MET/MET/Run2016F-UL2016_MiniAODv2-v2/231124_093245/0000/NANO_NANO_7.root
+/hdfs/store/user/gparida/HHbbtt/Full_Production_CMSSW_13_0_13_Nov24_23/2016/Data/MET/MET/Run2016F-UL2016_MiniAODv2-v2/231124_093245/0000/NANO_NANO_8.root
+/hdfs/store/user/gparida/HHbbtt/Full_Production_CMSSW_13_0_13_Nov24_23/2016/Data/MET/MET/Run2016F-UL2016_MiniAODv2-v2/231124_093245/0000/NANO_NANO_9.root

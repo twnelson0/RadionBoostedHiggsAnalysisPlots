@@ -1,0 +1,8 @@
+{
+    "MET_Run2016B-ver1_HIPM": "/hdfs/store/user/gparida/HHbbtt/Full_Production_CMSSW_13_0_13_Nov24_23/2016APV/Data/MET/MET/Run2016B-ver1_HIPM_UL2016_MiniAODv2-v2/231125_221159/*/*.root",
+    "MET_Run2016B-ver2_HIPM": "/hdfs/store/user/gparida/HHbbtt/Full_Production_CMSSW_13_0_13_Nov24_23/2016APV/Data/MET/MET/Run2016B-ver2_HIPM_UL2016_MiniAODv2-v2/231125_221214/*/*.root",
+    "MET_Run2016C_HIPM": "/hdfs/store/user/gparida/HHbbtt/Full_Production_CMSSW_13_0_13_Nov24_23/2016APV/Data/MET/MET/Run2016C-HIPM_UL2016_MiniAODv2-v2/231125_221228/*/*.root",
+    "MET_Run2016D_HIPM": "/hdfs/store/user/gparida/HHbbtt/Full_Production_CMSSW_13_0_13_Nov24_23/2016APV/Data/MET/MET/Run2016D-HIPM_UL2016_MiniAODv2-v2/231125_221242/*/*.root",
+    "MET_Run2016E_HIPM": "/hdfs/store/user/gparida/HHbbtt/Full_Production_CMSSW_13_0_13_Nov24_23/2016APV/Data/MET/MET/Run2016E-HIPM_UL2016_MiniAODv2-v2/231125_221257/*/*.root",
+    "MET_Run2016F_HIPM": "/hdfs/store/user/gparida/HHbbtt/Full_Production_CMSSW_13_0_13_Nov24_23/2016APV/Data/MET/MET/Run2016F-HIPM_UL2016_MiniAODv2-v2/231125_221311/*/*.root"
+}

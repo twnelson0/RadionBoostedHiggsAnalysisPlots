@@ -1,0 +1,1 @@
+/hdfs/store/user/mithakor/HHbbtt/Full_Production_CMSSW_13_0_13_Dec5_24/2016APV/MC/GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-4000_TuneCP5_PSWeights_narrow_13TeV-madgraph-pythia8/GluGluToBulkGravitonToHHTo2B2WToLNu2J_M-4000_TuneCP5_PSWeights_narrow_13TeV-madgraph-pythia8/241220_153643/0000/NANO_NANO_1.root
