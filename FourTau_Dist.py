@@ -190,35 +190,35 @@ class FourTauPlotting(processor.ProcessorABC):
 		
 		event_level = ak.zip(
 			{
-				"jet_trigger": events.HLTJet,
-				"mu_trigger": events.HLTEleMuX,
-				"pfMET": events.pfMET,
-				"pfMETPhi": events.pfMETPhi,
-				"event_weight": ak.ones_like(events.pfMET)*0.9,
-                "n_electrons": ak.zeros_like(events.pfMET),
-                "n_muons": ak.zeros_like(events.pfMET),
-                "n_tau_electrons": ak.zeros_like(events.pfMET),
-                "n_tau_muons": ak.zeros_like(events.pfMET),
-				"n_tau_hadronic": ak.zeros_like(events.pfMET)
-				#"n_muons": events.nEle,
-				#"n_electrons": events.nMu,
+				#"jet_trigger": events.HLTJet,
+				#"mu_trigger": events.HLTEleMuX,
+				"METHTMHT_Trigger": events.HLT_PFHT500_PFMET100_PFMHT100_IDTight,
+				"Mu_Trigger": events.HLT_Mu50,
+				"pfMET": events.MET_pt,
+				"pfMETPhi": events.MET_phi,
+				"event_weight": ak.ones_like(events.MET_pt)*0.9,
+				"n_electrons": ak.zeros_like(events.MET_pt),
+				"n_muons": ak.zeros_like(events.MET_pt),
+				"n_tau_electrons": ak.zeros_like(events.MET_pt),
+				"n_tau_muons": ak.zeros_like(events.MET_pt),
+				"n_tau_hadronic": ak.zeros_like(events.MET_pt)
 			},
 			with_name="EventArray",
 			behavior=candidate.behavior,
 		)
 		tau = ak.zip( 
 			{
-				"pt": events.boostedTauPt,
-				"E": events.boostedTauEnergy,
-				"Px": events.boostedTauPx,
-				"Py": events.boostedTauPy,
-				"Pz": events.boostedTauPz,
-				"mass": events.boostedTauMass,
-				"eta": events.boostedTauEta,
-				"phi": events.boostedTauPhi,
+				"pt": events.boostedTau_pt,
+				"Px": events.boostedTau_pt*np.cos(events.boostedTau_phi),
+				"Py": events.boostedTau_pt*np.sin(events.boostedTau_phi),
+				"Pz": (events.boostedTau_pt/np.sin(2*np.arctan(np.exp(-boostedTau_eta))))*np.cos(2*np.arctan(np.exp(-boostedTau_eta))),
+				"E": np.sqrt((events.boostedTau_pt/np.sin(2*np.arctan(np.exp(-boostedTau_eta))))**2 + events.boostedTau_mass**2)
+				"mass": events.boostedTau_mass,
+				"eta": events.boostedTau_eta,
+				"phi": events.boostedTau_phi,
 				"nBoostedTau": events.nBoostedTau,
-				"charge": events.boostedTauCharge,
-				"iso": events.boostedTauByIsolationMVArun2v1DBoldDMwLTrawNew,
+				"charge": events.boostedTau_charge,
+				"iso": events.boostedTau_rawIso,
 				"decay": events.boostedTaupfTausDiscriminationByDecayModeFinding,
 			},
 			with_name="TauArray",
@@ -226,16 +226,17 @@ class FourTauPlotting(processor.ProcessorABC):
 		)
 		electron = ak.zip(
 			{
-				"pt": events.elePt,
-				"E": events.eleEn,
-				"eta": events.eleEta,
-				"phi": events.elePhi,
-				"charge": events.eleCharge,
-				"Px": events.elePt*np.cos(events.elePhi),
-				"Py": events.elePt*np.sin(events.elePhi),
-				"Pz": events.elePt*np.tan(2*np.arctan(np.exp(-events.eleEta)))**-1,
-				"SCEta": events.eleSCEta,
-				"IDMVANoIso": events.eleIDMVANoIso,
+				"pt": events.electron_pt,
+				"eta": events.electron_eta,
+				"phi": events.electron_phi,
+				"charge": events.electron_charge,
+				"Px": events.electron_pt*np.cos(events.electron_phi),
+				"Py": events.electron_pt*np.sin(events.electron_phi),
+				"Pz": events.electron_pt*np.tan(2*np.arctan(np.exp(-events.electron_eta)))**-1,
+				"E": np.sqrt(events.electron_pt**2 + (events.electron_pt/np.tan(2*np.arctan(np.exp(-events.electron_eta))))**2 + events.electron_mass**2),
+				#"SCEta": events.electron_SCEta,
+				"SCEta": events.electron_deltaEtaSC,
+				"IDMVANoIso": events.electron_IDMVANoIso,
 					
 			},
 			with_name="ElectronArray",
@@ -244,18 +245,18 @@ class FourTauPlotting(processor.ProcessorABC):
 		)
 		muon = ak.zip(
 			{
-				"pt": events.muPt,
-				"E": events.muEn,
-				"eta": events.muEta,
-				"phi": events.muPhi,
-				"charge": events.muCharge,
-				"Px": events.muPt*np.cos(events.muPhi),
-				"Py": events.muPt*np.sin(events.muPhi),
-				"Pz": events.muPt*np.tan(2*np.arctan(np.exp(-events.muEta)))**-1,
+				"pt": events.muon_pt,
+				"eta": events.muon_eta,
+				"phi": events.muon_phi,
+				"charge": events.muon_charge,
+				"Px": events.muon_pt*np.cos(events.muon_phi),
+				"Py": events.muon_pt*np.sin(events.muon_phi),
+				"Pz": events.muon_pt*np.tan(2*np.arctan(np.exp(-events.muon_eta)))**-1,
+				"E": np.sqrt(events.muon_pt**2 + (events.muon_pt/np.tan(2*np.arctan(np.exp(-events.muon_eta))))**2 + events.muon_mass**2),
 				"nMu": events.nMu,
-				"IDbit": events.muIDbit,
-				"D0": events.muD0,
-				"Dz": events.muDz
+				"IDbit": events.muon_IDbit,
+				"D0": events.muon_dxy,
+				"Dz": events.muon_dz
 					
 			},
 			with_name="MuonArray",
@@ -265,10 +266,10 @@ class FourTauPlotting(processor.ProcessorABC):
 
 		AK8Jet = ak.zip(
 			{
-				"AK8JetDropMass": events.AK8JetSoftDropMass,
-				"AK8JetPt": events.AK8JetPt,
-				"eta": events.AK8JetEta,
-				"phi": events.AK8JetPhi,
+				"AK8JetDropMass": events.FatJet_msoftdrop,
+				"AK8JetPt": events.FatJet_pt,
+				"eta": events.FatJet_eta,
+				"phi": events.FatJet_phi,
 			},
 			with_name="AK8JetArray",
 			behavior=candidate.behavior,
@@ -276,11 +277,11 @@ class FourTauPlotting(processor.ProcessorABC):
 		
 		Jet = ak.zip(
 			{
-				"Pt": events.jetPt,
-				"PFLooseId": events.jetPFLooseId,
-				"eta": events.jetEta,
-				"phi": events.jetPhi,
-				"DeepCSVTags_b": events.jetDeepCSVTags_b
+				"Pt": events.jet_pt,
+				#"PFLooseId": events.jetPFLooseId,
+				"eta": events.jet_eta,
+				"phi": events.jet_phi,
+				"DeepCSVTags_b": events.jet_DeepCSVTags_b
 			},
 			with_name="PFJetArray",
 			behavior=candidate.behavior,
@@ -288,16 +289,16 @@ class FourTauPlotting(processor.ProcessorABC):
 
 		if not(self.isData): #Check to see if this is (or is not) an MC simulation
 			Gen_Info = ak.zip({
-					"MCId": events.mcPID,
-					"MotherId": events.mcMomPID,
-					"GMotherId": events.mcGMomPID,
-					"Pt": events.mcPt,
-					"Eta": events.mcEta,
-					"Phi": events.mcPhi,
-					"E": events.mcE,
-					"Px": events.mcPt*np.cos(events.mcPhi),
-					"Py": events.mcPt*np.sin(events.mcPhi),
-					"Pz": events.mcPt*np.tan(2*np.arctan(np.exp(-events.mcEta)))**-1,
+					"MCId": events.GenPart_pdgID,
+					"MotherId": events.GenPart_genPartIdxMother,
+					#"GMotherId": events.mcGMomPID,
+					"Pt": events.GenPart_pt,
+					"Eta": events.GenPart_eta,
+					"Phi": events.GenPart_phi,
+					"Px": events.GenPart_pt*np.cos(events.GenPart_phi),
+					"Py": events.GenPart_pt*np.sin(events.GenPart_phi),
+					"Pz": events.GenPart_pt*np.tan(2*np.arctan(np.exp(-events.GenPart_eta)))**-1,
+					"E": np.sqrt(events.GenPart_pt**2 + (events.GenPart_pt*np.tan(2*np.arctan(np.exp(-events.GenPart_eta)))**-1)**2 + events.GenPart_mass**2),
 
 				},
 				with_name = "GEN_Array",
@@ -411,15 +412,18 @@ class FourTauPlotting(processor.ProcessorABC):
 		#		sum_metmht = ak.where(sum_metmht > 1500,1500,sum_metmht)
 
 		
-		#Triggering logic
+		#Triggering logic (This whole thing needs to be changed for NanoAOD)
 		trigger_mask = bit_mask([self.trigger_bit])
 		if (not(self.isData)):	#MC trigger logic
 			if (self.OrTrigger): # and np.pi == np.exp(1)): #Select for both triggers
 				print("Both Triggers")
-				event_level_21 = event_level[np.bitwise_and(event_level.mu_trigger,bit_mask([21])) == bit_mask([21])]
-				event_level_fail = event_level[np.bitwise_and(event_level.mu_trigger,bit_mask([21])) != bit_mask([21])]
-				event_level_27 = event_level_fail[np.bitwise_and(event_level_fail.jet_trigger,bit_mask([27])) == bit_mask([27])]
-				event_level_39 = event_level_fail[np.bitwise_and(event_level_fail.jet_trigger,bit_mask([39])) == bit_mask([39])]
+				#event_level_21 = event_level[np.bitwise_and(event_level.mu_trigger,bit_mask([21])) == bit_mask([21])]
+				event_level_21 = event_level[ak.all(event_level.Mu_Trigger,axis=1) == 1]
+				#event_level_fail = event_level[np.bitwise_and(event_level.mu_trigger,bit_mask([21])) != bit_mask([21])]
+				event_level_fail = event_level[ak.all(event_level.Mu_Trigger,axis=1) != 1]
+				event_level_39 = event_level_fail[ak.all(event_level.METHTMHT_Trigger,axis = 1) == 1]
+				#event_level_27 = event_level_fail[np.bitwise_and(event_level_fail.jet_trigger,bit_mask([27])) == bit_mask([27])]
+				#event_level_39 = event_level_fail[np.bitwise_and(event_level_fail.jet_trigger,bit_mask([39])) == bit_mask([39])]
 
 				#Muon ID selection
 				id_cond = np.bitwise_and(muon.IDbit,2) != 0
@@ -429,19 +433,19 @@ class FourTauPlotting(processor.ProcessorABC):
 				muon = muon[good_muon_cond]
 			
 				#Single Muon Trigger	
-				tau_21 = tau[np.bitwise_and(event_level.mu_trigger,bit_mask([21])) == bit_mask([21])]
-				tau_fail = tau[np.bitwise_and(event_level.mu_trigger,bit_mask([21])) != bit_mask([21])]
-				AK8Jet_21 = AK8Jet[np.bitwise_and(event_level.mu_trigger,bit_mask([21])) == bit_mask([21])]
-				AK8Jet_fail = AK8Jet[np.bitwise_and(event_level.mu_trigger,bit_mask([21])) != bit_mask([21])]
-				Jet_21 = Jet[np.bitwise_and(event_level.mu_trigger,bit_mask([21])) == bit_mask([21])]
-				Jet_fail = Jet[np.bitwise_and(event_level.mu_trigger,bit_mask([21])) != bit_mask([21])]
-				muon_21 = muon[np.bitwise_and(event_level.mu_trigger,bit_mask([21])) == bit_mask([21])]
-				muon_fail = muon[np.bitwise_and(event_level.mu_trigger,bit_mask([21])) != bit_mask([21])]
-				electron_21 = electron[np.bitwise_and(event_level.mu_trigger,bit_mask([21])) == bit_mask([21])]
-				electron_fail = electron[np.bitwise_and(event_level.mu_trigger,bit_mask([21])) != bit_mask([21])]
+				tau_21 = tau[ak.all(event_level.Mu_Trigger,axis=1) == 1]
+				tau_fail = tau[ak.all(ak.all(event_level.Mu_Trigger,axis=1) == 1,axis=1) != 1]
+				AK8Jet_21 = AK8Jet[ak.all(event_level.Mu_Trigger,axis=1) == 1]
+				AK8Jet_fail = AK8Jet[ak.all(ak.all(event_level.Mu_Trigger,axis=1) == 1,axis=1) != 1]
+				Jet_21 = Jet[ak.all(event_level.Mu_Trigger,axis=1) == 1]
+				Jet_fail = Jet[ak.all(ak.all(event_level.Mu_Trigger,axis=1) == 1,axis=1) != 1]
+				muon_21 = muon[ak.all(event_level.Mu_Trigger,axis=1) == 1]
+				muon_fail = muon[ak.all(ak.all(event_level.Mu_Trigger,axis=1) == 1,axis=1) != 1]
+				electron_21 = electron[ak.all(event_level.Mu_Trigger,axis=1) == 1]
+				electron_fail = electron[ak.all(event_level.Mu_Trigger,axis=1) != 1]
 				if (not(self.isData)): # and self.isData):
-					Gen_Info_21 = Gen_Info[np.bitwise_and(event_level.mu_trigger,bit_mask([21])) == bit_mask([21])]
-					Gen_Info_fail = Gen_Info[np.bitwise_and(event_level.mu_trigger,bit_mask([21])) != bit_mask([21])]
+					Gen_Info_21 = Gen_Info[ak.all(event_level.Mu_Trigger,axis=1) == 1]
+					Gen_Info_fail = Gen_Info[ak.all(event_level.Mu_Trigger,axis=1) == 1,axis=1) != 1]
 					
 				
 
@@ -468,13 +472,13 @@ class FourTauPlotting(processor.ProcessorABC):
 
 				
 				#Apply JetHT_MHT_MET Trigger
-				tau_39 = tau_fail[np.bitwise_and(event_level_fail.jet_trigger,bit_mask([39])) == bit_mask([39])]
-				AK8Jet_39 = AK8Jet_fail[np.bitwise_and(event_level_fail.jet_trigger,bit_mask([39])) == bit_mask([39])]
-				Jet_39 = Jet_fail[np.bitwise_and(event_level_fail.jet_trigger,bit_mask([39])) == bit_mask([39])]
-				electron_39 = electron_fail[np.bitwise_and(event_level_fail.jet_trigger,bit_mask([39])) == bit_mask([39])]
-				muon_39 = muon_fail[np.bitwise_and(event_level_fail.jet_trigger,bit_mask([39])) == bit_mask([39])]
+				tau_39 = tau_fail[ak.all(event_level.METHTMHT_Trigger,axis = 1) == 1]
+				AK8Jet_39 = AK8Jet_fail[ak.all(event_level.METHTMHT_Trigger,axis = 1) == 1]
+				Jet_39 = Jet_fail[ak.all(event_level.METHTMHT_Trigger,axis = 1) == 1]
+				electron_39 = electron_fail[ak.all(event_level.METHTMHT_Trigger,axis = 1) == 1]
+				muon_39 = muon_fail[ak.all(event_level.METHTMHT_Trigger,axis = 1) == 1]
 				if (not(self.isData)): # and self.isData):
-					Gen_Info_39 = Gen_Info_fail[np.bitwise_and(event_level_fail.jet_trigger,bit_mask([39])) == bit_mask([39])]
+					Gen_Info_39 = Gen_Info_fail[ak.all(event_level.METHTMHT_Trigger,axis = 1) == 1]
 		
 				#HT Cut
 				tau_39 = tau_39[event_level_39.HT > 550]	
@@ -549,11 +553,11 @@ class FourTauPlotting(processor.ProcessorABC):
 				if (self.trigger_bit != None and self.OrTrigger == False):
 					if (self.trigger_bit == 21): #Single Mu
 						print("Single Trigger: Mu Trigger (21)")
-						tau = tau[np.bitwise_and(event_level.mu_trigger,trigger_mask) == trigger_mask]
-						AK8Jet = AK8Jet[np.bitwise_and(event_level.mu_trigger,trigger_mask) == trigger_mask]
-						Jet = Jet[np.bitwise_and(event_level.mu_trigger,trigger_mask) == trigger_mask]
-						muon = muon[np.bitwise_and(event_level.mu_trigger,trigger_mask) == trigger_mask]
-						event_level = event_level[np.bitwise_and(event_level.mu_trigger,trigger_mask) == trigger_mask]
+						tau = tau[ak.all(event_level.Mu_Trigger,axis=1) == 1]
+						AK8Jet = AK8Jet[ak.all(event_level.Mu_Trigger,axis=1) == 1]
+						Jet = Jet[ak.all(event_level.Mu_Trigger,axis=1) == 1]
+						muon = muon[ak.all(event_level.Mu_Trigger,axis=1) == 1]
+						event_level = event_level[ak.all(event_level.Mu_Trigger,axis=1) == 1]
 						
 						#Muon ID selection
 						id_cond = np.bitwise_and(muon.IDbit,2) != 0
@@ -605,12 +609,12 @@ class FourTauPlotting(processor.ProcessorABC):
 					
 					if (self.trigger_bit == 39): #Jet HT
 						print("Single Trigger: Jet Trigger (39)")
-						tau = tau[np.bitwise_and(event_level.jet_trigger,trigger_mask) == trigger_mask]
-						AK8Jet = AK8Jet[np.bitwise_and(event_level.jet_trigger,trigger_mask) == trigger_mask]
-						Jet = Jet[np.bitwise_and(event_level.jet_trigger,trigger_mask) == trigger_mask]
-						muon = muon[np.bitwise_and(event_level.jet_trigger,trigger_mask) == trigger_mask]
-						electron = electron[np.bitwise_and(event_level.jet_trigger,trigger_mask) == trigger_mask]
-						event_level = event_level[np.bitwise_and(event_level.jet_trigger,trigger_mask) == trigger_mask]
+						tau = tau[ak.all(event_level.METHTMHT_Trigger,axis=1) == 1]
+						AK8Jet = AK8Jet[ak.all(event_level.METHTMHT_Trigger,axis=1) == 1]
+						Jet = Jet[ak.all(event_level.METHTMHT_Trigger,axis=1) == 1]
+						muon = muon[ak.all(event_level.METHTMHT_Trigger,axis=1) == 1]
+						electron = electron[ak.all(event_level.METHTMHT_Trigger,axis=1) == 1]
+						event_level = event_level[ak.all(event_level.METHTMHT_Trigger,axis=1) == 1]
 						print("Number of events after Online Trigger(dropping empty arrays): %d"%ak.num(tau[ak.num(tau,axis=1) > 0],axis=0))
 				
 						#Offline Cuts
@@ -652,20 +656,20 @@ class FourTauPlotting(processor.ProcessorABC):
 
 
 				print("Single Muon Trigger")
-				tau = tau[np.bitwise_and(event_level.mu_trigger,bit_mask([21])) == bit_mask([21])]	
-				AK8Jet = AK8Jet[np.bitwise_and(event_level.mu_trigger,bit_mask([21])) == bit_mask([21])]	
-				Jet = Jet[np.bitwise_and(event_level.mu_trigger,bit_mask([21])) == bit_mask([21])]	
-				muon = muon[np.bitwise_and(event_level.mu_trigger,bit_mask([21])) == bit_mask([21])]	
-				electron = electron[np.bitwise_and(event_level.mu_trigger,bit_mask([21])) == bit_mask([21])]	
-				event_level = event_level[np.bitwise_and(event_level.mu_trigger,bit_mask([21])) == bit_mask([21])]
+				tau = tau[ak.all(event_level.Mu_Trigger,axis=1) == 1]	
+				AK8Jet = AK8Jet[ak.all(event_level.Mu_Trigger,axis=1) == 1]	
+				Jet = Jet[ak.all(event_level.Mu_Trigger,axis=1) == 1]	
+				muon = muon[ak.all(event_level.Mu_Trigger,axis=1) == 1]	
+				electron = electron[ak.all(event_level.Mu_Trigger,axis=1) == 1]	
+				event_level = event_level[ak.all(event_level.Mu_Trigger,axis=1) == 1]
 
 				if (self.OrTrigger): #If working on both triggers drop events that passed JetHT trigger
-					tau = tau[np.bitwise_and(event_level.jet_trigger,bit_mask([39])) != bit_mask([39])]	
-					AK8Jet = AK8Jet[np.bitwise_and(event_level.jet_trigger,bit_mask([39])) != bit_mask([39])]	
-					Jet = Jet[np.bitwise_and(event_level.jet_trigger,bit_mask([39])) != bit_mask([39])]	
-					muon = muon[np.bitwise_and(event_level.jet_trigger,bit_mask([39])) != bit_mask([39])]	
-					electron = electron[np.bitwise_and(event_level.jet_trigger,bit_mask([39])) != bit_mask([39])]	
-					event_level = event_level[np.bitwise_and(event_level.jet_trigger,bit_mask([39])) != bit_mask([39])]
+					tau = tau[ak.all(event_level.METHTMHT_Trigger,axis = 1) != 1]	
+					AK8Jet = AK8Jet[ak.all(event_level.METHTMHT_Trigger,axis = 1) != 1]	
+					Jet = Jet[ak.all(event_level.METHTMHT_Trigger,axis = 1) != 1]	
+					muon = muon[ak.all(event_level.METHTMHT_Trigger,axis = 1) != 1]	
+					electron = electron[ak.all(event_level.METHTMHT_Trigger,axis = 1) != 1]	
+					event_level = event_level[ak.all(event_level.METHTMHT_Trigger,axis = 1) != 1]
 					
 
 				#pT
@@ -685,12 +689,12 @@ class FourTauPlotting(processor.ProcessorABC):
 				
 			if ("JetHT" in dataset): # and np.exp(1) == np.pi): #HT 
 				print("Jet Trigger")
-				tau = tau[np.bitwise_and(event_level.jet_trigger,bit_mask([39])) == bit_mask([39])]	
-				AK8Jet = AK8Jet[np.bitwise_and(event_level.jet_trigger,bit_mask([39])) == bit_mask([39])]	
-				Jet = Jet[np.bitwise_and(event_level.jet_trigger,bit_mask([39])) == bit_mask([39])]	
-				muon = muon[np.bitwise_and(event_level.jet_trigger,bit_mask([39])) == bit_mask([39])]	
-				electron = electron[np.bitwise_and(event_level.jet_trigger,bit_mask([39])) == bit_mask([39])]	
-				event_level = event_level[np.bitwise_and(event_level.jet_trigger,bit_mask([39])) == bit_mask([39])]
+				tau = tau[ak.all(event_level.METHTMHT_Trigger,axis = 1) == 1]	
+				AK8Jet = AK8Jet[ak.all(event_level.METHTMHT_Trigger,axis = 1) == 1]	
+				Jet = Jet[ak.all(event_level.METHTMHT_Trigger,axis = 1) == 1]	
+				muon = muon[ak.all(event_level.METHTMHT_Trigger,axis = 1) == 1]	
+				electron = electron[ak.all(event_level.METHTMHT_Trigger,axis = 1) == 1]	
+				event_level = event_level[ak.all(event_level.METHTMHT_Trigger,axis = 1) == 1]
 				print("Number of events after Online Trigger(dropping empty arrays): %d"%ak.num(tau[ak.num(tau,axis=1) > 0],axis=0))
 
 				#Offline Cuts
@@ -2295,7 +2299,7 @@ if __name__ == "__main__":
 
 			}
 			
-			fourtau_out = iterative_runner(file_dict, treename="4tau_tree", processor_instance=FourTauPlotting(trigger_bit=trigger_pair[0], or_trigger=trigger_pair[1],PUWeights = PUWeight, PU_weight_bool =True, signal_mass = mass))
+			fourtau_out = iterative_runner(file_dict, treename="Events", processor_instance=FourTauPlotting(trigger_bit=trigger_pair[0], or_trigger=trigger_pair[1],PUWeights = PUWeight, PU_weight_bool =True, signal_mass = mass)) #Modified for NanoAOD (changd treename)
 			for hist_name in four_tau_hist_list: #Loop over all histograms
 				#fig,ax = plt.subplots()
 				fig0,ax0 = plt.subplots()
