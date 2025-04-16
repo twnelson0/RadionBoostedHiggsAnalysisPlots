@@ -14,6 +14,9 @@ import pandas as pd
 from matplotlib.backends.backend_pdf import PdfPages
 import vector
 import os
+import time
+from distributed import Client
+from dask_jobqueue import HTCondorCluster
 #import glob
 vector.register_awkward()
 
@@ -2041,9 +2044,47 @@ if __name__ == "__main__":
 	#background_base = "root://cmseos.fnal.gov//store/user/abdollah/SkimBoostedHH4t/2018/4t/v2/"	
 	#data_loc = "root://cmseos.fnal.gov//store/user/abdollah/SkimBoostedHH4t/2018/4t/v2/"
 
+	#Condor related stuff
+	os.environ["CONDOR_CONFIG"] = "/etc/condor/condor_config"
+	htc_log_err_dir = "/nfs_scratch/twnelson/ControlPlot_HTC/Run_" + str(time.localtime()[0]) + "_" + str(time.localtime()[1]) + "_" + str(time.localtime()[2]) + "_" + str(time.localtime()[3]) + f".{time.localtime()[4]:02d}"
+	os.makedirs(htc_log_err_dir)
+	cluster = HTCondorCluster(
+		cores=2,
+		memory="4 GB",
+		disk = "2 GB",
+		death_timeout = "60",
+		#python="/usr/bin/python3.9/", #This should be correct but I'm seeing errors corresponding to this line 
+		#python="/usr/local/bin/python3",
+	    #python="/usr/local/bin/python3.10", #This should be correct but I'm seeing errors corresponding to this line 
+		#python="/usr/local/lib/python3.10", #This should be correct but I'm seeing errors corresponding to this line 
+		job_extra_directives = {#"SingularityImage": "/cvmfs/unpacked.cern.ch/registry.hub.docker.com/coffeateam/coffea-base-almalinux8:0.7.26-py3.10",
+								"SingularityImage": "/cvmfs/unpacked.cern.ch/registry.hub.docker.com/coffeateam/coffea-dask-cc7:latest-py3.10",
+								#"SingularityImage": "docker://docker.io/coffeateam/coffea-base-almalinux9:0.7.26-py3.10",
+								#"SingularityImage": "/cvmfs/unpacked.cern.ch/registry.hub.docker.com/coffeateam/coffea-base-almalinux9:0.7.26-py3.10",
+								#"+JobFlavour": '"tomorrow"',
+								"log": "dask_job_output.$(PROCESS).$(CLUSTER).log",
+								"output": "dask_job_output.$(PROCESS).$(CLUSTER).out",
+								"error": "dask_job_output.$(PROCESS).$(CLUSTER).err",
+								"when_to_transfer_output": "ON_EXIT_OR_EVICT",
+								#"InitialDir": f"/nfs_scratch/{os.environ['USER']}",
+								"InitialDir": htc_log_err_dir,
+								#"InitialDir": f"/nfs_scratch/twnelson/ControlPlot_HTC/",
+								#"InitialDir": "~/Analysis/BoostedTau/ControlPlots/RadionBoostedHiggsAnalysisPlots",
+								#"InitialDir": background_base + "ZZTo4L_25February25_0413_skim__skim_Feb25",
+								#"InitialDir": f"/scratch/{os.environ['USER']}",
+								'transfer_input_files': background_base + "ZZTo4L_25February25_0413_skim__skim_Feb25/singleFileSkimForSubmission-NANO_NANO_411.root",
+			},
+			job_script_prologue=[
+                "export XRD_RUNFORKHANDLER=1",
+                #f"export X509_USER_PROXY={_x509_path}",
+            ]
+	)
+	cluster.adapt(minimum = 1, maximum = 10)
+
 
 	iterative_runner = processor.Runner(
-		executor = processor.IterativeExecutor(compression=None),
+		executor = processor.DaskExecutor(client=Client(cluster)),
+		#executor = processor.IterativeExecutor(compression=None), #This needs to be changed
 		schema=BaseSchema
 	)
 	#four_tau_hist_list = ["FourTau_Mass_Arr","HiggsDeltaPhi_Arr", "Higgs_DeltaR_Arr","leading_dR_Arr","subleading_dR_Arr","LeadingHiggs_mass","SubLeadingHiggs_mass", "radionPT_Arr", "tau_pt_Arr", 
@@ -2085,9 +2126,9 @@ if __name__ == "__main__":
 	for mass in mass_str_arr:
 		print("====================Radion Mass = " + mass[0] + "." + mass[1] + " TeV====================")
 		file_dict = { #Reduced files to run over
-			#"ZZ4l": [background_base + "ZZTo4L_25February25_0413_skim__skim_Feb2/singleFileSkimForSubmission-NANO_NANO_411.root"],
+			"ZZ4l": [background_base + "ZZTo4L_25February25_0413_skim__skim_Feb25/singleFileSkimForSubmission-NANO_NANO_411.root"],
 			#"ZZ4l": ["singleFileSkimForSubmission-NANO_NANO_411.root"],
-			"ZZ4l": np.char.replace(np.array( os.listdir(background_base + "ZZTo4L_25February25_0413_skim__skim_Feb25/")), "", background_base + "ZZTo4L_25February25_0413_skim__skim_Feb25/",1).tolist(), #Run over all minAOD files
+			#"ZZ4l": np.char.replace(np.array( os.listdir(background_base + "ZZTo4L_25February25_0413_skim__skim_Feb25/")), "", background_base + "ZZTo4L_25February25_0413_skim__skim_Feb25/",1).tolist(), #Run over all minAOD files
 			
 			#"DYJetsToLL_Pt-50To100": [background_base + "DYJetsToLL_Pt-50To100.root"] ,
 			#"DYJetsToLL_Pt-100To250": [ background_base + "DYJetsToLL_Pt-100To250.root"], 
@@ -2142,7 +2183,7 @@ if __name__ == "__main__":
 		for key_name, file_array in file_dict.items(): 
 			if (key_name != "Data_JetHT" or key_name != "Data_SingleMuon"): #This logic needs to be fixed
 				for file in file_array:
-					print(file)
+					#print(file)
 					#tempFile = uproot.open(file[0]) #Get file
 					tempFile = uproot.open(file) #Get file
 					#numEvents_Dict[key_name] = tempFile['hEvents'].member('fEntries')/2
@@ -2325,6 +2366,7 @@ if __name__ == "__main__":
 
 			}
 			
+			#fourtau_out = iterative_runner(file_dict, treename="Events", processor_instance=FourTauPlotting(trigger_bit=trigger_pair[0], or_trigger=trigger_pair[1],PUWeights = PUWeight, PU_weight_bool =True, signal_mass = mass)) #Modified for NanoAOD (changd treename)
 			fourtau_out = iterative_runner(file_dict, treename="Events", processor_instance=FourTauPlotting(trigger_bit=trigger_pair[0], or_trigger=trigger_pair[1],PUWeights = PUWeight, PU_weight_bool =True, signal_mass = mass)) #Modified for NanoAOD (changd treename)
 			for hist_name in four_tau_hist_list: #Loop over all histograms
 				#fig,ax = plt.subplots()
