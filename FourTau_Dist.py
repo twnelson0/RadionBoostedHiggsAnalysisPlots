@@ -18,7 +18,28 @@ import time
 from distributed import Client
 from dask_jobqueue import HTCondorCluster
 #import glob
-vector.register_awkward()
+
+
+#X509 function (for HTC)
+def move_X509():
+    try:
+        _x509_localpath = (
+            [
+                line
+                for line in os.popen("voms-proxy-info").read().split("\n")
+                if line.startswith("path")
+            ][0]
+            .split(":")[-1]
+            .strip()
+        )
+    except Exception as err:
+        raise RuntimeError(
+            "x509 proxy could not be parsed, try creating it with 'voms-proxy-init'"
+        ) from err
+    _x509_path = f'/scratch/{os.environ["USER"]}/{_x509_localpath.split("/")[-1]}'
+    os.system(f"cp {_x509_localpath} {_x509_path}")
+    return os.path.basename(_x509_localpath)
+
 
 hep.style.use(hep.style.CMS)
 TABLEAU_COLORS = ['blue','orange','green','red','purple','brown','pink','gray','olive','cyan']
@@ -187,6 +208,7 @@ class FourTauPlotting(processor.ProcessorABC):
 		#pass
 
 	def process(self, events):
+		vector.register_awkward()
 		#Begin by checking if running on data or sample
 		dataset = events.metadata['dataset']
 		if ("Data_" in dataset): #Check to see if running on data
@@ -811,18 +833,19 @@ class FourTauPlotting(processor.ProcessorABC):
 		min_tau_ele = electron_fourVec.nearest(tau_fourVec)
 		min_tau_mu = muon_fourVec.nearest(tau_fourVec)
 		
-		for j in range(ak.num(tau,axis=0)): #Debugging work
-			if (len(min_tau_ele[j]) != len(electron_fourVec[j])):
-				print("!!Electron electron-tau dR mismatch!!")
-				print("Min Electron-Tau dR length: %d"%len(min_tau_ele[j]))
-				print("Electron length: %d"%len(electron_fourVec[j]))
-			if (len(min_tau_mu[j]) != len(muon_fourVec[j])):
-				print("!!Electron electron-tau dR mismatch!!")
-				print("Min Muon-tau dR length: %d"%len(min_tau_mu[j]))
-				print("Moun length: %d"%len(muon_fourVec[j]))
+		#Some sort of debugging thing I don't remember why I put this in 
+		#for j in range(ak.num(tau,axis=0)): #Debugging work
+		#	if (len(min_tau_ele[j]) != len(electron_fourVec[j])):
+		#		print("!!Electron electron-tau dR mismatch!!")
+		#		print("Min Electron-Tau dR length: %d"%len(min_tau_ele[j]))
+		#		print("Electron length: %d"%len(electron_fourVec[j]))
+		#	if (len(min_tau_mu[j]) != len(muon_fourVec[j])):
+		#		print("!!Electron electron-tau dR mismatch!!")
+		#		print("Min Muon-tau dR length: %d"%len(min_tau_mu[j]))
+		#		print("Moun length: %d"%len(muon_fourVec[j]))
 
-		print("There are %d electrons in total"%ak.sum(ak.num(electron.pt,axis=1)))
-		print("There are %d muons in total"%ak.sum(ak.num(muon.pt,axis=1)))
+		#print("There are %d electrons in total"%ak.sum(ak.num(electron.pt,axis=1)))
+		#print("There are %d muons in total"%ak.sum(ak.num(muon.pt,axis=1)))
 
 		ele_dR_collection = electron_fourVec.delta_r(min_tau_ele)
 		mu_dR_collection = muon_fourVec.delta_r(min_tau_mu)
@@ -893,8 +916,8 @@ class FourTauPlotting(processor.ProcessorABC):
 
 
 		#Delta R Cut on taus (identifiy and remove jets incorrectly reconstructed as taus)
-		a,b = ak.unzip(ak.cartesian([tau,tau], axis = 1, nested = True)) #Create all di-tau pairs
-		select_arr = np.bitwise_and(deltaR(a,b) < 0.8, deltaR(a,b) != 0)
+		#a,b = ak.unzip(ak.cartesian([tau,tau], axis = 1, nested = True)) #Create all di-tau pairs
+		#select_arr = np.bitwise_and(deltaR(a,b) < 0.8, deltaR(a,b) != 0)
 		#for i in range(5):
 		#	print(tau.pt[i]) 
 		#	print(select_arr[i])
@@ -965,83 +988,47 @@ class FourTauPlotting(processor.ProcessorABC):
 			#event_level = event_level[good_events]
 			#muon = muon[good_events]
 			#electron = electron[good_events]
-			#charge_Arr = charge_Arr[good_events]	
+			#charge_Arr = charge_Arr[good_events]
+			#Find all collections of taus with less than 4 events or more than 4 events
+			#n_more_4 = 0
+			#n_less_4 = 0
+			#for x in ak.num(tau.pt,axis=1):
+			#	if (x < 4):
+			#		n_less_4 += 1
+			#	if (x > 4):
+			#		n_more_4 += 1
+			#print("Number of events with 5 or more taus: %d"%n_more_4)
+			#print("Number of events with less than 4 taus: %d"%n_less_4)
+
 	
 			#Obtain leading pair
 			tau_4vec = ak.zip({"t": tau.E, "x": tau.Px, "y": tau.Py, "z": tau.Pz},with_name="Momentum4D")
 			tau_lead,tau_other = ak.unzip(ak.cartesian([tau_4vec[:,0],tau_4vec], axis = 1, nested = False))
 			#deltaR_Arr = deltaR(tau_lead,tau) #Delta R Between leading tau and all other taus in event
-			deltaR_Arr = tau_lead.deltaR(tau_4vec)
+			#print("Tau_lead object:")
+			#type(tau_lead)
+			deltaR_Arr = ak.values_astype(tau_lead, np.float64).deltaR(ak.values_astype(tau_4vec, np.float64))
 			#deltaphi_Arr = delta_phi(tau_lead,tau) #Debugg the delta phi values
-
-			#Construct all delta Rs from all possible pairings
-			#tau_plus,tau_minus = ak.unzip(ak.cartesian(tau[tau.charge > 0],tau[tau.charge < 0]))
-			#tau1,tau2 = ak.unzip(ak.cartesian([tau,tau],axis = 1, nested = False))
-			#deltaR_Full = deltaR(tau1,tau2)
-			#deltaR_Full = deltaR_Full[deltaR_Full != 0] #Remove 0s
-			#dummyIndx = 10
-			#if (len(deltaR_Full) < 10):
-			#	test_range = len(deltaR_Full)
-			#else:
-			#	test_range = 10
-				#test_range = len(deltaR_Full)
-			#print("Delta R of all possible pairings")
-			#for i in range(test_range):
-			#	print(deltaR_Full[i])
-			
-			#Select only taus with oposite charge
-			#leadingTau_Pair = tau[charge_Arr == 0]
-			#deltaR_Arr = deltaR_Arr[charge_Arr == 0]
-			#deltaphi_Arr = deltaphi_Arr[charge_Arr == 0]
 
 			#Remove leading tau from consideration
 			leadingTau_Pair = tau[deltaR_Arr != 0]
-			#deltaphi_Arr = deltaphi_Arr[deltaR_Arr != 0]
 			charge_Arr = charge_Arr[deltaR_Arr != 0]
 			deltaR_Arr = deltaR_Arr[deltaR_Arr != 0]
 
-			#Look at the delta Phi and delta R values
-			#for i in range(len(deltaphi_Arr)):
-			#	for dphi in deltaphi_Arr[i]:
-			#		if (np.abs(dphi) > pi):
-			#			print("!!!Outside Expected Range!!!")
-			#			print(deltaphi_Arr[i])
-			#			print(dphi)
-			#			print(tau[:,0][i].phi)
-			#			print(leadingTau_Pair[i].phi)
-
-			#print("Charges of all possible pairings")
-			#for i in range(test_range):
-			#	print(charge_Arr[i])
-		
 			#Select OS tau that minimizes delta R	
 			leadingTau_Pair = leadingTau_Pair[deltaR_Arr == ak.min(deltaR_Arr,axis=1)] #Paired tau is selected as the one that minimized deltaR with leading tau
-			#deltaphi_Arr = deltaphi_Arr[deltaR_Arr == ak.min(deltaR_Arr,axis=1)]
 			charge_Arr = charge_Arr[deltaR_Arr == ak.min(deltaR_Arr,axis=1)]
 			deltaR_Arr = ak.min(deltaR_Arr,axis=1)
 			pair1_charge = charge_Arr
 	
-			#print("Leading pair Minimized delta R:")
-			#for i in range(test_range):
-			#	print(deltaR_Arr[i])
-
-			#print("Charge of leading Piar")
-			#for i in range(test_range):
-			#	print(pair1_charge[i])
-			
-			zerocharge = pair1_charge[pair1_charge == 0]
-			zerocharge = zerocharge[ak.num(zerocharge,axis=1) > 0]
-			nonZerocharge = pair1_charge[pair1_charge != 0]
-			nonZerocharge = nonZerocharge[ak.num(nonZerocharge,axis=1) > 0]
-
-			numZeroCharge_lead = ak.num(zerocharge,axis=0)
-			numNonZeroCharge_lead = ak.num(nonZerocharge,axis=0)
-
-			#print("There are %d leading pairs with an electric charge of 0"%numZeroCharge_lead)
-			#print("There are %d leading pairs with an electric charge of +/- 2"%numNonZeroCharge_lead)
-
 			#Remove any empty/invalid pairings
 			tau = tau[ak.num(leadingTau_Pair) > 0]
+			#un_matched_tau = 0
+			#for x in ak.num(leadingTau_Pair):
+			#	if (x == 0):
+			#		un_matched_tau += 1
+			#print("Number of unmatched taus: %d"%un_matched_tau)
+			tau_4vec = tau_4vec[ak.num(leadingTau_Pair) > 0]
 			Jet = Jet[ak.num(leadingTau_Pair) > 0]
 			AK8Jet = AK8Jet[ak.num(leadingTau_Pair) > 0]
 			muon = muon[ak.num(leadingTau_Pair) > 0]
@@ -1050,38 +1037,76 @@ class FourTauPlotting(processor.ProcessorABC):
 			leadingTau_Pair = leadingTau_Pair[ak.num(leadingTau_Pair) > 0]
 
 			#Find second pair
-			tau_lead = tau[tau.pt == tau[:,0].pt]
-			leadingpT = ak.ravel(tau_lead.pt)
+			tau_lead = tau[tau.pt == tau[:,0].pt] #Is this wrong??
+			#doubleLead_taus = 0
+			#for x in ak.num(tau_lead.pt,axis=1):
+			#    if (x != 1):
+			#	    print("x != 0")
+			#	    print(x)
+			#	    doubleLead_taus += 1
+			#print("There are %d double lead tau events"%doubleLead_taus)
+			#tau_lead = tau[:,0]
+
+			tau_lead_4vec = ak.firsts(ak.zip({"t": tau_lead.E, "x": tau_lead.Px, "y": tau_lead.Py, "z": tau_lead.Pz},with_name="Momentum4D"))
+			tau_leadPair_4vec = ak.firsts(ak.zip({"t": leadingTau_Pair.E, "x": leadingTau_Pair.Px, "y": leadingTau_Pair.Py, "z": leadingTau_Pair.Pz},with_name="Momentum4D"))
 
 			leadingPairpT = leadingTau_Pair.pt
-			tau_rem = tau[tau.pt != leadingpT]
-			tau_rem = tau_rem[tau_rem.pt != ak.ravel(leadingPairpT)] #Get Remaining taus
+			tau_rem = tau[ak.values_astype(tau_lead_4vec, np.float64).deltaR(ak.values_astype(tau_4vec, np.float64)) != 0] #Select leading tau by deltaR
+			
+            #Look at how many events have a delta R = 0
+			#n_multiRemove = 0
+			#deltaR_temp_arr = ak.values_astype(tau_lead_4vec, np.float64).deltaR(ak.values_astype(tau_4vec, np.float64)) #Force 64 bit floating point values to prevent eps issues
+			#num_0_arr = ak.num(deltaR_temp_arr[deltaR_temp_arr == 0], axis=1)
+			##metricTable_arr = tau_lead.NanoAODSchema.metric_table(tau) #I can't use metric table since I'm using the base schema not the nanoAOD schema
+			#trouble_indx = 0
+			#for x in num_0_arr:
+			#	if x > 1:
+			#		print(x)
+			#		n_multiRemove += 1
+			#		print("Problem indx four momenta")
+			#		print("E: " + str(tau[trouble_indx].E))
+			#		print("Px: " + str(tau[trouble_indx].Px))
+			#		print("Py: " + str(tau[trouble_indx].Py))
+			#		print("Pz: " + str(tau[trouble_indx].Pz))
+			#		print("Problem index Delta R")
+			#		print(str(deltaR_temp_arr[trouble_indx]))
+			#		for j in range(1,4): #Look at indvidiual delta Rs to confirm the results
+			#			print("Lead " + str(j) + "tau DeltaR: " + str(tau_lead_4vec[trouble_indx].deltaR(tau_4vec[trouble_indx][j])))
+			#			#print("Lead Third DeltaR: " + str(tau_lead_4vec[trouble_indx].deltaR(tau_4vec[trouble_indx][3])))
+			#			#print("Lead Fourth DeltaR: " + str(tau_lead_4vec[trouble_indx].deltaR(tau_4vec[trouble_indx][4])))
+			#		#print("Problem index metric table")
+			#		#print(str(metricTable_arr[trouble_indx]))
+			#	trouble_indx += 1
+			#print("Number of events with multiple removed taus: %d"%n_multiRemove)
+			##Look at how many events have < 3 events left after selection (should be 0 in theory)
+			#n_less3 = 0
+			#for x in ak.num(tau_rem.pt,axis=1):
+			#	if (x < 3):
+			#		n_less3 += 1
+			#print("Number of events with fewer than 3 taus after one tau (in theory) is removed: %d"%n_less3)
+
+			tau_rem_4vec = ak.zip({"t": tau_rem.E, "x": tau_rem.Px, "y": tau_rem.Py, "z": tau_rem.Pz},with_name="Momentum4D")
+			tau_rem = tau_rem[ak.values_astype(tau_leadPair_4vec,np.float64).deltaR(ak.values_astype(tau_rem_4vec,np.float64)) != 0]
+
+			#In theory there should be >= 2 taus left, check this
+			#n_lessthan2 = 0
+			#for x in ak.num(tau_rem):
+			#	if (x < 2):
+			#		print(x)
+			#		n_lessthan2 += 1
+			#print("number with fewer than 2 taus left: %d"%n_lessthan2)
 
 			#Drop events with no oposite signs
 			charge_Arr = totalCharge(tau_rem[:,0],tau_rem)
 		
 			tau_rem_4vec = ak.zip({"t": tau_rem.E, "x": tau_rem.Px, "y": tau_rem.Py, "z": tau_rem.Pz},with_name="Momentum4D")
 			tau_nextlead,tau_rem_other = ak.unzip(ak.cartesian([tau_rem_4vec[:,0],tau_rem_4vec], axis = 1, nested = False))
-			#deltaR_Arr = deltaR(tau_nextlead,tau_rem)
-			deltaR_Arr = tau_nextlead.deltaR(tau_rem_4vec)
-
-			#Look at all pairings left
-			#tau3,tau4 = ak.unzip(ak.cartesian([tau_rem,tau_rem], axis=1, nested = False))
-			#deltaR_rem_Full = deltaR(tau3,tau4)
-			#deltaR_rem_Full = deltaR_rem_Full[deltaR_rem_Full != 0]
-			
-			#print("Remaining pairings")
-			#for i in range(test_range):
-			#	print(deltaR_rem_Full[i])
+			deltaR_Arr = ak.values_astype(tau_nextlead,np.float64).deltaR(ak.values_astype(tau_rem_4vec,np.float64))
 
 			#Remove leading tau
 			leadingTau_NextPair = tau_rem[deltaR_Arr != 0]
 			deltaR_temp = deltaR_Arr[deltaR_Arr != 0]
 			charge_Arr = charge_Arr[deltaR_Arr != 0]
-			
-			#print("Charges of all possible pairings")
-			#for i in range(test_range):
-			#	print(charge_Arr[i])
 			
 			#Select pair that minimizes delta R	
 			leadingTau_NextPair = leadingTau_NextPair[deltaR_temp == ak.min(deltaR_temp,axis=1)]
@@ -1096,22 +1121,18 @@ class FourTauPlotting(processor.ProcessorABC):
 			#print("Charge of subleading Piar")
 			#for i in range(test_range):
 			#	print(pair2_charge[i])
-
-			zerocharge = pair2_charge[pair2_charge == 0]
-			zerocharge = zerocharge[ak.num(zerocharge,axis=1) > 0]
-			nonZerocharge = pair2_charge[pair2_charge != 0]
-			nonZerocharge = nonZerocharge[ak.num(nonZerocharge,axis=1) > 0]
-			
-			numZeroCharge_sublead = ak.num(zerocharge,axis=0)
-			numNonZeroCharge_sublead = ak.num(nonZerocharge,axis=0)
-
+	
 			#print("There are %d subleading pairs with an electric charge of 0"%numZeroCharge_sublead)
 			#print("There are %d subleading pairs with an electric charge of +/- 2"%numNonZeroCharge_sublead)
 
 			#Determine what is signal and what is faking signal (if sum and product of total charge of both pairs are 0 than it's signal otherwise it's a fake)
 			#print("Tau length for debugging (pre signal condition)")
 			#print(len(tau))
-			signal_cond = np.bitwise_and(ak.all(pair1_charge + pair2_charge,axis=1) == 0, ak.all(pair1_charge * pair2_charge,axis=1) == 0)
+			#print(ak.num(pair1_charge,axis=0))
+			#print(ak.num(pair2_charge,axis=0))
+			#foo1 = pair1_charge + pair2_charge
+			#foo2 = pair1_charge * pair2_charge
+			#signal_cond = np.bitwise_and(ak.all(pair1_charge + pair2_charge,axis=1) == 0, np.sign(ak.all(pair1_charge * pair2_charge,axis=1)) == -1) #Had previoulsy been 0 which I think is wrong
     
 			#Drop all but signal (OSOS Higgs)
 			#tau_rem = tau_rem[signal_cond]
@@ -1129,8 +1150,23 @@ class FourTauPlotting(processor.ProcessorABC):
 			#print("Tau length for debugging (post signal condition)")
 			#print(len(tau))
 			
+			#num_leadTau_0 = 0
+			#for x in ak.num(tau_lead.pt,axis=1):
+			#	if (x != 1):
+			#		num_leadTau_0 += 1
+			#		print(x)
+			#print("Number of incorrect leading tau events (before empty/invalid pair removal code):")
+			#print(num_leadTau_0)
+
+			##Take a look at what's being dropped
+			#print("What's being dropped:")
+			#for pt in tau_lead[ak.num(leadingTau_NextPair) == 0]:
+			#	print(pt)
+			
 			#Remove any empty/invalid pairings (this may be vegistal at best but I'm not sure)
 			tau_lead = tau_lead[ak.num(leadingTau_NextPair) != 0]
+			#print("Here's what the selection array looks like:")
+			#print(ak.num(leadingTau_NextPair) != 0)
 			leadingTau_Pair = leadingTau_Pair[ak.num(leadingTau_NextPair) != 0]
 			tau_rem = tau_rem[ak.num(leadingTau_NextPair) != 0]
 			tau = tau[ak.num(leadingTau_NextPair) != 0]
@@ -1149,12 +1185,30 @@ class FourTauPlotting(processor.ProcessorABC):
 			#print("Next Leading Tau Pair %d"%len(leadingTau_NextPair))
 			#print(leadingTau_NextPair.pt)
 
+			#num_leadTau_0 = 0
+			#for x in ak.num(tau_lead.pt,axis=1):
+			#	if (x != 1):
+			#		num_leadTau_0 += 1
+			#		print(x)
+			#print("Number of incorrect leading tau events:")
+			#print(num_leadTau_0)
+
+
 			#Reconstruct tau object in order of pairings 
 			tau = ak.concatenate((tau_lead,leadingTau_Pair),axis=1)
 			tau = ak.concatenate((tau,tau_nextlead),axis=1)
 			tau = ak.concatenate((tau,leadingTau_NextPair),axis=1)
-		
+
 			#Determine if taus match to lepton (e or mu) and make sutiable replacements
+			#print("Number of 4tau events: %d"%ak.num(tau.pt,axis=0))
+			##print(ak.num(tau.pt,axis=1))
+			#non_4_events = 0
+			#for x in ak.num(tau.pt,axis=1):
+			#	if (x != 4):
+			#		print(x)
+			#		non_4_events +=1
+			#print("There are %d events that don't have 4 taus"%non_4_events)
+			
 			lead_tau = ak.zip({"t": tau[:,0].E,"x": tau[:,0].Px, "y": tau[:,0].Py,"z" : tau[:,0].Pz},with_name = "Momentum4D")
 			leadingpair_tau = ak.zip({"t": tau[:,1].E,"x": tau[:,1].Px, "y": tau[:,1].Py,"z" : tau[:,1].Pz},with_name = "Momentum4D")
 			sublead_tau = ak.zip({"t": tau[:,2].E,"x": tau[:,2].Px, "y": tau[:,2].Py,"z" : tau[:,2].Pz},with_name = "Momentum4D")
@@ -1205,29 +1259,30 @@ class FourTauPlotting(processor.ProcessorABC):
 				n_4had_gen = 0
 				n_3had_1e_gen = 0
 				n_3had_1mu_gen = 0
-
-				for evnt in range(len(Good_GenTau)):
-					print(gen_had_arr[evnt])
-					if (gen_had_arr[evnt] + gen_muon_arr[evnt] + gen_elec_arr[evnt] > 4):
-						print("!!!Too many gen level particles!!!!!")
-						print("Electrons from tau: %d"%gen_elec_arr[evnt])
-						print("Muons from tau: %d"%gen_muon_arr[evnt])
-						print("Hardonic taus: %d"%gen_had_arr[evnt])
-					if (gen_had_arr[evnt] + gen_muon_arr[evnt] + gen_elec_arr[evnt] < 4):
-						print("!!!Too few gen level particles!!!!!!")
-						print("Electrons from tau: %d"%gen_elec_arr[evnt])
-						print("Muons from tau: %d"%gen_muon_arr[evnt])
-						print("Hardonic taus: %d"%gen_had_arr[evnt])
-					if (gen_had_arr[evnt] == 4):
-						n_4had_gen += 1
-					if (gen_had_arr[evnt] == 3 and gen_muon_arr[evnt] == 1):
-						n_3had_1mu_gen += 1
-					if (gen_had_arr[evnt] == 3 and gen_elec_arr[evnt] == 1):
-						n_3had_1e_gen += 1
-				
-				print("Fraction of gen 4 hadron decays: %.3f"%(n_4had_gen/len(gen_elec_arr)))	
-				print("Fraction of gen 3 hadron 1 electron decays: %.3f"%(n_3had_1e_gen/len(gen_elec_arr)))	
-				print("Fraction of gen 3 hadron 1 muon decays: %.3f"%(n_3had_1mu_gen/len(gen_elec_arr)))	
+                
+                #Truth debugging print statements
+			#	for evnt in range(len(Good_GenTau)):
+			#		print(gen_had_arr[evnt])
+			#		if (gen_had_arr[evnt] + gen_muon_arr[evnt] + gen_elec_arr[evnt] > 4):
+			#			print("!!!Too many gen level particles!!!!!")
+			#			print("Electrons from tau: %d"%gen_elec_arr[evnt])
+			#			print("Muons from tau: %d"%gen_muon_arr[evnt])
+			#			print("Hardonic taus: %d"%gen_had_arr[evnt])
+			#		if (gen_had_arr[evnt] + gen_muon_arr[evnt] + gen_elec_arr[evnt] < 4):
+			#			print("!!!Too few gen level particles!!!!!!")
+			#			print("Electrons from tau: %d"%gen_elec_arr[evnt])
+			#			print("Muons from tau: %d"%gen_muon_arr[evnt])
+			#			print("Hardonic taus: %d"%gen_had_arr[evnt])
+			#		if (gen_had_arr[evnt] == 4):
+			#			n_4had_gen += 1
+			#		if (gen_had_arr[evnt] == 3 and gen_muon_arr[evnt] == 1):
+			#			n_3had_1mu_gen += 1
+			#		if (gen_had_arr[evnt] == 3 and gen_elec_arr[evnt] == 1):
+			#			n_3had_1e_gen += 1
+			#	
+			#	print("Fraction of gen 4 hadron decays: %.3f"%(n_4had_gen/len(gen_elec_arr)))	
+			#	print("Fraction of gen 3 hadron 1 electron decays: %.3f"%(n_3had_1e_gen/len(gen_elec_arr)))	
+			#	print("Fraction of gen 3 hadron 1 muon decays: %.3f"%(n_3had_1mu_gen/len(gen_elec_arr)))	
 
 			
 			#Old style implementation (mostly awkward free)
@@ -1290,14 +1345,14 @@ class FourTauPlotting(processor.ProcessorABC):
 				if (n_muon_array[n] == 1 and n_hadron_array[n] == 3):
 					n_3had_1muon += 1
 
-			print("==========Checking the branching factions==========")
-			print("Observed fraction of 4 hadron fraction: %.3f"%(n_4had/len(n_hadron_array)))
-			print("Expcted fraction of 4 hadron fraction: %.3f"%((2/3)**4))
-			print("Observed fraction of 3 hadron + 1 electron fraction: %.3f"%(n_3had_1elec/len(n_hadron_array)))
-			print("Expcted fraction of 3 hadron + 1 electron fraction: %.3f"%((2/3)**3*(1/6)))
-			print("Observed fraction of 3 hadron + 1 muon fraction: %.3f"%(n_3had_1muon/len(n_hadron_array)))
-			print("Expcted fraction of 3 hadron + 1 muon fraction: %.3f"%((2/3)**3*(1/6)))
-			print("==========End Mostly Awkward Free Algorithm==========")
+			#print("==========Checking the branching factions==========")
+			#print("Observed fraction of 4 hadron fraction: %.3f"%(n_4had/len(n_hadron_array)))
+			#print("Expcted fraction of 4 hadron fraction: %.3f"%((2/3)**4))
+			#print("Observed fraction of 3 hadron + 1 electron fraction: %.3f"%(n_3had_1elec/len(n_hadron_array)))
+			#print("Expcted fraction of 3 hadron + 1 electron fraction: %.3f"%((2/3)**3*(1/6)))
+			#print("Observed fraction of 3 hadron + 1 muon fraction: %.3f"%(n_3had_1muon/len(n_hadron_array)))
+			#print("Expcted fraction of 3 hadron + 1 muon fraction: %.3f"%((2/3)**3*(1/6)))
+			#print("==========End Mostly Awkward Free Algorithm==========")
 		
 			#Awkward implementation
 			for i in range(4):
@@ -2032,9 +2087,13 @@ if __name__ == "__main__":
 	#Locations of files
 	signal_base = "root://cmseos.fnal.gov//store/user/abdollah/SkimBoostedHH4t/2018/4t/v2_Hadd/GluGluToRadionToHHTo4T_M-"
 	#background_base = "root://cmseos.fnal.gov//store/user/abdollah/SkimBoostedHH4t/2018/4t/v2_Hadd/"	
-	background_base = "/hdfs/store/user/twnelson/HH4Tau_EtAl/Skimmed_Files/2018/MC/" #ZZTo4L_25February25_0413_skim__skim_Feb25/ #NanoAOD files
+	#background_base = "/hdfs/store/user/twnelson/HH4Tau_EtAl/Skimmed_Files/2018/MC/" #ZZTo4L_25February25_0413_skim__skim_Feb25/ #NanoAOD files
+	#background_base = "/hdfs/store/user/twnelson/HH4Tau_EtAl/Skimmed_Files/2018/MC/"
+	#background_base = "root://cmsxrootd.hep.wisc.edu:1094//store/user/twnelson/HH4Tau_EtAl/Skimmed_Files/2018/MC/" #ZZTo4L_25February25_0413_skim__skim_Feb25/ #NanoAOD files
+	background_base = "root://cms-xrd-global.cern.ch//store/user/twnelson/HH4Tau_EtAl/Skimmed_Files/2018/MC/" #ZZTo4L_25February25_0413_skim__skim_Feb25/ #NanoAOD files
+	background_loc = "/hdfs/store/user/twnelson/HH4Tau_EtAl/Skimmed_Files/2018/MC/" #ZZTo4L_25February25_0413_skim__skim_Feb25/ #NanoAOD files
 	#background_base = "" #For testing nanoAOD just dumped one ZZ4l root file into here, not scalable though 
-	data_loc = "root://cmseos.fnal.gov//store/user/abdollah/SkimBoostedHH4t/2018/4t/v2_Hadd/"
+	#data_loc = "root://cmseos.fnal.gov//store/user/abdollah/SkimBoostedHH4t/2018/4t/v2_Hadd/"
 	
 	#signal_base = "hdfs/store/user/abdollah/SkimBoostedHH4t/2018/4t/v2_Hadd/GluGluToRadionToHHTo4T_M-"
 	#background_base = "hdfs/store/user/abdollah/SkimBoostedHH4t/2018/4t/v2_Hadd/"	
@@ -2042,51 +2101,74 @@ if __name__ == "__main__":
 	
 	#signal_base = "root://cmseos.fnal.gov//store/user/abdollah/SkimBoostedHH4t/2018/4t/v2/GluGluToRadionToHHTo4T_M-"
 	#background_base = "root://cmseos.fnal.gov//store/user/abdollah/SkimBoostedHH4t/2018/4t/v2/"	
-	#data_loc = "root://cmseos.fnal.gov//store/user/abdollah/SkimBoostedHH4t/2018/4t/v2/"
+	data_loc = "root://cmseos.fnal.gov//store/user/abdollah/SkimBoostedHH4t/2018/4t/v2/"
 
+	#Xrootd crap
+#	try:
+#	    _x509_path = (
+#        [
+#				line
+#				for line in os.popen("voms-proxy-info").read().split("\n")
+#				if line.startswith("path")
+#			][0]
+#			.split(":")[-1]
+#			.strip()
+#	    )
+#	except Exception as err:
+#		print(f"Could not find voms proxy, but continuing anyway.")
+#		print("Xrootd transfers will most likely fail.")
+        #return None
+
+	_x509_path = move_X509()
+	print(f"x509 path: {_x509_path}")
 	#Condor related stuff
 	os.environ["CONDOR_CONFIG"] = "/etc/condor/condor_config"
-	htc_log_err_dir = "/nfs_scratch/twnelson/ControlPlot_HTC/Run_" + str(time.localtime()[0]) + "_" + str(time.localtime()[1]) + "_" + str(time.localtime()[2]) + "_" + str(time.localtime()[3]) + f".{time.localtime()[4]:02d}"
-	os.makedirs(htc_log_err_dir)
+	#htc_log_err_dir = "/scratch/twnelson/ControlPlot_HTC/Run_" + str(time.localtime()[0]) + "_" + str(time.localtime()[1]) + "_" + str(time.localtime()[2]) + "_" + str(time.localtime()[3]) + f".{time.localtime()[4]:02d}"
+	#os.makedirs(htc_log_err_dir)
+	
 	cluster = HTCondorCluster(
-		cores=2,
-		memory="4 GB",
-		disk = "2 GB",
-		death_timeout = "60",
-		#python="/usr/bin/python3.9/", #This should be correct but I'm seeing errors corresponding to this line 
-		#python="/usr/local/bin/python3",
-	    #python="/usr/local/bin/python3.10", #This should be correct but I'm seeing errors corresponding to this line 
-		#python="/usr/local/lib/python3.10", #This should be correct but I'm seeing errors corresponding to this line 
-		job_extra_directives = {#"SingularityImage": "/cvmfs/unpacked.cern.ch/registry.hub.docker.com/coffeateam/coffea-base-almalinux8:0.7.26-py3.10",
-								"SingularityImage": "/cvmfs/unpacked.cern.ch/registry.hub.docker.com/coffeateam/coffea-dask-cc7:latest-py3.10",
-								#"SingularityImage": "docker://docker.io/coffeateam/coffea-base-almalinux9:0.7.26-py3.10",
-								#"SingularityImage": "/cvmfs/unpacked.cern.ch/registry.hub.docker.com/coffeateam/coffea-base-almalinux9:0.7.26-py3.10",
-								#"+JobFlavour": '"tomorrow"',
-								"log": "dask_job_output.$(PROCESS).$(CLUSTER).log",
-								"output": "dask_job_output.$(PROCESS).$(CLUSTER).out",
-								"error": "dask_job_output.$(PROCESS).$(CLUSTER).err",
-								"when_to_transfer_output": "ON_EXIT_OR_EVICT",
-								#"InitialDir": f"/nfs_scratch/{os.environ['USER']}",
-								"InitialDir": htc_log_err_dir,
-								#"InitialDir": f"/nfs_scratch/twnelson/ControlPlot_HTC/",
-								#"InitialDir": "~/Analysis/BoostedTau/ControlPlots/RadionBoostedHiggsAnalysisPlots",
-								#"InitialDir": background_base + "ZZTo4L_25February25_0413_skim__skim_Feb25",
-								#"InitialDir": f"/scratch/{os.environ['USER']}",
-								'transfer_input_files': background_base + "ZZTo4L_25February25_0413_skim__skim_Feb25/singleFileSkimForSubmission-NANO_NANO_411.root",
-			},
-			job_script_prologue=[
+            cores=1,
+            memory="5 GB",
+            disk="1.5 GB",
+            death_timeout = '60',
+            job_extra_directives={
+                "+JobFlavour": '"tomorrow"',
+                "log": "dask_job_output.$(PROCESS).$(CLUSTER).log",
+                "output": "dask_job_output.$(PROCESS).$(CLUSTER).out",
+                "error": "dask_job_output.$(PROCESS).$(CLUSTER).err",
+                "should_transfer_files": "yes",
+                "when_to_transfer_output": "ON_EXIT_OR_EVICT",
+                "transfer_executable": "false",
+                "+SingularityImage": '"/cvmfs/unpacked.cern.ch/registry.hub.docker.com/coffeateam/coffea-dask-cc7:latest-py3.10"',
+                #"+SingularityImage": '"/cvmfs/unpacked.cern.ch/registry.hub.docker.com/coffeateam/coffea-base-almalinux9:0.7.25-py3.10"',
+                "Requirements": "HasSingularityJobStart",
+                "InitialDir": f'/scratch/{os.environ["USER"]}',
+                'transfer_input_files': f"{_x509_path}",
+
+            },
+            job_script_prologue = [
                 "export XRD_RUNFORKHANDLER=1",
-                #f"export X509_USER_PROXY={_x509_path}",
+                f"export X509_USER_PROXY={_x509_path}"
             ]
-	)
-	cluster.adapt(minimum = 1, maximum = 10)
+    )
+	cluster.adapt(minimum=1, maximum=5)
 
-
-	iterative_runner = processor.Runner(
-		executor = processor.DaskExecutor(client=Client(cluster)),
+	run_on_condor = True
+	
+	if (run_on_condor):
+		iterative_runner = processor.Runner(
+			#executor = processor.DaskExecutor(client=Client(cluster)),
+			executor = processor.DaskExecutor(client=Client(cluster)),
+			schema=BaseSchema,
+			skipbadfiles=True,
+			xrootdtimeout=1000,
+			#executor = processor.DaskExecutor(client=cowtools.GetCondorClient(container_image="/cvmfs/unpacked.cern.ch/registry.hub.docker.com/coffeateam/coffea-base-almalinux9:0.7.25-py3.10")),
+			#executor = processor.DaskExecutor(client=cowtools.GetCondorClient(cluster,container_image="/cvmfs/unpacked.cern.ch/registry.hub.docker.com/coffeateam/coffea-base-almalinux9:0.7.25-py3.10")),
 		#executor = processor.IterativeExecutor(compression=None), #This needs to be changed
-		schema=BaseSchema
-	)
+		)
+	else:
+		#iterative_runner = processor.Runner(executor = processor.FuturesExecutor(), schema=BaseSchema)
+		iterative_runner = processor.Runner(executor = processor.IterativeExecutor(), schema=BaseSchema)
 	#four_tau_hist_list = ["FourTau_Mass_Arr","HiggsDeltaPhi_Arr", "Higgs_DeltaR_Arr","leading_dR_Arr","subleading_dR_Arr","LeadingHiggs_mass","SubLeadingHiggs_mass", "radionPT_Arr", "tau_pt_Arr", 
 	#		"tau_eta_Arr","ZMult_Arr", "BJet_Arr", "tau_lead_pt_Arr", "tau_sublead_pt_Arr", "tau_3rdlead_pt_Arr", "tau_4thlead_pt_Arr", "leading_dPhi_Arr", "subleading_dPhi_Arr", 
 	#		"radionMET_dPhi_Arr","leadingHiggs_Rad_dR_Arr","subleadingHiggs_Rad_dR_Arr","leadingHiggs_MET_dPhi_Arr","subleadingHiggs_MET_dPhi_Arr","Radion_eta_Arr", "Radion_Charge_Arr"]
@@ -2119,16 +2201,21 @@ if __name__ == "__main__":
 			data = f2["pileup"].values()
 			HistoPUMC = np.divide(mc, ak.sum(mc))
 			HistoPUData = np.divide(data, ak.sum(data))
-			PUWeight = np.divide(HistoPUData, HistoPUMC)	
+			PUWeight = np.divide(HistoPUData, HistoPUMC) #	
+			#PUWeight = np.ones(len(mc))
 
 
 	#Loop over all mass points
 	for mass in mass_str_arr:
 		print("====================Radion Mass = " + mass[0] + "." + mass[1] + " TeV====================")
+		#print(np.char.replace(np.array( os.listdir(background_loc + "ZZTo4L_25February25_0413_skim__skim_Feb25/")), "", background_loc + "ZZTo4L_25February25_0413_skim__skim_Feb25/",1).tolist())
 		file_dict = { #Reduced files to run over
-			"ZZ4l": [background_base + "ZZTo4L_25February25_0413_skim__skim_Feb25/singleFileSkimForSubmission-NANO_NANO_411.root"],
+			#"ZZ4l": [background_base + "ZZTo4L_25February25_0413_skim__skim_Feb25/singleFileSkimForSubmission-NANO_NANO_411.root"],
 			#"ZZ4l": ["singleFileSkimForSubmission-NANO_NANO_411.root"],
-			#"ZZ4l": np.char.replace(np.array( os.listdir(background_base + "ZZTo4L_25February25_0413_skim__skim_Feb25/")), "", background_base + "ZZTo4L_25February25_0413_skim__skim_Feb25/",1).tolist(), #Run over all minAOD files
+			"ZZ4l": np.char.replace(np.array( os.listdir(background_loc + "ZZTo4L_25February25_0413_skim__skim_Feb25/")), "", background_base + "ZZTo4L_25February25_0413_skim__skim_Feb25/",1).tolist(), #Run over allnanoAOD files
+			#"ZZ4l": np.char.replace(np.array( os.listdir(background_loc + "ZZ4l_Small_Sample/")), "", background_base + "ZZ4l_Small_Sample/",1).tolist(), #Run over allnanoAOD files
+			#"ZZ4l": np.char.replace(np.array( os.listdir(background_loc + "Hadd_ZZTo4L/")), "", background_base + "Hadd_ZZTo4L/",1).tolist(), #Run over allnanoAOD files
+			#"ZZ4l": [background_base + "Hadd_ZZTo4L/ZZTo4L_Hadd_9.root"],
 			
 			#"DYJetsToLL_Pt-50To100": [background_base + "DYJetsToLL_Pt-50To100.root"] ,
 			#"DYJetsToLL_Pt-100To250": [ background_base + "DYJetsToLL_Pt-100To250.root"], 
@@ -2143,6 +2230,8 @@ if __name__ == "__main__":
   
         }
 
+		#file_dict["ZZ4l"].remove("root://cms-xrd-global.cern.ch//store/user/twnelson/HH4Tau_EtAl/Skimmed_Files/2018/MC/Hadd_ZZTo4L/ZZTo4L_Hadd_9.root") #Remove file 9 to fix errors (maybe?)
+
 		file_dict_signal_only = {
 		#file_dict = {
 			"Signal": [signal_base + mass + ".root"]
@@ -2150,33 +2239,37 @@ if __name__ == "__main__":
 		
 		#Grand Unified Background + Signal + Data Dictionary links file name to location of root file
 		file_dict_full = {
-			"TTToSemiLeptonic": [background_base + "TTToSemiLeptonic.root"], "TTTo2L2Nu": [background_base + "TTTo2L2Nu.root"], "TTToHadronic": [background_base + "TTToHadronic.root"],
-			"ZZ4l": [background_base + "ZZ4l.root"],  
-			"VV2l2nu" : [background_base + "VV2l2nu.root"], 
-			"WZ1l3nu" : [background_base + "WZ1l3nu.root"], 
-			"WZ3l1nu" : [background_base + "WZ3l1nu.root"], 
-			"ZZ2l2q" : [background_base + "ZZ2l2q.root"], 
-			"WZ2l2q" : [background_base + "WZ2l2q.root"], 
-			"WZ1l1nu2q" : [background_base + "WZ1l1nu2q.root"],
-			"DYJetsToLL_Pt-50To100": [background_base + "DYJetsToLL_Pt-50To100.root"] ,
-			"DYJetsToLL_Pt-100To250": [ background_base + "DYJetsToLL_Pt-100To250.root"], 
-			"DYJetsToLL_Pt-250To400": [ background_base + "DYJetsToLL_Pt-250To400.root"], 
-			"DYJetsToLL_Pt-400To650": [ background_base + "DYJetsToLL_Pt-400To650.root"], 
-			"DYJetsToLL_Pt-650ToInf": [background_base + "DYJetsToLL_Pt-650ToInf.root"],
-			"Tbar-tchan" : [background_base + "Tbar-tchan.root"], 
-			"T-tchan" : [background_base + "T-tchan.root"], 
-			"Tbar-tW" : [background_base + "Tbar-tW.root"], 
-			"T-tW" : [background_base + "T-tW.root"],
-			"WJetsToLNu_HT-100To200" : [background_base + "WJetsToLNu_HT-100To200.root"],
-			"WJetsToLNu_HT-200To400" : [background_base + "WJetsToLNu_HT-200To400.root"], 
-			"WJetsToLNu_HT-400To600" : [background_base + "WJetsToLNu_HT-400To600.root"], 
-			"WJetsToLNu_HT-600To800" : [background_base + "WJetsToLNu_HT-600To800.root"],
-			"WJetsToLNu_HT-800To1200" : [background_base + "WJetsToLNu_HT-800To1200.root"],
-			"WJetsToLNu_HT-1200To2500" : [background_base + "WJetsToLNu_HT-1200To2500.root"],
-			"WJetsToLNu_HT-2500ToInf" : [background_base + "WJetsToLNu_HT-2500ToInf.root"],
-			"Signal": [signal_base + mass + ".root"],
-			"Data_SingleMuon": [data_loc + "SingleMu_Run2018A.root", data_loc + "SingleMu_Run2018B.root", data_loc + "SingleMu_Run2018C.root", data_loc + "SingleMu_Run2018D.root"],
-			"Data_JetHT": [data_loc + "JetHT_Run2018A-17Sep2018-v1.root", data_loc + "JetHT_Run2018B-17Sep2018-v1.root", data_loc + "JetHT_Run2018C-17Sep2018-v1.root",data_loc + "JetHT_Run2018D-PromptReco-v2.root"]
+			"TTToSemiLeptonic": np.char.replace(np.array( os.listdir(background_loc + "TTToSemiLeptonic_28February25_0848_skim__skim_Feb25/")), "", background_base + "TTToSemiLeptonic_28February25_0848_skim__skim_Feb25/",1).tolist(), 
+			"TTTo2L2Nu": np.char.replace(np.array( os.listdir(background_loc + "TTTo2L2Nu_28February25_0613_skim__skim_Feb25/")), "", background_base + "TTTo2L2Nu_28February25_0613_skim__skim_Feb25/",1).tolist(), 
+			"TTToHadronic": np.char.replace(np.array( os.listdir(background_loc + "/")), "", background_base + "/",1).tolist(),
+			"ZZ4l": np.char.replace(np.array( os.listdir(background_loc + "ZZTo4L_25February25_0413_skim__skim_Feb25/")), "", background_base + "ZZTo4L_25February25_0413_skim__skim_Feb25/",1).tolist(), 
+			#"VV2l2nu" : [background_base + "VV2l2nu.root"], 
+			"VV2l2nu" : np.char.replace(np.array( os.listdir(background_loc + "WWTo2L2Nu_28February25_1013_skim__skim_Feb25/")), "", background_base + "WWTo2L2Nu_28February25_1013_skim__skim_Feb25/",1).tolist(), 
+			"WZ1l3nu" : np.char.replace(np.array( os.listdir(background_loc + "WZTo1L3Nu_4f_28February25_0951_skim__skim_Feb25/")), "", background_base + "WZTo1L3Nu_4f_28February25_0951_skim__skim_Feb25/",1).tolist(), 
+			#"WZ3l1nu" : np.char.replace(np.array( os.listdir(background_loc + "/")), "", background_base + "/",1).tolist(),  #Needs to be added ASAP!!
+			"ZZ2l2q" : np.char.replace(np.array( os.listdir(background_loc + "ZZTo2Q2L_28February25_0959_skim__skim_Feb25/")), "", background_base + "ZZTo2Q2L_28February25_0959_skim__skim_Feb25/",1).tolist(), 
+			#"WZ2l2q" : np.char.replace(np.array( os.listdir(background_loc + "/")), "", background_base + "/",1).tolist(), #This one missing too???
+			"WZ1l1nu2q" : np.char.replace(np.array( os.listdir(background_loc + "WZTo1L1Nu2Q_28February25_0800_skim__skim_Feb25/")), "", background_base + "WZTo1L1Nu2Q_28February25_0800_skim__skim_Feb25/",1).tolist(),
+			"DYJetsToLL_Pt-50To100": np.char.replace(np.array( os.listdir(background_loc + "DYJetsToLL_M-50_HT-100to200_28February25_1006_skim__skim_Feb25/")), "", background_base + "DYJetsToLL_M-50_HT-100to200_28February25_1006_skim__skim_Feb25/",1).tolist(),
+			"DYJetsToLL_Pt-100To250": np.char.replace(np.array( os.listdir(background_loc + "/")), "", background_base + "/",1).tolist(), 
+			"DYJetsToLL_Pt-250To400": np.char.replace(np.array( os.listdir(background_loc + "/")), "", background_base + "/",1).tolist(), 
+			"DYJetsToLL_Pt-400To650": np.char.replace(np.array( os.listdir(background_loc + "/")), "", background_base + "/",1).tolist(), 
+			"DYJetsToLL_Pt-650ToInf": np.char.replace(np.array( os.listdir(background_loc + "/")), "", background_base + "/",1).tolist(),
+			"Tbar-tchan" : np.char.replace(np.array( os.listdir(background_loc + "/")), "", background_base + "/",1).tolist(), 
+			"T-tchan" : np.char.replace(np.array( os.listdir(background_loc + "/")), "", background_base + "/",1).tolist(), 
+			"Tbar-tW" : np.char.replace(np.array( os.listdir(background_loc + "/")), "", background_base + "/",1).tolist(), 
+			"T-tW" : np.char.replace(np.array( os.listdir(background_loc + "/")), "", background_base + "/",1).tolist(),
+			"WJetsToLNu_HT-100To200" : np.char.replace(np.array( os.listdir(background_loc + "/")), "", background_base + "/",1).tolist(),
+			"WJetsToLNu_HT-200To400" : np.char.replace(np.array( os.listdir(background_loc + "/")), "", background_base + "/",1).tolist(), 
+			"WJetsToLNu_HT-400To600" : np.char.replace(np.array( os.listdir(background_loc + "/")), "", background_base + "/",1).tolist(), 
+			"WJetsToLNu_HT-600To800" : np.char.replace(np.array( os.listdir(background_loc + "/")), "", background_base + "/",1).tolist(),
+			"WJetsToLNu_HT-800To1200" : np.char.replace(np.array( os.listdir(background_loc + "/")), "", background_base + "/",1).tolist(),
+			"WJetsToLNu_HT-1200To2500" : np.char.replace(np.array( os.listdir(background_loc + "/")), "", background_base + "/",1).tolist(),
+			"WJetsToLNu_HT-2500ToInf" : np.char.replace(np.array( os.listdir(background_loc + "/")), "", background_base + "/",1).tolist(),
+			
+			#"Signal": [signal_base + mass + ".root"],
+			#"Data_SingleMuon": [data_loc + "SingleMu_Run2018A.root", data_loc + "SingleMu_Run2018B.root", data_loc + "SingleMu_Run2018C.root", data_loc + "SingleMu_Run2018D.root"],
+			#"Data_JetHT": [data_loc + "JetHT_Run2018A-17Sep2018-v1.root", data_loc + "JetHT_Run2018B-17Sep2018-v1.root", data_loc + "JetHT_Run2018C-17Sep2018-v1.root",data_loc + "JetHT_Run2018D-PromptReco-v2.root"]
 		}
 		
 		#Generate dictionary of number of processed events This logic needs fixing
@@ -2482,10 +2575,18 @@ if __name__ == "__main__":
 								fig2, ax2 = plt.subplots()
 								if (hist_name != "Electron_tau_dR_Arr" and hist_name != "Muon_tau_dR_Arr"):
 									hist_dict_single_background[hist_name].fill(fourtau_out[background][hist_name],weight = fourtau_out[background]["Weight"]) #Obtain background distributions 
+
+									#print(hist_dict_single_background[hist_name].values())
 									hist_dict_single_background[hist_name].plot1d(ax=ax2)
 									plt.title(background_type)
 									plt.savefig("SingleBackground" + background_plot_names[background_type] + four_tau_names[hist_name])
 									plt.close()
+									#print("Bin information for " + hist_name)
+									#center_arr = hist_dict_single_background[hist_name].axes.centers[0]
+									#count_arr = hist_dict_single_background[hist_name].counts()
+									#for n in range(hist_dict_single_background[hist_name].axes.size[0]):
+									#	print(f"Bin #{n}, center at {center_arr[n]}: {count_arr[n]}")
+
 								else: #lepton-tau delta R 
 									#hist_dict_single_background[hist_name].fill(fourtau_out[background][hist_name]) #Obtain background distributions 
 									fill_Arr = ak.from_iter(fourtau_out[background][hist_name])
@@ -2514,6 +2615,13 @@ if __name__ == "__main__":
 								#print(fourtau_out[background]["Weight"])
 								hist_dict_background[hist_name].fill(background_type,fourtau_out[background][hist_name],weight = fourtau_out[background]["Weight"]) #Obtain background distributions
 								print("Background %s added"%background)
+								print("Showing histogram:" + hist_name)
+								#hist_dict_background[hist_name].show(background_type)
+                                #print()
+								#center_arr = hist_dict_background[hist_name].axes.centers[0]
+								#count_arr = hist_dict_background[hist_name].counts()
+								#for n in range(hist_dict_background[hist_name].axes.size[0]):
+								#	print(f"Bin #{n}, center at {center_arr[n]}: {count_arr[n]}")
 							if (hist_name == "num_electron_tau_Arr"): # and np.pi == np.exp(1)): #Count final states
 								background_state_array += fin_state_vec(fourtau_out[background]["num_electron_tau_Arr"],fourtau_out[background]["num_muon_tau_Arr"]).tolist()
 
