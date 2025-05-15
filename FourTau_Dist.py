@@ -339,8 +339,8 @@ class FourTauPlotting(processor.ProcessorABC):
 
 			PU_Info = ak.zip({
 				#"puTrue": events.puTrue[:,0] #I have no idea where this info is contained in the nanoAOD
-                "puTrue": events.Pileup_nPU #Possiblity 1
-                #"puTrue": events.Pileup_nTrueInt #Possiblity 2
+                #"puTrue": events.Pileup_nPU #Possiblity 1
+                "puTrue": events.Pileup_nTrueInt #Possiblity 2
                 #"puTrue": events.Pileup_sumLOOT #Possiblity 3
 				},
 				with_name = "PU_Array",
@@ -394,12 +394,12 @@ class FourTauPlotting(processor.ProcessorABC):
 				PU_Corr = self.PUWeights[PU_Arr]
 				event_level["event_weight"] = np.multiply(event_level.event_weight,PU_Corr) #Is this line screwing things up??
 				#Debugg/gest PU reweighting
-				#for i in range(len(event_level.event_weight)):
-				#	if (dummy_weight[i]*PU_Corr[i] != event_level.event_weight[i]):
-				#	    print("!!Event gen weighting mistmatch!!")
-				#	    print("Event weight: %f"%event_level.event_weight[i])
-				#	    print("Expected weight: %f"%dummy_weight[i]*PU_Corr[i])
-				print(event_level.event_weight)
+				for i in range(len(event_level.event_weight)):
+					if (dummy_weight[i]*PU_Corr[i] != event_level.event_weight[i]):
+					    print("!!Event gen weighting mistmatch!!")
+					    print("Event weight: %f"%event_level.event_weight[i])
+					    print("Expected weight: %f"%dummy_weight[i]*PU_Corr[i])
+				#print(event_level.event_weight)
 
 
 
@@ -2204,6 +2204,10 @@ if __name__ == "__main__":
 			PUWeight = np.divide(HistoPUData, HistoPUMC) #	
 			#PUWeight = np.ones(len(mc))
 
+	#Look at the PU Weight values obtained
+	#print("==========!!PU Weight debugging!!==========")
+	#for pu in PUWeight:
+	#	print(pu)
 
 	#Loop over all mass points
 	for mass in mass_str_arr:
@@ -2243,29 +2247,28 @@ if __name__ == "__main__":
 			"TTTo2L2Nu": np.char.replace(np.array( os.listdir(background_loc + "TTTo2L2Nu_28February25_0613_skim__skim_Feb25/")), "", background_base + "TTTo2L2Nu_28February25_0613_skim__skim_Feb25/",1).tolist(), 
 			"TTToHadronic": np.char.replace(np.array( os.listdir(background_loc + "/")), "", background_base + "/",1).tolist(),
 			"ZZ4l": np.char.replace(np.array( os.listdir(background_loc + "ZZTo4L_25February25_0413_skim__skim_Feb25/")), "", background_base + "ZZTo4L_25February25_0413_skim__skim_Feb25/",1).tolist(), 
-			#"VV2l2nu" : [background_base + "VV2l2nu.root"], 
 			"VV2l2nu" : np.char.replace(np.array( os.listdir(background_loc + "WWTo2L2Nu_28February25_1013_skim__skim_Feb25/")), "", background_base + "WWTo2L2Nu_28February25_1013_skim__skim_Feb25/",1).tolist(), 
 			"WZ1l3nu" : np.char.replace(np.array( os.listdir(background_loc + "WZTo1L3Nu_4f_28February25_0951_skim__skim_Feb25/")), "", background_base + "WZTo1L3Nu_4f_28February25_0951_skim__skim_Feb25/",1).tolist(), 
 			#"WZ3l1nu" : np.char.replace(np.array( os.listdir(background_loc + "/")), "", background_base + "/",1).tolist(),  #Needs to be added ASAP!!
 			"ZZ2l2q" : np.char.replace(np.array( os.listdir(background_loc + "ZZTo2Q2L_28February25_0959_skim__skim_Feb25/")), "", background_base + "ZZTo2Q2L_28February25_0959_skim__skim_Feb25/",1).tolist(), 
 			#"WZ2l2q" : np.char.replace(np.array( os.listdir(background_loc + "/")), "", background_base + "/",1).tolist(), #This one missing too???
 			"WZ1l1nu2q" : np.char.replace(np.array( os.listdir(background_loc + "WZTo1L1Nu2Q_28February25_0800_skim__skim_Feb25/")), "", background_base + "WZTo1L1Nu2Q_28February25_0800_skim__skim_Feb25/",1).tolist(),
-			"DYJetsToLL_Pt-50To100": np.char.replace(np.array( os.listdir(background_loc + "DYJetsToLL_M-50_HT-100to200_28February25_1006_skim__skim_Feb25/")), "", background_base + "DYJetsToLL_M-50_HT-100to200_28February25_1006_skim__skim_Feb25/",1).tolist(),
-			"DYJetsToLL_Pt-100To250": np.char.replace(np.array( os.listdir(background_loc + "/")), "", background_base + "/",1).tolist(), 
-			"DYJetsToLL_Pt-250To400": np.char.replace(np.array( os.listdir(background_loc + "/")), "", background_base + "/",1).tolist(), 
-			"DYJetsToLL_Pt-400To650": np.char.replace(np.array( os.listdir(background_loc + "/")), "", background_base + "/",1).tolist(), 
-			"DYJetsToLL_Pt-650ToInf": np.char.replace(np.array( os.listdir(background_loc + "/")), "", background_base + "/",1).tolist(),
-			"Tbar-tchan" : np.char.replace(np.array( os.listdir(background_loc + "/")), "", background_base + "/",1).tolist(), 
-			"T-tchan" : np.char.replace(np.array( os.listdir(background_loc + "/")), "", background_base + "/",1).tolist(), 
-			"Tbar-tW" : np.char.replace(np.array( os.listdir(background_loc + "/")), "", background_base + "/",1).tolist(), 
-			"T-tW" : np.char.replace(np.array( os.listdir(background_loc + "/")), "", background_base + "/",1).tolist(),
-			"WJetsToLNu_HT-100To200" : np.char.replace(np.array( os.listdir(background_loc + "/")), "", background_base + "/",1).tolist(),
-			"WJetsToLNu_HT-200To400" : np.char.replace(np.array( os.listdir(background_loc + "/")), "", background_base + "/",1).tolist(), 
-			"WJetsToLNu_HT-400To600" : np.char.replace(np.array( os.listdir(background_loc + "/")), "", background_base + "/",1).tolist(), 
-			"WJetsToLNu_HT-600To800" : np.char.replace(np.array( os.listdir(background_loc + "/")), "", background_base + "/",1).tolist(),
-			"WJetsToLNu_HT-800To1200" : np.char.replace(np.array( os.listdir(background_loc + "/")), "", background_base + "/",1).tolist(),
-			"WJetsToLNu_HT-1200To2500" : np.char.replace(np.array( os.listdir(background_loc + "/")), "", background_base + "/",1).tolist(),
-			"WJetsToLNu_HT-2500ToInf" : np.char.replace(np.array( os.listdir(background_loc + "/")), "", background_base + "/",1).tolist(),
+			#"DYJetsToLL_Pt-50To100": np.char.replace(np.array( os.listdir(background_loc + "DYJetsToLL_M-50_HT-100to200_28February25_1006_skim__skim_Feb25/")), "", background_base + "DYJetsToLL_M-50_HT-100to200_28February25_1006_skim__skim_Feb25/",1).tolist(),
+			#"DYJetsToLL_Pt-100To250": np.char.replace(np.array( os.listdir(background_loc + "/")), "", background_base + "/",1).tolist(), 
+			#"DYJetsToLL_Pt-250To400": np.char.replace(np.array( os.listdir(background_loc + "/")), "", background_base + "/",1).tolist(), 
+			#"DYJetsToLL_Pt-400To650": np.char.replace(np.array( os.listdir(background_loc + "/")), "", background_base + "/",1).tolist(), 
+			#"DYJetsToLL_Pt-650ToInf": np.char.replace(np.array( os.listdir(background_loc + "/")), "", background_base + "/",1).tolist(),
+			"T-tchan" : np.char.replace(np.array( os.listdir(background_loc + "ST_t-channel_top_4f_InclusiveDecays_28February25_0801_skim__skim_Feb25/")), "", background_base + "ST_t-channel_top_4f_InclusiveDecays_28February25_0801_skim__skim_Feb25/",1).tolist(), 
+			"Tbar-tchan" : np.char.replace(np.array( os.listdir(background_loc + "ST_t-channel_antitop_4f_InclusiveDecays_28February25_0734_skim__skim_Feb25/")), "", background_base + "ST_t-channel_antitop_4f_InclusiveDecays_28February25_0734_skim__skim_Feb25/",1).tolist(), 
+			"T-tW" : np.char.replace(np.array( os.listdir(background_loc + "ST_tW_top_5f_inclusiveDecays_28February25_0656_skim__skim_Feb25/")), "", background_base + "ST_tW_top_5f_inclusiveDecays_28February25_0656_skim__skim_Feb25/",1).tolist(), 
+			"Tbar-tW" : np.char.replace(np.array( os.listdir(background_loc + "ST_tW_antitop_5f_inclusiveDecays_28February25_0714_skim__skim_Feb25/")), "", background_base + "ST_tW_antitop_5f_inclusiveDecays_28February25_0714_skim__skim_Feb25/",1).tolist(),
+			"WJetsToLNu_HT-100To200" : np.char.replace(np.array( os.listdir(background_loc + "WJetsToLNu_HT-100To200_28February25_0723_skim__skim_Feb25/")), "", background_base + "WJetsToLNu_HT-100To200_28February25_0723_skim__skim_Feb25/",1).tolist(),
+			"WJetsToLNu_HT-200To400" : np.char.replace(np.array( os.listdir(background_loc + "WJetsToLNu_HT-200To400_28February25_0658_skim__skim_Feb25/")), "", background_base + "WJetsToLNu_HT-200To400_28February25_0658_skim__skim_Feb25/",1).tolist(), 
+			"WJetsToLNu_HT-400To600" : np.concatenate((np.char.replace(np.array( os.listdir(background_loc + "WJetsToLNu_HT-400To600_28February25_0948_skim__skim_Feb25/")), "", background_base + "WJetsToLNu_HT-400To600_28February25_0948_skim__skim_Feb25/",1).tolist(),np.char.replace(np.array( os.listdir(background_loc + "WJetsToLNu_HT-400To600_OtherPart_28February25_0948_skim__skim_Feb25/")), "", background_base + "/WJetsToLNu_HT-400To600_OtherPart_28February25_0948_skim__skim_Feb25",1).tolist())), 
+			"WJetsToLNu_HT-600To800" : np.concatenate((np.char.replace(np.array( os.listdir(background_loc + "WJetsToLNu_HT-600To800_28February25_0610_skim__skim_Feb25/")), "", background_base + "WJetsToLNu_HT-600To800_28February25_0610_skim__skim_Feb25/",1).tolist(),np.char.replace(np.array( os.listdir(background_loc + "WJetsToLNu_HT-600To800_OtherPart_28February25_0654_skim__skim_Feb25/")), "", background_base + "WJetsToLNu_HT-600To800_OtherPart_28February25_0654_skim__skim_Feb25/",1).tolist())),
+			"WJetsToLNu_HT-800To1200" : np.concatenate((np.char.replace(np.array( os.listdir(background_loc + "WJetsToLNu_HT-800To1200_28February25_0609_skim__skim_Feb25/")), "", background_base + "WJetsToLNu_HT-800To1200_28February25_0609_skim__skim_Feb25/",1).tolist(),np.char.replace(np.array( os.listdir(background_loc + "WJetsToLNu_HT-800To1200_OtherPart_28February25_0846_skim__skim_Feb25/")), "", background_base + "WJetsToLNu_HT-800To1200_OtherPart_28February25_0846_skim__skim_Feb25/",1).tolist())),
+			"WJetsToLNu_HT-1200To2500" : np.concatenate((np.char.replace(np.array( os.listdir(background_loc + "WJetsToLNu_HT-1200To2500_28February25_0952_skim__skim_Feb25/")), "", background_base + "WJetsToLNu_HT-1200To2500_28February25_0952_skim__skim_Feb25/",1).tolist(),np.char.replace(np.array( os.listdir(background_loc + "WJetsToLNu_HT-1200To2500_OtherPart_28February25_1012_skim__skim_Feb25/")), "", background_base + "WJetsToLNu_HT-1200To2500_OtherPart_28February25_1012_skim__skim_Feb25/",1).tolist())),
+			"WJetsToLNu_HT-2500ToInf" : np.concatenate((np.char.replace(np.array( os.listdir(background_loc + "WJetsToLNu_HT-2500ToInf_28February25_1025_skim__skim_Feb25/")), "", background_base + "WJetsToLNu_HT-2500ToInf_28February25_1025_skim__skim_Feb25/",1).tolist(),np.char.replace(np.array( os.listdir(background_loc + "WJetsToLNu_HT-2500ToInf_OtherPart_28February25_1022_skim__skim_Feb25/")), "", background_base + "WJetsToLNu_HT-2500ToInf_OtherPart_28February25_1022_skim__skim_Feb25/",1).tolist())),
 			
 			#"Signal": [signal_base + mass + ".root"],
 			#"Data_SingleMuon": [data_loc + "SingleMu_Run2018A.root", data_loc + "SingleMu_Run2018B.root", data_loc + "SingleMu_Run2018C.root", data_loc + "SingleMu_Run2018D.root"],
