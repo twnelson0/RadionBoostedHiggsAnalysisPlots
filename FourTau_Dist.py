@@ -227,7 +227,10 @@ class FourTauPlotting(processor.ProcessorABC):
 				"n_muons": ak.zeros_like(events.MET_pt),
 				"n_tau_electrons": ak.zeros_like(events.MET_pt),
 				"n_tau_muons": ak.zeros_like(events.MET_pt),
-				"n_tau_hadronic": ak.zeros_like(events.MET_pt)
+				"n_tau_hadronic": ak.zeros_like(events.MET_pt),
+				"event_num": events.event,
+				"run": events.run,
+				"Lumi" : events.luminosityBlock
 			},
 			with_name="EventArray",
 			behavior=candidate.behavior,
@@ -410,7 +413,7 @@ class FourTauPlotting(processor.ProcessorABC):
 		#	.StrCat(["Leading pair","Subleading pair"], name = "delta_phi")
 		#	.Reg(50, -pi, pi, name="delta_phD")
 	        #Force taus to be ordered via transverse momenta (if they are not already)
-		tau = tau[ak.argsort(tau.pt,axis=1)]
+		#tau = tau[ak.argsort(tau.pt,axis=1)]
 
 		print("!!!=====Dataset=====!!!!")	
 		print(type(dataset))
@@ -418,6 +421,42 @@ class FourTauPlotting(processor.ProcessorABC):
 
 
 		print("Number of events before selection + Trigger: %d"%ak.num(tau,axis=0))
+
+		#Look at the problem events before anything is applied
+		print("============================Problem Event (Before anything is done)============================")
+		if (dataset == "TTToHadronic"):
+			print("Problem ttbar Hadronic file")
+			print("Event number: " + str(event_level[event_level.event_num == 205226271].event_num))
+			print("Event run number: " + str(event_level[event_level.event_num == 205226271].run))
+			print("Event lumiblock: " + str(event_level[event_level.event_num == 205226271].Lumi))
+			print("Problem tau properties")
+			print("E: " + str(tau[event_level.event_num == 205226271].E))
+			print("Px: " + str(tau[event_level.event_num == 205226271].Px))
+			print("Py: " + str(tau[event_level.event_num == 205226271].Py))
+			print("Pz: " + str(tau[event_level.event_num == 205226271].Pz))
+			print("Pt: " + str(tau[event_level.event_num == 205226271].pt))
+			print("Number of boosted taus: " + str(tau[event_level.event_num == 205226271].nBoostedTau))
+		if (dataset == "WJetsToLNu_HT-1200To2500"):
+			print("Problem ttbar Hadronic file")
+			print("Event number: " + str(event_level[event_level.event_num == 72103573].event_num))
+			print("Problem tau properties")
+			print("E: " + str(tau[event_level.event_num == 72103573].E))
+			print("Px: " + str(tau[event_level.event_num == 72103573].Px))
+			print("Py: " + str(tau[event_level.event_num == 72103573].Py))
+			print("Pz: " + str(tau[event_level.event_num == 72103573].Pz))
+			print("Pt: " + str(tau[event_level.event_num == 72103573].pt))
+		if (dataset == "TTTo2L2Nu"):
+			print("Problem ttbar Hadronic file")
+			print("Event number: " + str(event_level[event_level.event_num == 90513344].event_num))
+			print("Event run number: " + str(event_level[event_level.event_num == 90513344].run))
+			print("Event lumiblock: " + str(event_level[event_level.event_num == 90513344].Lumi))
+			print("Problem tau properties")
+			print("E: " + str(tau[event_level.event_num == 90513344].E))
+			print("Px: " + str(tau[event_level.event_num == 90513344].Px))
+			print("Py: " + str(tau[event_level.event_num == 90513344].Py))
+			print("Pz: " + str(tau[event_level.event_num == 90513344].Pz))
+			print("Pt: " + str(tau[event_level.event_num == 90513344].pt))
+			print("Number of boosted taus: " + str(tau[event_level.event_num == 90513344].nBoostedTau))
 
 		#Construct HT and MHT variables (and give them their own object)
 		Jet_MHT = Jet[Jet.Pt > 30]
@@ -429,12 +468,84 @@ class FourTauPlotting(processor.ProcessorABC):
 		#Jet_MHT["MHT"] = np.sqrt(Jet_MHT.MHT_x**2 + Jet_MHT.MHT_y**2)
 		event_level["MHT"] = np.sqrt(event_level.MHT_x**2 + event_level.MHT_y**2) 
 		
+		#Look at the problem events after MHT is obtained
+		print("============================Problem Event (After Jet MHT is obtained)============================")
+		if (dataset == "TTToHadronic"):
+			print("Problem ttbar Hadronic file")
+			print("Event number: " + str(event_level[event_level.event_num == 205226271].event_num))
+			print("Event run number: " + str(event_level[event_level.event_num == 205226271].run))
+			print("Event lumiblock: " + str(event_level[event_level.event_num == 205226271].Lumi))
+			print("Problem tau properties")
+			print("E: " + str(tau[event_level.event_num == 205226271].E))
+			print("Px: " + str(tau[event_level.event_num == 205226271].Px))
+			print("Py: " + str(tau[event_level.event_num == 205226271].Py))
+			print("Pz: " + str(tau[event_level.event_num == 205226271].Pz))
+			print("Pt: " + str(tau[event_level.event_num == 205226271].pt))
+			print("Number of boosted taus: " + str(tau[event_level.event_num == 205226271].nBoostedTau))
+		if (dataset == "WJetsToLNu_HT-1200To2500"):
+			print("Problem ttbar Hadronic file")
+			print("Event number: " + str(event_level[event_level.event_num == 72103573].event_num))
+			print("Problem tau properties")
+			print("E: " + str(tau[event_level.event_num == 72103573].E))
+			print("Px: " + str(tau[event_level.event_num == 72103573].Px))
+			print("Py: " + str(tau[event_level.event_num == 72103573].Py))
+			print("Pz: " + str(tau[event_level.event_num == 72103573].Pz))
+			print("Pt: " + str(tau[event_level.event_num == 72103573].pt))
+		if (dataset == "TTTo2L2Nu"):
+			print("Problem ttbar Hadronic file")
+			print("Event number: " + str(event_level[event_level.event_num == 90513344].event_num))
+			print("Event run number: " + str(event_level[event_level.event_num == 90513344].run))
+			print("Event lumiblock: " + str(event_level[event_level.event_num == 90513344].Lumi))
+			print("Problem tau properties")
+			print("E: " + str(tau[event_level.event_num == 90513344].E))
+			print("Px: " + str(tau[event_level.event_num == 90513344].Px))
+			print("Py: " + str(tau[event_level.event_num == 90513344].Py))
+			print("Pz: " + str(tau[event_level.event_num == 90513344].Pz))
+			print("Pt: " + str(tau[event_level.event_num == 90513344].pt))
+			print("Number of boosted taus: " + str(tau[event_level.event_num == 90513344].nBoostedTau))
+		
 		#HT Seleciton (new)
 		#tau_temp1,HT_Jet_Cand = ak.unzip(ak.cartesian([tau,Jet_MHT], axis = 1, nested = True))
 		Jet_HT = Jet[Jet.Pt > 30]
 		Jet_HT = Jet_HT[np.abs(Jet_HT.eta) < 3]
 		Jet_HT = Jet_HT[Jet_HT.PFLooseId > 0.5]
 		event_level["HT"] = ak.sum(Jet_HT.Pt, axis = 1, keepdims=False)
+		
+		#Look at the problem events after Jet HT is calculated
+		print("============================Problem Event (After Jet HT is calculated)============================")
+		if (dataset == "TTToHadronic"):
+			print("Problem ttbar Hadronic file")
+			print("Event number: " + str(event_level[event_level.event_num == 205226271].event_num))
+			print("Event run number: " + str(event_level[event_level.event_num == 205226271].run))
+			print("Event lumiblock: " + str(event_level[event_level.event_num == 205226271].Lumi))
+			print("Problem tau properties")
+			print("E: " + str(tau[event_level.event_num == 205226271].E))
+			print("Px: " + str(tau[event_level.event_num == 205226271].Px))
+			print("Py: " + str(tau[event_level.event_num == 205226271].Py))
+			print("Pz: " + str(tau[event_level.event_num == 205226271].Pz))
+			print("Pt: " + str(tau[event_level.event_num == 205226271].pt))
+			print("Number of boosted taus: " + str(tau[event_level.event_num == 205226271].nBoostedTau))
+		if (dataset == "WJetsToLNu_HT-1200To2500"):
+			print("Problem ttbar Hadronic file")
+			print("Event number: " + str(event_level[event_level.event_num == 72103573].event_num))
+			print("Problem tau properties")
+			print("E: " + str(tau[event_level.event_num == 72103573].E))
+			print("Px: " + str(tau[event_level.event_num == 72103573].Px))
+			print("Py: " + str(tau[event_level.event_num == 72103573].Py))
+			print("Pz: " + str(tau[event_level.event_num == 72103573].Pz))
+			print("Pt: " + str(tau[event_level.event_num == 72103573].pt))
+		if (dataset == "TTTo2L2Nu"):
+			print("Problem ttbar Hadronic file")
+			print("Event number: " + str(event_level[event_level.event_num == 90513344].event_num))
+			print("Event run number: " + str(event_level[event_level.event_num == 90513344].run))
+			print("Event lumiblock: " + str(event_level[event_level.event_num == 90513344].Lumi))
+			print("Problem tau properties")
+			print("E: " + str(tau[event_level.event_num == 90513344].E))
+			print("Px: " + str(tau[event_level.event_num == 90513344].Px))
+			print("Py: " + str(tau[event_level.event_num == 90513344].Py))
+			print("Pz: " + str(tau[event_level.event_num == 90513344].Pz))
+			print("Pt: " + str(tau[event_level.event_num == 90513344].pt))
+			print("Number of boosted taus: " + str(tau[event_level.event_num == 90513344].nBoostedTau))
 		
 		#Apply trigger weights
 		#if not(self.isData):
@@ -609,6 +720,7 @@ class FourTauPlotting(processor.ProcessorABC):
 						tau = tau[ak.any(muon.nMu > 0, axis = 1)]
 						AK8Jet = AK8Jet[ak.any(muon.nMu > 0, axis = 1)]
 						Jet = Jet[ak.any(muon.nMu > 0, axis = 1)]
+						event_level = event_level[ak.any(muon.nMu > 0, axis = 1)]
 						electron = electron[ak.any(muon.nMu > 0, axis = 1)]
 						muon = muon[ak.any(muon.nMu > 0, axis = 1)]
 								
@@ -685,6 +797,7 @@ class FourTauPlotting(processor.ProcessorABC):
 		else:
 			 #Skip the trigger (??)
 			if ("SingleMuon" in dataset):  #and np.exp(1) == np.pi): #Single Mu
+				print("Running single muon trigger on single muon data")
 				#Muon ID selection
 				#id_cond = np.bitwise_and(muon.IDbit,2) != 0 #Do not delete
 				id_cond = muon.IDSelec
@@ -789,6 +902,41 @@ class FourTauPlotting(processor.ProcessorABC):
 			print("# of events after Trigger + Selection: %d"%ak.num(tau,axis=0))
 			print("# of events after Trigger + Selection (dropping empty arrays): %d"%ak.num(tau[ak.num(tau,axis=1) > 0],axis=0))
 				
+		#Look at the problem events after trigger is applied
+		print("============================Problem Event (After trigger is applied)============================")
+		if (dataset == "TTToHadronic"):
+			print("Problem ttbar Hadronic file")
+			print("Event number: " + str(event_level[event_level.event_num == 205226271].event_num))
+			print("Event run number: " + str(event_level[event_level.event_num == 205226271].run))
+			print("Event lumiblock: " + str(event_level[event_level.event_num == 205226271].Lumi))
+			print("Problem tau properties")
+			print("E: " + str(tau[event_level.event_num == 205226271].E))
+			print("Px: " + str(tau[event_level.event_num == 205226271].Px))
+			print("Py: " + str(tau[event_level.event_num == 205226271].Py))
+			print("Pz: " + str(tau[event_level.event_num == 205226271].Pz))
+			print("Pt: " + str(tau[event_level.event_num == 205226271].pt))
+			print("Number of boosted taus: " + str(tau[event_level.event_num == 205226271].nBoostedTau))
+		if (dataset == "WJetsToLNu_HT-1200To2500"):
+			print("Problem ttbar Hadronic file")
+			print("Event number: " + str(event_level[event_level.event_num == 72103573].event_num))
+			print("Problem tau properties")
+			print("E: " + str(tau[event_level.event_num == 72103573].E))
+			print("Px: " + str(tau[event_level.event_num == 72103573].Px))
+			print("Py: " + str(tau[event_level.event_num == 72103573].Py))
+			print("Pz: " + str(tau[event_level.event_num == 72103573].Pz))
+			print("Pt: " + str(tau[event_level.event_num == 72103573].pt))
+		if (dataset == "TTTo2L2Nu"):
+			print("Problem ttbar Hadronic file")
+			print("Event number: " + str(event_level[event_level.event_num == 90513344].event_num))
+			print("Event run number: " + str(event_level[event_level.event_num == 90513344].run))
+			print("Event lumiblock: " + str(event_level[event_level.event_num == 90513344].Lumi))
+			print("Problem tau properties")
+			print("E: " + str(tau[event_level.event_num == 90513344].E))
+			print("Px: " + str(tau[event_level.event_num == 90513344].Px))
+			print("Py: " + str(tau[event_level.event_num == 90513344].Py))
+			print("Pz: " + str(tau[event_level.event_num == 90513344].Pz))
+			print("Pt: " + str(tau[event_level.event_num == 90513344].pt))
+			print("Number of boosted taus: " + str(tau[event_level.event_num == 90513344].nBoostedTau))
 		#Get the number of electrons + muons after trigger
 		#Apply electron and muon selections first
 		muon = muon[muon.pt > 20]
@@ -963,8 +1111,42 @@ class FourTauPlotting(processor.ProcessorABC):
 		#muon["tau_min_dR"] = ak.where(ak.num(mu_dR_collection,axis=1) != 0, mu_dR_collection, ak.singletons(np.ones(ak.num(mu_dR_collection,axis=0))))
 		#print(electron[0].tau_min_dR)
 		#min_tau_mu = tau_fourVec.nearest(muon_fourVec)
-
 			
+		#Look at the problem events before pairing is applied
+		print("============================Problem Event (After selections before pairing)============================")
+		if (dataset == "TTToHadronic"):
+			print("Problem ttbar Hadronic file")
+			print("Event number: " + str(event_level[event_level.event_num == 205226271].event_num))
+			print("Event run number: " + str(event_level[event_level.event_num == 205226271].run))
+			print("Event lumiblock: " + str(event_level[event_level.event_num == 205226271].Lumi))
+			print("Problem tau properties")
+			print("E: " + str(tau[event_level.event_num == 205226271].E))
+			print("Px: " + str(tau[event_level.event_num == 205226271].Px))
+			print("Py: " + str(tau[event_level.event_num == 205226271].Py))
+			print("Pz: " + str(tau[event_level.event_num == 205226271].Pz))
+			print("Pt: " + str(tau[event_level.event_num == 205226271].pt))
+			print("Number of boosted taus: " + str(tau[event_level.event_num == 205226271].nBoostedTau))
+		if (dataset == "WJetsToLNu_HT-1200To2500"):
+			print("Problem ttbar Hadronic file")
+			print("Event number: " + str(event_level[event_level.event_num == 72103573].event_num))
+			print("Problem tau properties")
+			print("E: " + str(tau[event_level.event_num == 72103573].E))
+			print("Px: " + str(tau[event_level.event_num == 72103573].Px))
+			print("Py: " + str(tau[event_level.event_num == 72103573].Py))
+			print("Pz: " + str(tau[event_level.event_num == 72103573].Pz))
+			print("Pt: " + str(tau[event_level.event_num == 72103573].pt))
+		if (dataset == "TTTo2L2Nu"):
+			print("Problem ttbar Hadronic file")
+			print("Event number: " + str(event_level[event_level.event_num == 90513344].event_num))
+			print("Event run number: " + str(event_level[event_level.event_num == 90513344].run))
+			print("Event lumiblock: " + str(event_level[event_level.event_num == 90513344].Lumi))
+			print("Problem tau properties")
+			print("E: " + str(tau[event_level.event_num == 90513344].E))
+			print("Px: " + str(tau[event_level.event_num == 90513344].Px))
+			print("Py: " + str(tau[event_level.event_num == 90513344].Py))
+			print("Pz: " + str(tau[event_level.event_num == 90513344].Pz))
+			print("Pt: " + str(tau[event_level.event_num == 90513344].pt))
+			print("Number of boosted taus: " + str(tau[event_level.event_num == 90513344].nBoostedTau))
 
 		#Add Topology Cuts (only if there's anything left to cut on)
 		if (ak.num(event_level.MHT,axis=0) > 0):
@@ -1037,15 +1219,8 @@ class FourTauPlotting(processor.ProcessorABC):
 			leadingTau_Pair = leadingTau_Pair[ak.num(leadingTau_Pair) > 0]
 
 			#Find second pair
-			tau_lead = tau[tau.pt == tau[:,0].pt] #Is this wrong??
-			#doubleLead_taus = 0
-			#for x in ak.num(tau_lead.pt,axis=1):
-			#    if (x != 1):
-			#	    print("x != 0")
-			#	    print(x)
-			#	    doubleLead_taus += 1
-			#print("There are %d double lead tau events"%doubleLead_taus)
-			#tau_lead = tau[:,0]
+			#tau_lead = tau[tau.pt == tau[:,0].pt] #Is this wrong??
+			tau_lead = ak.singletons(tau[:,0])
 
 			tau_lead_4vec = ak.firsts(ak.zip({"t": tau_lead.E, "x": tau_lead.Px, "y": tau_lead.Py, "z": tau_lead.Pz},with_name="Momentum4D"))
 			tau_leadPair_4vec = ak.firsts(ak.zip({"t": leadingTau_Pair.E, "x": leadingTau_Pair.Px, "y": leadingTau_Pair.Py, "z": leadingTau_Pair.Pz},with_name="Momentum4D"))
@@ -1087,6 +1262,93 @@ class FourTauPlotting(processor.ProcessorABC):
 
 			tau_rem_4vec = ak.zip({"t": tau_rem.E, "x": tau_rem.Px, "y": tau_rem.Py, "z": tau_rem.Pz},with_name="Momentum4D")
 			tau_rem = tau_rem[ak.values_astype(tau_leadPair_4vec,np.float64).deltaR(ak.values_astype(tau_rem_4vec,np.float64)) != 0]
+		
+			if (dataset == "TTToHadronic"):
+				print("Problem TT To Hadronic file")
+				print("===================================Tau Rem===================================")
+				print("Event number: " + str(event_level[event_level.event_num == 205226271].event_num))
+				print("Problem tau properties")
+				print("E: " + str(tau_rem[event_level.event_num == 205226271].E))
+				print("Px: " + str(tau_rem[event_level.event_num == 205226271].Px))
+				print("Py: " + str(tau_rem[event_level.event_num == 205226271].Py))
+				print("Pz: " + str(tau_rem[event_level.event_num == 205226271].Pz))
+				print("Pt: " + str(tau_rem[event_level.event_num == 205226271].pt))
+			if (dataset == "WJetsToLNu_HT-1200To2500"): #Print remaining taus
+				print("Problem WJets file")
+				print("===================================Tau Rem===================================")
+				print("Event number: " + str(event_level[event_level.event_num == 72103573].event_num))
+				print("Problem tau properties")
+				print("E: " + str(tau_rem[event_level.event_num == 72103573].E))
+				print("Px: " + str(tau_rem[event_level.event_num == 72103573].Px))
+				print("Py: " + str(tau_rem[event_level.event_num == 72103573].Py))
+				print("Pz: " + str(tau_rem[event_level.event_num == 72103573].Pz))
+				print("Pt: " + str(tau_rem[event_level.event_num == 72103573].pt))
+			if (dataset == "TTTo2L2Nu"):
+				print("Problem ttbar Hadronic file")
+				print("===================================Tau Rem===================================")
+				print("Event number: " + str(event_level[event_level.event_num == 90513344].event_num))
+				print("Event run number: " + str(event_level[event_level.event_num == 90513344].run))
+				print("Event lumiblock: " + str(event_level[event_level.event_num == 90513344].Lumi))
+				print("Problem tau properties")
+				print("E: " + str(tau_rem[event_level.event_num == 90513344].E))
+				print("Px: " + str(tau_rem[event_level.event_num == 90513344].Px))
+				print("Py: " + str(tau_rem[event_level.event_num == 90513344].Py))
+				print("Pz: " + str(tau_rem[event_level.event_num == 90513344].Pz))
+				print("Pt: " + str(tau_rem[event_level.event_num == 90513344].pt))
+				print("Number of boosted taus: " + str(tau[event_level.event_num == 90513344].nBoostedTau))
+
+			if (dataset == "TTToHadronic"):
+				print("Problem TT To Hadronic file")
+				print("===================================Leading and Paired Tau===================================")
+				print("Event number: " + str(event_level[event_level.event_num == 205226271].event_num))
+				print("Leading tau properties:")
+				print("E: " + str(tau_lead[event_level.event_num == 205226271].E))
+				print("Px: " + str(tau_lead[event_level.event_num == 205226271].Px))
+				print("Py: " + str(tau_lead[event_level.event_num == 205226271].Py))
+				print("Pz: " + str(tau_lead[event_level.event_num == 205226271].Pz))
+				print("Pt: " + str(tau_lead[event_level.event_num == 205226271].pt))
+				print("Paired tau properties:")
+				print("E: " + str(leadingTau_Pair[event_level.event_num == 205226271].E))
+				print("Px: " + str(leadingTau_Pair[event_level.event_num == 205226271].Px))
+				print("Py: " + str(leadingTau_Pair[event_level.event_num == 205226271].Py))
+				print("Pz: " + str(leadingTau_Pair[event_level.event_num == 205226271].Pz))
+				print("Pt: " + str(leadingTau_Pair[event_level.event_num == 205226271].pt))
+			if (dataset == "WJetsToLNu_HT-1200To2500"): #Print remaining taus
+				print("Problem WJets file")
+				print("===================================Leading and Paired Tau===================================")
+				print("Event number: " + str(event_level[event_level.event_num == 72103573].event_num))
+				print("Leading tau properties:")
+				print("E: " + str(tau_lead[event_level.event_num == 72103573].E))
+				print("Px: " + str(tau_lead[event_level.event_num == 72103573].Px))
+				print("Py: " + str(tau_lead[event_level.event_num == 72103573].Py))
+				print("Pz: " + str(tau_lead[event_level.event_num == 72103573].Pz))
+				print("Pt: " + str(tau_lead[event_level.event_num == 72103573].pt))
+				print("Paired tau properties:")
+				print("E: " + str(leadingTau_Pair[event_level.event_num == 72103573].E))
+				print("Px: " + str(leadingTau_Pair[event_level.event_num == 72103573].Px))
+				print("Py: " + str(leadingTau_Pair[event_level.event_num == 72103573].Py))
+				print("Pz: " + str(leadingTau_Pair[event_level.event_num == 72103573].Pz))
+				print("Pt: " + str(leadingTau_Pair[event_level.event_num == 72103573].pt))
+			if (dataset == "TTTo2L2Nu"):
+				print("Problem TT To Leptonic file")
+				print("===================================Leading and Paired Tau===================================")
+				print("Event number: " + str(event_level[event_level.event_num == 90513344].event_num))
+				print("Leading tau properties:")
+				print("E: " + str(tau_lead[event_level.event_num == 90513344].E))
+				print("Px: " + str(tau_lead[event_level.event_num == 90513344].Px))
+				print("Py: " + str(tau_lead[event_level.event_num == 90513344].Py))
+				print("Pz: " + str(tau_lead[event_level.event_num == 90513344].Pz))
+				print("Pt: " + str(tau_lead[event_level.event_num == 90513344].pt))
+				print("Paired tau properties:")
+				print("E: " + str(leadingTau_Pair[event_level.event_num == 90513344].E))
+				print("Px: " + str(leadingTau_Pair[event_level.event_num == 90513344].Px))
+				print("Py: " + str(leadingTau_Pair[event_level.event_num == 90513344].Py))
+				print("Pz: " + str(leadingTau_Pair[event_level.event_num == 90513344].Pz))
+				print("Pt: " + str(leadingTau_Pair[event_level.event_num == 90513344].pt))
+
+			#Look at how many taus are left after the leading and paired tau removal
+			#print("Number of events with 2 remaining taus: %d"%ak.num(tau_rem[ak.num(tau_rem.pt,axis=1) == 2].pt,axis=0))
+			#print("Number of events with > 2 remaining taus: %d"%ak.num(tau_rem[ak.num(tau_rem.pt,axis=1) > 2].pt,axis=0))
 
 			#In theory there should be >= 2 taus left, check this
 			#n_lessthan2 = 0
@@ -1173,7 +1435,58 @@ class FourTauPlotting(processor.ProcessorABC):
 			leadingTau_NextPair = leadingTau_NextPair[ak.num(leadingTau_NextPair) != 0]
 			
 			#Obtain next/remaining leading tau
-			tau_nextlead = tau_rem[tau_rem.pt == tau_rem[:,0].pt]
+			#tau_nextlead = tau_rem[tau_rem.pt == tau_rem[:,0].pt]
+			tau_nextlead = ak.singletons(tau_rem[:,0])
+			
+			if (dataset == "TTToHadronic"):
+				print("Problem TT To Hadronic file")
+				print("===================================Next Leading and Its Paired Tau===================================")
+				print("Event number: " + str(event_level[event_level.event_num == 205226271].event_num))
+				print("Next Leading tau properties:")
+				print("E: " + str(tau_nextlead[event_level.event_num == 205226271].E))
+				print("Px: " + str(tau_nextlead[event_level.event_num == 205226271].Px))
+				print("Py: " + str(tau_nextlead[event_level.event_num == 205226271].Py))
+				print("Pz: " + str(tau_nextlead[event_level.event_num == 205226271].Pz))
+				print("Pt: " + str(tau_nextlead[event_level.event_num == 205226271].pt))
+				print("Paired tau properties:")
+				print("E: " + str(leadingTau_NextPair[event_level.event_num == 205226271].E))
+				print("Px: " + str(leadingTau_NextPair[event_level.event_num == 205226271].Px))
+				print("Py: " + str(leadingTau_NextPair[event_level.event_num == 205226271].Py))
+				print("Pz: " + str(leadingTau_NextPair[event_level.event_num == 205226271].Pz))
+				print("Pt: " + str(leadingTau_NextPair[event_level.event_num == 205226271].pt))
+			#Look at the next leading tau and its paired tau
+			if (dataset == "WJetsToLNu_HT-1200To2500"): #Print remaining taus
+				print("Problem WJets file")
+				print("===================================Next Leading and Its Paired Tau===================================")
+				print("Event number: " + str(event_level[event_level.event_num == 72103573].event_num))
+				print("Next Leading tau properties:")
+				print("E: " + str(tau_nextlead[event_level.event_num == 72103573].E))
+				print("Px: " + str(tau_nextlead[event_level.event_num == 72103573].Px))
+				print("Py: " + str(tau_nextlead[event_level.event_num == 72103573].Py))
+				print("Pz: " + str(tau_nextlead[event_level.event_num == 72103573].Pz))
+				print("Pt: " + str(tau_nextlead[event_level.event_num == 72103573].pt))
+				print("Paired tau properties:")
+				print("E: " + str(leadingTau_NextPair[event_level.event_num == 72103573].E))
+				print("Px: " + str(leadingTau_NextPair[event_level.event_num == 72103573].Px))
+				print("Py: " + str(leadingTau_NextPair[event_level.event_num == 72103573].Py))
+				print("Pz: " + str(leadingTau_NextPair[event_level.event_num == 72103573].Pz))
+				print("Pt: " + str(leadingTau_NextPair[event_level.event_num == 72103573].pt))
+			if (dataset == "TTTo2L2Nu"):
+				print("Problem TT To Hadronic file")
+				print("===================================Next Leading and Its Paired Tau===================================")
+				print("Event number: " + str(event_level[event_level.event_num == 90513344].event_num))
+				print("Next Leading tau properties:")
+				print("E: " + str(tau_nextlead[event_level.event_num == 90513344].E))
+				print("Px: " + str(tau_nextlead[event_level.event_num == 90513344].Px))
+				print("Py: " + str(tau_nextlead[event_level.event_num == 90513344].Py))
+				print("Pz: " + str(tau_nextlead[event_level.event_num == 90513344].Pz))
+				print("Pt: " + str(tau_nextlead[event_level.event_num == 90513344].pt))
+				print("Paired tau properties:")
+				print("E: " + str(leadingTau_NextPair[event_level.event_num == 90513344].E))
+				print("Px: " + str(leadingTau_NextPair[event_level.event_num == 90513344].Px))
+				print("Py: " + str(leadingTau_NextPair[event_level.event_num == 90513344].Py))
+				print("Pz: " + str(leadingTau_NextPair[event_level.event_num == 90513344].Pz))
+				print("Pt: " + str(leadingTau_NextPair[event_level.event_num == 90513344].pt))
 
 			#Check size of taus
 			#print("Leading Tau %d"%len(tau_lead))
@@ -1193,6 +1506,11 @@ class FourTauPlotting(processor.ProcessorABC):
 			#print("Number of incorrect leading tau events:")
 			#print(num_leadTau_0)
 
+			#Look at the number of taus that have been selected (determine where duplicated tau slipping in)
+			#print("Number of leading taus with 2 taus: %d"%ak.num(tau_lead[ak.num(tau_lead,axis=1) == 2].pt,axis=0))
+			#print("Number of taus paired to leading tau with 2 taus: %d"%ak.num(leadingTau_Pair[ak.num(leadingTau_Pair,axis=1) == 2].pt,axis=0))
+			#print("Number of next leading taus with 2 taus: %d"%ak.num(tau_nextlead[ak.num(tau_nextlead,axis=1) == 2].pt,axis=0))
+			#print("Number of taus paired to next leading tau with 2 taus: %d"%ak.num(leadingTau_NextPair[ak.num(leadingTau_NextPair,axis=1) == 2].pt,axis=0))
 
 			#Reconstruct tau object in order of pairings 
 			tau = ak.concatenate((tau_lead,leadingTau_Pair),axis=1)
@@ -1286,64 +1604,64 @@ class FourTauPlotting(processor.ProcessorABC):
 
 			
 			#Old style implementation (mostly awkward free)
-			print("==========Begin Mostly Awkward Free Algorithm==========")
-			
-			for n in range(len(temp_electron.t)): #Just use event loop
-				#Keep track of the indicies of previously paired electrons and muons
-				prev_used_ele = []
-				prev_used_mu = []
-				for i in range(4): #Loop over all taus
-					elec_dR_Array = []
-					muon_dR_Array = []
-					tau_fourVec = ak.zip({"t": tau[n][i].E,"x": tau[n][i].Px, "y": tau[n][i].Py,"z" : tau[n][i].Pz},with_name = "Momentum4D")
-				
-					#Get lepton tau angular seperations
-					for j_e in range(len(temp_electron[n])):
-						elec_dR_Array.append(tau_fourVec.deltaR(temp_electron[n][j_e]))
-						if (j_e in prev_used_ele): #Skip previously paired electrons
-							continue
-					if (len(temp_electron[n]) == 0): #Handle events with no electrons
-						elec_dR_Array.append(10)
-					for j_mu in range(len(temp_muon[n])):
-						muon_dR_Array.append(tau_fourVec.deltaR(temp_muon[n][j_mu]))
-						if (j_mu in prev_used_mu): #Skip previously paired muons
-							continue
-					if (len(temp_muon[n]) == 0): #Handle events with no muons
-						muon_dR_Array.append(10)
-					
-					#Get the smallest delta R Values
-					min_elec_dR = min(elec_dR_Array)
-					min_muon_dR = min(muon_dR_Array) 
+			#print("==========Begin Mostly Awkward Free Algorithm==========")
+			#
+			#for n in range(len(temp_electron.t)): #Just use event loop
+			#	#Keep track of the indicies of previously paired electrons and muons
+			#	prev_used_ele = []
+			#	prev_used_mu = []
+			#	for i in range(4): #Loop over all taus
+			#		elec_dR_Array = []
+			#		muon_dR_Array = []
+			#		tau_fourVec = ak.zip({"t": tau[n][i].E,"x": tau[n][i].Px, "y": tau[n][i].Py,"z" : tau[n][i].Pz},with_name = "Momentum4D")
+			#	
+			#		#Get lepton tau angular seperations
+			#		for j_e in range(len(temp_electron[n])):
+			#			elec_dR_Array.append(tau_fourVec.deltaR(temp_electron[n][j_e]))
+			#			if (j_e in prev_used_ele): #Skip previously paired electrons
+			#				continue
+			#		if (len(temp_electron[n]) == 0): #Handle events with no electrons
+			#			elec_dR_Array.append(10)
+			#		for j_mu in range(len(temp_muon[n])):
+			#			muon_dR_Array.append(tau_fourVec.deltaR(temp_muon[n][j_mu]))
+			#			if (j_mu in prev_used_mu): #Skip previously paired muons
+			#				continue
+			#		if (len(temp_muon[n]) == 0): #Handle events with no muons
+			#			muon_dR_Array.append(10)
+			#		
+			#		#Get the smallest delta R Values
+			#		min_elec_dR = min(elec_dR_Array)
+			#		min_muon_dR = min(muon_dR_Array) 
 
-					if (min_elec_dR < min_muon_dR and min_elec_dR < 0.05):
-						n_electron_array[n] += 1
-						prev_used_ele.append(elec_dR_Array.index(min_elec_dR))
-					if (min_muon_dR < min_elec_dR and min_muon_dR < 0.05):
-						n_muon_array[n] += 1
-						prev_used_mu.append(muon_dR_Array.index(min_muon_dR))
-					if (min_elec_dR >= 0.05 and min_muon_dR >= 0.05):
-						n_hadron_array[n] += 1
-				#if (i == 0):
-				#	print(prev_used_ele)
-				#temp_electron = temp_electron[ak.from_iter(prev_used_ele)]#prev_elec_dR
-				#temp_muon = temp_muon[ak.from_iter(prev_used_mu)]#prev_elec_dR
+			#		if (min_elec_dR < min_muon_dR and min_elec_dR < 0.05):
+			#			n_electron_array[n] += 1
+			#			prev_used_ele.append(elec_dR_Array.index(min_elec_dR))
+			#		if (min_muon_dR < min_elec_dR and min_muon_dR < 0.05):
+			#			n_muon_array[n] += 1
+			#			prev_used_mu.append(muon_dR_Array.index(min_muon_dR))
+			#		if (min_elec_dR >= 0.05 and min_muon_dR >= 0.05):
+			#			n_hadron_array[n] += 1
+			#	#if (i == 0):
+			#	#	print(prev_used_ele)
+			#	#temp_electron = temp_electron[ak.from_iter(prev_used_ele)]#prev_elec_dR
+			#	#temp_muon = temp_muon[ak.from_iter(prev_used_mu)]#prev_elec_dR
 
-			n_3had_1elec = 0
-			n_3had_1muon = 0
-			n_4had = 0
-			
-			for n in range(len(n_electron_array)):
-				#Debugging work
-				if (n_electron_array[n] + n_muon_array[n] + n_hadron_array[n] > 4):
-					print("==========!!!More particles coming out than going in at event %d!!!=========="%n)
+			#n_3had_1elec = 0
+			#n_3had_1muon = 0
+			#n_4had = 0
+			#
+			#for n in range(len(n_electron_array)):
+			#	#Debugging work
+			#	if (n_electron_array[n] + n_muon_array[n] + n_hadron_array[n] > 4):
+			#		print("==========!!!More particles coming out than going in at event %d!!!=========="%n)
 
-				#Count number of 4 hadronic, and 3 hadronic + 1 lepton states
-				if (n_hadron_array[n] == 4):
-					n_4had += 1
-				if (n_electron_array[n] == 1 and n_hadron_array[n] == 3):
-					n_3had_1elec += 1
-				if (n_muon_array[n] == 1 and n_hadron_array[n] == 3):
-					n_3had_1muon += 1
+			#	#Count number of 4 hadronic, and 3 hadronic + 1 lepton states
+			#	if (n_hadron_array[n] == 4):
+			#		n_4had += 1
+			#	if (n_electron_array[n] == 1 and n_hadron_array[n] == 3):
+			#		n_3had_1elec += 1
+			#	if (n_muon_array[n] == 1 and n_hadron_array[n] == 3):
+			#		n_3had_1muon += 1
 
 			#print("==========Checking the branching factions==========")
 			#print("Observed fraction of 4 hadron fraction: %.3f"%(n_4had/len(n_hadron_array)))
@@ -1437,10 +1755,11 @@ class FourTauPlotting(processor.ProcessorABC):
 				use_ele = min_elec_dR < min_mu_dR #, min_elec_dR < 0.05) #,not_prev_id_elec)
 				use_mu = min_elec_dR > min_mu_dR #, min_mu_dR < 0.05) #,not_prev_id_muon)
 				use_had = np.bitwise_not(np.bitwise_or(use_ele,use_mu))
-
-				for a,b in zip(use_ele,use_mu):
-					if (a and b):
-						print("!!!!Use both electron and muon!!!!")
+				
+				#(Commented out 8 June 2025 for (hopefully) increased speed)
+				#for a,b in zip(use_ele,use_mu):
+				#	if (a and b):
+				#		print("!!!!Use both electron and muon!!!!")
 
 				#Update paired electrons and muons
 				#print(len(use_ele))
@@ -1584,20 +1903,20 @@ class FourTauPlotting(processor.ProcessorABC):
 				tau[:,i]["Pz"] = tau_fourVec.z
 				
 			
-			#Check taus are not pairing to the same leptons
-			for evnt in range(ak.num(tau,axis=0)):
-				if (tau[:,0][evnt].E == tau[:,1][evnt].E and tau[:,0][evnt].Px == tau[:,1][evnt].Px and tau[:,0][evnt].Py == tau[:,1][evnt].Py and tau[:,0][evnt].Pz == tau[:,1][evnt].Pz):
-					print("!!!Leading tau and paired tau appear to be matching to the same lepton!!!")
-				if (tau[:,0][evnt].E == tau[:,2][evnt].E) and tau[:,0][evnt].Px == tau[:,2][evnt].Px and tau[:,0][evnt].Py == tau[:,2][evnt].Py and tau[:,0][evnt].Pz == tau[:,2][evnt].Pz:
-					print("!!!Leading tau and subleading tau appear to be matching to the same lepton!!!")
-				if (tau[:,2][evnt].E == tau[:,3][evnt].E and tau[:,2][evnt].Px == tau[:,3][evnt].Px and tau[:,2][evnt].Py == tau[:,3][evnt].Py and tau[:,2][evnt].Pz == tau[:,3][evnt].Pz):
-					print("!!!Subleading tau and paired tau appear to be matching to the same lepton!!!")
-				if (tau[:,1][evnt].E == tau[:,3][evnt].E and tau[:,1][evnt].Px == tau[:,3][evnt].Px and tau[:,1][evnt].Py == tau[:,3][evnt].Py and tau[:,1][evnt].Pz == tau[:,3][evnt].Pz):
-					print("!!!Paired taus appear to be matching to the same lepton!!!")
-				if (tau[:,0][evnt].E == tau[:,3][evnt].E and tau[:,0][evnt].Px == tau[:,3][evnt].Px and tau[:,0][evnt].Py == tau[:,3][evnt].Py and tau[:,0][evnt].Pz == tau[:,3][evnt].Pz):
-					print("!!!Leading tau and subleading paired taus appear to be matching to the same lepton!!!")
-				if (tau[:,1][evnt].E == tau[:,2][evnt].E and tau[:,1][evnt].Px == tau[:,2][evnt].Px and tau[:,1][evnt].Py == tau[:,2][evnt].Py and tau[:,1][evnt].Pz == tau[:,2][evnt].Pz):
-					print("!!!Subleading tau matched to leading paired taus appear to be matching to the same lepton!!!")
+			#Check taus are not pairing to the same leptons #(Commented out 8 June 2025 for (hopefully) increased speed)
+			#for evnt in range(ak.num(tau,axis=0)):
+			#	if (tau[:,0][evnt].E == tau[:,1][evnt].E and tau[:,0][evnt].Px == tau[:,1][evnt].Px and tau[:,0][evnt].Py == tau[:,1][evnt].Py and tau[:,0][evnt].Pz == tau[:,1][evnt].Pz):
+			#		print("!!!Leading tau and paired tau appear to be matching to the same lepton!!!")
+			#	if (tau[:,0][evnt].E == tau[:,2][evnt].E) and tau[:,0][evnt].Px == tau[:,2][evnt].Px and tau[:,0][evnt].Py == tau[:,2][evnt].Py and tau[:,0][evnt].Pz == tau[:,2][evnt].Pz:
+			#		print("!!!Leading tau and subleading tau appear to be matching to the same lepton!!!")
+			#	if (tau[:,2][evnt].E == tau[:,3][evnt].E and tau[:,2][evnt].Px == tau[:,3][evnt].Px and tau[:,2][evnt].Py == tau[:,3][evnt].Py and tau[:,2][evnt].Pz == tau[:,3][evnt].Pz):
+			#		print("!!!Subleading tau and paired tau appear to be matching to the same lepton!!!")
+			#	if (tau[:,1][evnt].E == tau[:,3][evnt].E and tau[:,1][evnt].Px == tau[:,3][evnt].Px and tau[:,1][evnt].Py == tau[:,3][evnt].Py and tau[:,1][evnt].Pz == tau[:,3][evnt].Pz):
+			#		print("!!!Paired taus appear to be matching to the same lepton!!!")
+			#	if (tau[:,0][evnt].E == tau[:,3][evnt].E and tau[:,0][evnt].Px == tau[:,3][evnt].Px and tau[:,0][evnt].Py == tau[:,3][evnt].Py and tau[:,0][evnt].Pz == tau[:,3][evnt].Pz):
+			#		print("!!!Leading tau and subleading paired taus appear to be matching to the same lepton!!!")
+			#	if (tau[:,1][evnt].E == tau[:,2][evnt].E and tau[:,1][evnt].Px == tau[:,2][evnt].Px and tau[:,1][evnt].Py == tau[:,2][evnt].Py and tau[:,1][evnt].Pz == tau[:,2][evnt].Pz):
+			#		print("!!!Subleading tau matched to leading paired taus appear to be matching to the same lepton!!!")
 
 				
 
@@ -1618,10 +1937,14 @@ class FourTauPlotting(processor.ProcessorABC):
 
 			#Obtain di-tau delta R and higgs delta R (if there are any events left)
 			if (ak.num(tau,axis=0) > 0):
-				tau1 = tau[tau.pt == tau[:,0].pt]
-				tau2 = tau[tau.pt == tau[:,1].pt]
-				tau3 = tau[tau.pt == tau[:,2].pt]
-				tau4 = tau[tau.pt == tau[:,3].pt]
+				tau1 = tau[np.bitwise_and(tau.E == tau[:,0].E,np.bitwise_and(np.bitwise_and(tau.Px == tau[:,0].Px, tau.Py == tau[:,0].Py), tau.Pz == tau[:,0].Pz))]
+				tau2 = tau[np.bitwise_and(tau.E == tau[:,1].E,np.bitwise_and(np.bitwise_and(tau.Px == tau[:,1].Px, tau.Py == tau[:,1].Py), tau.Pz == tau[:,1].Pz))]
+				tau3 = tau[np.bitwise_and(tau.E == tau[:,2].E,np.bitwise_and(np.bitwise_and(tau.Px == tau[:,2].Px, tau.Py == tau[:,2].Py), tau.Pz == tau[:,2].Pz))]
+				tau4 = tau[np.bitwise_and(tau.E == tau[:,3].E,np.bitwise_and(np.bitwise_and(tau.Px == tau[:,3].Px, tau.Py == tau[:,3].Py), tau.Pz == tau[:,3].Pz))]
+			#	tau1 = tau[tau.pt == tau[:,0].pt]
+			#	tau2 = tau[tau.pt == tau[:,1].pt]
+			#	tau3 = tau[tau.pt == tau[:,2].pt]
+			#	tau4 = tau[tau.pt == tau[:,3].pt]
 	
 				#print("Tau length for debugging")
 				#print(len(tau))
@@ -1629,8 +1952,59 @@ class FourTauPlotting(processor.ProcessorABC):
 				#	if len(t) != 4:
 				#		print("Event does not have 4 events")
 				
-				leading_deltaR = deltaR(tau1,tau2)
-				next_deltaR = deltaR(tau3,tau4)
+				#leading_deltaR = deltaR(tau1,tau2)
+				#next_deltaR = deltaR(tau3,tau4)
+				#Check on the number of taus
+				tau_num_arr = ak.num(tau.pt,axis=1)
+				
+				#Drop the goddman events with anomolous numbers of taus
+				#tau = tau[tau_num_arr != 4]
+				#Jet = Jet[tau_num_arr != 4]
+				#AK8Jet = AK8Jet[tau_num_arr != 4]
+				#event_level = event_level[tau_num_arr != 4]
+				#electron = electron[tau_num_arr != 4]
+				#muon = muon[tau_num_arr != 4]
+
+
+				#Print statements for debugging events with anomolous numbers of taus
+				tau_notFour = tau_num_arr[tau_num_arr != 4]
+				print("Number of events with unexpected number of taus: %d"%ak.num(tau_notFour,axis=0))
+				print("Number of events with 4 taus: %d"%ak.num(tau_num_arr[tau_num_arr == 4],axis=0))
+				print("Number of events with 3 taus: %d"%ak.num(tau_num_arr[tau_num_arr == 3],axis=0))
+				print("Number of events with 2 taus: %d"%ak.num(tau_num_arr[tau_num_arr == 2],axis=0))
+				print("Number of events with 5 taus: %d"%ak.num(tau_num_arr[tau_num_arr == 5],axis=0))
+				print("Number of events with 6 taus: %d"%ak.num(tau_num_arr[tau_num_arr == 6],axis=0))
+
+				#Look at the event with 5 taus to see what's going wrong
+				print("=================================Inspection of event with 5 taus===========================================")
+				print("Tau Energies: " + str(tau[tau_num_arr == 5].E))
+				print("Tau Pt: " + str(tau[tau_num_arr == 5].pt))
+				print("Tau Px: " + str(tau[tau_num_arr == 5].Px))
+				print("Tau Py: " + str(tau[tau_num_arr == 5].Py))
+				print("Tau Pz: " + str(tau[tau_num_arr == 5].Pz))
+				print("Tau phi: " + str(tau[tau_num_arr == 5].eta))
+				print("Tau eta: " + str(tau[tau_num_arr == 5].phi))
+				print("Number of boosted taus " + str(tau[tau_num_arr == 5].nBoostedTau))
+				print("Event number:" + str(event_level[tau_num_arr == 5].event_num))
+				print("Run:" + str(event_level[tau_num_arr == 5].run))
+				print("LumiBlock:" + str(event_level[tau_num_arr == 5].Lumi))
+				print("============================================================================")
+				
+				test_arr3 = ak.num(tau3.eta,axis=1) 
+				num_3 = ak.num(test_arr3,axis=0)
+				test_arr4 = ak.num(tau4.eta,axis=1)
+				num_4 = ak.num(test_arr4,axis=0)
+				
+				test_sizes = test_arr3 == test_arr4
+				test_sizes[test_sizes]
+				if (num_3 != num_4):
+					print("Different numbers of next leading and paired taus (this is a problem)")
+				if (ak.num(test_sizes,axis=0) == num_3):
+					print("Issue with dimensions of the taus")
+				#End print statments for debugging events with anomolous number of taus
+
+
+
 				leading_higgs = ak.zip({
 						"x": tau1.Px + tau2.Px,
 						"y": tau1.Py + tau2.Py,
@@ -1705,7 +2079,7 @@ class FourTauPlotting(processor.ProcessorABC):
 				if (self.isData or not(self.isData)):
 					print("# of events after Higgs cut (dropping empty arrays): %d"%ak.num(tau[ak.num(tau,axis=1) > 0],axis=0))
 	
-			#Apply Tau topolotical condition	
+			#Apply Tau topological condition	
 			#tau = tau[tau_cond]
 			#Jet = Jet[tau_cond]
 			#AK8Jet = AK8Jet[tau_cond]
@@ -1787,8 +2161,6 @@ class FourTauPlotting(processor.ProcessorABC):
 
 		tau = tau[ak.num(tau,axis=1) > 0] #Handle empty arrays left by the trigger
 
-
-		
 		
 		#Get the leading Higgs 4-momenta
 		PxLeading = tau[:,0].Px + tau[:,1].Px
@@ -2064,7 +2436,7 @@ if __name__ == "__main__":
 	final_state_dict_signal_error = dict.fromkeys(fin_state_vec(template_array_1,template_array_2),0)
 	final_state_dict_data_error = dict.fromkeys(fin_state_vec(template_array_1,template_array_2),0)
 	final_state_dict_background_error = dict.fromkeys(fin_state_vec(template_array_1,template_array_2),0)
-	#final_state_dict_data_full = dict.fromkeys(fin_state_vec(template_array_1,template_array_2),[])
+	final_state_dict_data_full = dict.fromkeys(fin_state_vec(template_array_1,template_array_2),[])
 	#final_state_dict_signal_full = dict.fromkeys(fin_state_vec(template_array_1,template_array_2),[])
 	#final_state_dict_background_full = dict.fromkeys(fin_state_vec(template_array_1,template_array_2),[])
 	#final_state_dict_theory = dict.fromkeys(fin_state_vec(template_array_1,template_array_2),branch_ratio_vec(template_array_3,template_array_2,template_array_1))
@@ -2075,8 +2447,8 @@ if __name__ == "__main__":
 	#Trigger dictionaries
 	#trigger_dict = {"Mu50": (21,False), "PFMET120_PFMHT120_IDTight": (27,False), "EitherOr_Trigger": (41,True)}
 	#trigger_dict = {"Mu50": (21,False), "PFMET120_PFMHT120_IDTight": (27,False), "EitherOr_Trigger": (41,True)}
-	trigger_dict = {"EitherOr_Trigger": (41,True)}
-	#trigger_dict = {"Mu50": (21,False)}
+	#trigger_dict = {"EitherOr_Trigger": (41,True)}
+	trigger_dict = {"Mu50": (21,False)}
 	#trigger_dict = {"PFHT500_PFMET100_PFMHT100_IDTight": (39,False)} #,"EitherOr_Trigger": (41,True)}
 	#trigger_dict = {"Mu50": (21,False), "EitherOr_Trigger": (41,True)}
 	#trigger_dict = {"Mu50": (21,False), "PFHT500_PFMET100_PFMHT100_IDTight": (39,False), "EitherOr_Trigger": (41,True)}
@@ -2090,7 +2462,7 @@ if __name__ == "__main__":
 	#background_base = "/hdfs/store/user/twnelson/HH4Tau_EtAl/Skimmed_Files/2018/MC/" #ZZTo4L_25February25_0413_skim__skim_Feb25/ #NanoAOD files
 	#background_base = "/hdfs/store/user/twnelson/HH4Tau_EtAl/Skimmed_Files/2018/MC/"
 	#background_base = "root://cmsxrootd.hep.wisc.edu:1094//store/user/twnelson/HH4Tau_EtAl/Skimmed_Files/2018/MC/" #ZZTo4L_25February25_0413_skim__skim_Feb25/ #NanoAOD files
-	background_base = "root://cms-xrd-global.cern.ch//store/user/twnelson/HH4Tau_EtAl/Skimmed_Files/2018/MC/" #ZZTo4L_25February25_0413_skim__skim_Feb25/ #NanoAOD files
+	background_base = "root://cmsxrootd.hep.wisc.edu//store/user/twnelson/HH4Tau_EtAl/Skimmed_Files/2018/MC/" #ZZTo4L_25February25_0413_skim__skim_Feb25/ #NanoAOD files
 	background_loc = "/hdfs/store/user/twnelson/HH4Tau_EtAl/Skimmed_Files/2018/MC/" #ZZTo4L_25February25_0413_skim__skim_Feb25/ #NanoAOD files
 	#background_base = "" #For testing nanoAOD just dumped one ZZ4l root file into here, not scalable though 
 	#data_loc = "root://cmseos.fnal.gov//store/user/abdollah/SkimBoostedHH4t/2018/4t/v2_Hadd/"
@@ -2101,7 +2473,9 @@ if __name__ == "__main__":
 	
 	#signal_base = "root://cmseos.fnal.gov//store/user/abdollah/SkimBoostedHH4t/2018/4t/v2/GluGluToRadionToHHTo4T_M-"
 	#background_base = "root://cmseos.fnal.gov//store/user/abdollah/SkimBoostedHH4t/2018/4t/v2/"	
-	data_loc = "root://cmseos.fnal.gov//store/user/abdollah/SkimBoostedHH4t/2018/4t/v2/"
+	#data_loc = "root://cmseos.fnal.gov//store/user/abdollah/SkimBoostedHH4t/2018/4t/v2/" (miniAOD)
+	data_loc = "/hdfs/store/user/twnelson/HH4Tau_EtAl/Skimmed_Files/2018/Data/"
+	data_base = "root://cmsxrootd.hep.wisc.edu//store/user/twnelson/HH4Tau_EtAl/Skimmed_Files/2018/Data/" 
 
 	#Xrootd crap
 #	try:
@@ -2151,14 +2525,14 @@ if __name__ == "__main__":
                 f"export X509_USER_PROXY={_x509_path}"
             ]
     )
-	cluster.adapt(minimum=1, maximum=5)
+	cluster.adapt(minimum=1, maximum=500)
 
 	run_on_condor = True
 	
 	if (run_on_condor):
 		iterative_runner = processor.Runner(
 			#executor = processor.DaskExecutor(client=Client(cluster)),
-			executor = processor.DaskExecutor(client=Client(cluster)),
+			executor = processor.DaskExecutor(client=Client(cluster),status=False),
 			schema=BaseSchema,
 			skipbadfiles=True,
 			xrootdtimeout=1000,
@@ -2213,7 +2587,7 @@ if __name__ == "__main__":
 	for mass in mass_str_arr:
 		print("====================Radion Mass = " + mass[0] + "." + mass[1] + " TeV====================")
 		#print(np.char.replace(np.array( os.listdir(background_loc + "ZZTo4L_25February25_0413_skim__skim_Feb25/")), "", background_loc + "ZZTo4L_25February25_0413_skim__skim_Feb25/",1).tolist())
-		file_dict = { #Reduced files to run over
+		file_dict_test = { #Reduced files to run over
 			#"ZZ4l": [background_base + "ZZTo4L_25February25_0413_skim__skim_Feb25/singleFileSkimForSubmission-NANO_NANO_411.root"],
 			#"ZZ4l": ["singleFileSkimForSubmission-NANO_NANO_411.root"],
 			"ZZ4l": np.char.replace(np.array( os.listdir(background_loc + "ZZTo4L_25February25_0413_skim__skim_Feb25/")), "", background_base + "ZZTo4L_25February25_0413_skim__skim_Feb25/",1).tolist(), #Run over allnanoAOD files
@@ -2235,7 +2609,7 @@ if __name__ == "__main__":
         }
 
 		#file_dict["ZZ4l"].remove("root://cms-xrd-global.cern.ch//store/user/twnelson/HH4Tau_EtAl/Skimmed_Files/2018/MC/Hadd_ZZTo4L/ZZTo4L_Hadd_9.root") #Remove file 9 to fix errors (maybe?)
-
+		file_dict_debug = {"WJetsToLNu_HT-1200To2500":[background_base + "WJetsToLNu_HT-1200To2500_OtherPart_28February25_1012_skim__skim_Feb25/singleFileSkimForSubmission-NANO_NANO_80.root"]}
 		file_dict_signal_only = {
 		#file_dict = {
 			"Signal": [signal_base + mass + ".root"]
@@ -2245,54 +2619,139 @@ if __name__ == "__main__":
 		file_dict_full = {
 			"TTToSemiLeptonic": np.char.replace(np.array( os.listdir(background_loc + "TTToSemiLeptonic_28February25_0848_skim__skim_Feb25/")), "", background_base + "TTToSemiLeptonic_28February25_0848_skim__skim_Feb25/",1).tolist(), 
 			"TTTo2L2Nu": np.char.replace(np.array( os.listdir(background_loc + "TTTo2L2Nu_28February25_0613_skim__skim_Feb25/")), "", background_base + "TTTo2L2Nu_28February25_0613_skim__skim_Feb25/",1).tolist(), 
-			"TTToHadronic": np.char.replace(np.array( os.listdir(background_loc + "/")), "", background_base + "/",1).tolist(),
+			"TTToHadronic": np.char.replace(np.array( os.listdir(background_loc + "TTToHadronic_28February25_0521_skim__skim_Feb25/")), "", background_base + "TTToHadronic_28February25_0521_skim__skim_Feb25/",1).tolist(),
 			"ZZ4l": np.char.replace(np.array( os.listdir(background_loc + "ZZTo4L_25February25_0413_skim__skim_Feb25/")), "", background_base + "ZZTo4L_25February25_0413_skim__skim_Feb25/",1).tolist(), 
 			"VV2l2nu" : np.char.replace(np.array( os.listdir(background_loc + "WWTo2L2Nu_28February25_1013_skim__skim_Feb25/")), "", background_base + "WWTo2L2Nu_28February25_1013_skim__skim_Feb25/",1).tolist(), 
 			"WZ1l3nu" : np.char.replace(np.array( os.listdir(background_loc + "WZTo1L3Nu_4f_28February25_0951_skim__skim_Feb25/")), "", background_base + "WZTo1L3Nu_4f_28February25_0951_skim__skim_Feb25/",1).tolist(), 
-			#"WZ3l1nu" : np.char.replace(np.array( os.listdir(background_loc + "/")), "", background_base + "/",1).tolist(),  #Needs to be added ASAP!!
+			"WZ3l1nu" : np.char.replace(np.array( os.listdir(background_loc + "WZTo3L1Nu_4f_21May25_1336_skim__skim_Feb25/")), "", background_base + "WZTo3L1Nu_4f_21May25_1336_skim__skim_Feb25/",1).tolist(),  
 			"ZZ2l2q" : np.char.replace(np.array( os.listdir(background_loc + "ZZTo2Q2L_28February25_0959_skim__skim_Feb25/")), "", background_base + "ZZTo2Q2L_28February25_0959_skim__skim_Feb25/",1).tolist(), 
-			#"WZ2l2q" : np.char.replace(np.array( os.listdir(background_loc + "/")), "", background_base + "/",1).tolist(), #This one missing too???
+			"WZ2l2q" : np.char.replace(np.array( os.listdir(background_loc + "WZTo2L2Q_15May25_1113_skim__skim_Feb25/")), "", background_base + "WZTo2L2Q_15May25_1113_skim__skim_Feb25/",1).tolist(), 
 			"WZ1l1nu2q" : np.char.replace(np.array( os.listdir(background_loc + "WZTo1L1Nu2Q_28February25_0800_skim__skim_Feb25/")), "", background_base + "WZTo1L1Nu2Q_28February25_0800_skim__skim_Feb25/",1).tolist(),
-			#"DYJetsToLL_Pt-50To100": np.char.replace(np.array( os.listdir(background_loc + "DYJetsToLL_M-50_HT-100to200_28February25_1006_skim__skim_Feb25/")), "", background_base + "DYJetsToLL_M-50_HT-100to200_28February25_1006_skim__skim_Feb25/",1).tolist(),
-			#"DYJetsToLL_Pt-100To250": np.char.replace(np.array( os.listdir(background_loc + "/")), "", background_base + "/",1).tolist(), 
-			#"DYJetsToLL_Pt-250To400": np.char.replace(np.array( os.listdir(background_loc + "/")), "", background_base + "/",1).tolist(), 
-			#"DYJetsToLL_Pt-400To650": np.char.replace(np.array( os.listdir(background_loc + "/")), "", background_base + "/",1).tolist(), 
-			#"DYJetsToLL_Pt-650ToInf": np.char.replace(np.array( os.listdir(background_loc + "/")), "", background_base + "/",1).tolist(),
+			#"DYJetsToLL_Pt-0To50": np.char.replace(np.array( os.listdir(background_loc + "DYJetsToLL_LHEFilterPtZ-0To50_MatchEWPDG20_21May25_0928_skim__skim_Feb25/")), "", background_base + "DYJetsToLL_LHEFilterPtZ-0To50_MatchEWPDG20_21May25_0928_skim__skim_Feb25/",1).tolist(),
+			"DYJetsToLL_Pt-50To100": np.char.replace(np.array( os.listdir(background_loc + "DYJetsToLL_LHEFilterPtZ-50To100_MatchEWPDG20_21May25_0941_skim__skim_Feb25/")), "", background_base + "DYJetsToLL_LHEFilterPtZ-50To100_MatchEWPDG20_21May25_0941_skim__skim_Feb25/",1).tolist(),
+			"DYJetsToLL_Pt-100To250": np.char.replace(np.array( os.listdir(background_loc + "DYJetsToLL_LHEFilterPtZ-100To250_MatchEWPDG20_21May25_0958_skim__skim_Feb25/")), "", background_base + "DYJetsToLL_LHEFilterPtZ-100To250_MatchEWPDG20_21May25_0958_skim__skim_Feb25/",1).tolist(), 
+			"DYJetsToLL_Pt-250To400": np.char.replace(np.array( os.listdir(background_loc + "DYJetsToLL_LHEFilterPtZ-250To400_MatchEWPDG20_21May25_0955_skim__skim_Feb25/")), "", background_base + "DYJetsToLL_LHEFilterPtZ-250To400_MatchEWPDG20_21May25_0955_skim__skim_Feb25/",1).tolist(), 
+			"DYJetsToLL_Pt-400To650": np.char.replace(np.array( os.listdir(background_loc + "DYJetsToLL_LHEFilterPtZ-400To650_MatchEWPDG20_21May25_0953_skim__skim_Feb25/")), "", background_base + "DYJetsToLL_LHEFilterPtZ-400To650_MatchEWPDG20_21May25_0953_skim__skim_Feb25/",1).tolist(), 
+			"DYJetsToLL_Pt-650ToInf": np.char.replace(np.array( os.listdir(background_loc + "DYJetsToLL_LHEFilterPtZ-650ToInf_MatchEWPDG20_21May25_0954_skim__skim_Feb25/")), "", background_base + "DYJetsToLL_LHEFilterPtZ-650ToInf_MatchEWPDG20_21May25_0954_skim__skim_Feb25/",1).tolist(),
 			"T-tchan" : np.char.replace(np.array( os.listdir(background_loc + "ST_t-channel_top_4f_InclusiveDecays_28February25_0801_skim__skim_Feb25/")), "", background_base + "ST_t-channel_top_4f_InclusiveDecays_28February25_0801_skim__skim_Feb25/",1).tolist(), 
 			"Tbar-tchan" : np.char.replace(np.array( os.listdir(background_loc + "ST_t-channel_antitop_4f_InclusiveDecays_28February25_0734_skim__skim_Feb25/")), "", background_base + "ST_t-channel_antitop_4f_InclusiveDecays_28February25_0734_skim__skim_Feb25/",1).tolist(), 
 			"T-tW" : np.char.replace(np.array( os.listdir(background_loc + "ST_tW_top_5f_inclusiveDecays_28February25_0656_skim__skim_Feb25/")), "", background_base + "ST_tW_top_5f_inclusiveDecays_28February25_0656_skim__skim_Feb25/",1).tolist(), 
 			"Tbar-tW" : np.char.replace(np.array( os.listdir(background_loc + "ST_tW_antitop_5f_inclusiveDecays_28February25_0714_skim__skim_Feb25/")), "", background_base + "ST_tW_antitop_5f_inclusiveDecays_28February25_0714_skim__skim_Feb25/",1).tolist(),
 			"WJetsToLNu_HT-100To200" : np.char.replace(np.array( os.listdir(background_loc + "WJetsToLNu_HT-100To200_28February25_0723_skim__skim_Feb25/")), "", background_base + "WJetsToLNu_HT-100To200_28February25_0723_skim__skim_Feb25/",1).tolist(),
 			"WJetsToLNu_HT-200To400" : np.char.replace(np.array( os.listdir(background_loc + "WJetsToLNu_HT-200To400_28February25_0658_skim__skim_Feb25/")), "", background_base + "WJetsToLNu_HT-200To400_28February25_0658_skim__skim_Feb25/",1).tolist(), 
-			"WJetsToLNu_HT-400To600" : np.concatenate((np.char.replace(np.array( os.listdir(background_loc + "WJetsToLNu_HT-400To600_28February25_0948_skim__skim_Feb25/")), "", background_base + "WJetsToLNu_HT-400To600_28February25_0948_skim__skim_Feb25/",1).tolist(),np.char.replace(np.array( os.listdir(background_loc + "WJetsToLNu_HT-400To600_OtherPart_28February25_0948_skim__skim_Feb25/")), "", background_base + "/WJetsToLNu_HT-400To600_OtherPart_28February25_0948_skim__skim_Feb25",1).tolist())), 
-			"WJetsToLNu_HT-600To800" : np.concatenate((np.char.replace(np.array( os.listdir(background_loc + "WJetsToLNu_HT-600To800_28February25_0610_skim__skim_Feb25/")), "", background_base + "WJetsToLNu_HT-600To800_28February25_0610_skim__skim_Feb25/",1).tolist(),np.char.replace(np.array( os.listdir(background_loc + "WJetsToLNu_HT-600To800_OtherPart_28February25_0654_skim__skim_Feb25/")), "", background_base + "WJetsToLNu_HT-600To800_OtherPart_28February25_0654_skim__skim_Feb25/",1).tolist())),
-			"WJetsToLNu_HT-800To1200" : np.concatenate((np.char.replace(np.array( os.listdir(background_loc + "WJetsToLNu_HT-800To1200_28February25_0609_skim__skim_Feb25/")), "", background_base + "WJetsToLNu_HT-800To1200_28February25_0609_skim__skim_Feb25/",1).tolist(),np.char.replace(np.array( os.listdir(background_loc + "WJetsToLNu_HT-800To1200_OtherPart_28February25_0846_skim__skim_Feb25/")), "", background_base + "WJetsToLNu_HT-800To1200_OtherPart_28February25_0846_skim__skim_Feb25/",1).tolist())),
-			"WJetsToLNu_HT-1200To2500" : np.concatenate((np.char.replace(np.array( os.listdir(background_loc + "WJetsToLNu_HT-1200To2500_28February25_0952_skim__skim_Feb25/")), "", background_base + "WJetsToLNu_HT-1200To2500_28February25_0952_skim__skim_Feb25/",1).tolist(),np.char.replace(np.array( os.listdir(background_loc + "WJetsToLNu_HT-1200To2500_OtherPart_28February25_1012_skim__skim_Feb25/")), "", background_base + "WJetsToLNu_HT-1200To2500_OtherPart_28February25_1012_skim__skim_Feb25/",1).tolist())),
-			"WJetsToLNu_HT-2500ToInf" : np.concatenate((np.char.replace(np.array( os.listdir(background_loc + "WJetsToLNu_HT-2500ToInf_28February25_1025_skim__skim_Feb25/")), "", background_base + "WJetsToLNu_HT-2500ToInf_28February25_1025_skim__skim_Feb25/",1).tolist(),np.char.replace(np.array( os.listdir(background_loc + "WJetsToLNu_HT-2500ToInf_OtherPart_28February25_1022_skim__skim_Feb25/")), "", background_base + "WJetsToLNu_HT-2500ToInf_OtherPart_28February25_1022_skim__skim_Feb25/",1).tolist())),
+			"WJetsToLNu_HT-400To600" : np.concatenate((np.char.replace(np.array( os.listdir(background_loc + "WJetsToLNu_HT-400To600_28February25_0948_skim__skim_Feb25/")), "", background_base + "WJetsToLNu_HT-400To600_28February25_0948_skim__skim_Feb25/",1).tolist(),np.char.replace(np.array( os.listdir(background_loc + "WJetsToLNu_HT-400To600_OtherPart_28February25_0958_skim__skim_Feb25/")), "", background_base + "WJetsToLNu_HT-400To600_OtherPart_28February25_0958_skim__skim_Feb25/",1).tolist())).tolist(), 
+			"WJetsToLNu_HT-600To800" : np.concatenate((np.char.replace(np.array( os.listdir(background_loc + "WJetsToLNu_HT-600To800_28February25_0610_skim__skim_Feb25/")), "", background_base + "WJetsToLNu_HT-600To800_28February25_0610_skim__skim_Feb25/",1).tolist(),np.char.replace(np.array( os.listdir(background_loc + "WJetsToLNu_HT-600To800_OtherPart_28February25_0654_skim__skim_Feb25/")), "", background_base + "WJetsToLNu_HT-600To800_OtherPart_28February25_0654_skim__skim_Feb25/",1).tolist())).tolist(),
+			"WJetsToLNu_HT-800To1200" : np.concatenate((np.char.replace(np.array( os.listdir(background_loc + "WJetsToLNu_HT-800To1200_28February25_0609_skim__skim_Feb25/")), "", background_base + "WJetsToLNu_HT-800To1200_28February25_0609_skim__skim_Feb25/",1).tolist(),np.char.replace(np.array( os.listdir(background_loc + "WJetsToLNu_HT-800To1200_OtherPart_28February25_0846_skim__skim_Feb25/")), "", background_base + "WJetsToLNu_HT-800To1200_OtherPart_28February25_0846_skim__skim_Feb25/",1).tolist())).tolist(),
+			"WJetsToLNu_HT-1200To2500" : np.concatenate((np.char.replace(np.array( os.listdir(background_loc + "WJetsToLNu_HT-1200To2500_28February25_0952_skim__skim_Feb25/")), "", background_base + "WJetsToLNu_HT-1200To2500_28February25_0952_skim__skim_Feb25/",1).tolist(),np.char.replace(np.array( os.listdir(background_loc + "WJetsToLNu_HT-1200To2500_OtherPart_28February25_1012_skim__skim_Feb25/")), "", background_base + "WJetsToLNu_HT-1200To2500_OtherPart_28February25_1012_skim__skim_Feb25/",1).tolist())).tolist(),
+			"WJetsToLNu_HT-2500ToInf" : np.concatenate((np.char.replace(np.array( os.listdir(background_loc + "WJetsToLNu_HT-2500ToInf_28February25_1025_skim__skim_Feb25/")), "", background_base + "WJetsToLNu_HT-2500ToInf_28February25_1025_skim__skim_Feb25/",1).tolist(),np.char.replace(np.array( os.listdir(background_loc + "WJetsToLNu_HT-2500ToInf_OtherPart_28February25_1022_skim__skim_Feb25/")), "", background_base + "WJetsToLNu_HT-2500ToInf_OtherPart_28February25_1022_skim__skim_Feb25/",1).tolist())).tolist(),
 			
 			#"Signal": [signal_base + mass + ".root"],
-			#"Data_SingleMuon": [data_loc + "SingleMu_Run2018A.root", data_loc + "SingleMu_Run2018B.root", data_loc + "SingleMu_Run2018C.root", data_loc + "SingleMu_Run2018D.root"],
+			"Data_SingleMuon": np.concatenate((np.char.replace(np.array(os.listdir(data_loc + "SingleMu_Run2018A_22May25_1117_skim__skim_Feb25/")), "", data_base + "SingleMu_Run2018A_22May25_1117_skim__skim_Feb25/",1).tolist(),
+			np.char.replace(np.array(os.listdir(data_loc + "SingleMu_Run2018B_22May25_0822_skim__skim_Feb25/")), "", data_base + "SingleMu_Run2018B_22May25_0822_skim__skim_Feb25/").tolist(),
+			np.char.replace(np.array(os.listdir(data_loc + "SingleMu_Run2018B_22May25_1054_skim__skim_Feb25/")), "", data_base + "SingleMu_Run2018B_22May25_1054_skim__skim_Feb25/").tolist(),
+			np.char.replace(np.array(os.listdir(data_loc + "SingleMu_Run2018C_22May25_1102_skim__skim_Feb25/")), "", data_base + "SingleMu_Run2018C_22May25_1102_skim__skim_Feb25/").tolist(),
+			np.char.replace(np.array(os.listdir(data_loc + "SingleMu_Run2018D_23May25_0510_skim__skim_Feb25/")), "", data_base + "SingleMu_Run2018D_23May25_0510_skim__skim_Feb25/").tolist())).tolist() 
 			#"Data_JetHT": [data_loc + "JetHT_Run2018A-17Sep2018-v1.root", data_loc + "JetHT_Run2018B-17Sep2018-v1.root", data_loc + "JetHT_Run2018C-17Sep2018-v1.root",data_loc + "JetHT_Run2018D-PromptReco-v2.root"]
 		}
+
+		#Removing the problem files
+		#file_dict_full["WJetsToLNu_HT-1200To2500"].remove(background_base + "WJetsToLNu_HT-1200To2500_OtherPart_28February25_1012_skim__skim_Feb25/singleFileSkimForSubmission-NANO_NANO_80.root")
+		file_dict_full["TTToHadronic"].remove(background_base + "TTToHadronic_28February25_0521_skim__skim_Feb25/singleFileSkimForSubmission-NANO_NANO_1386.root")
+
+		#file_dict_singleMuSignal = {
+		file_dict = {
+			#"ZZ4l": [background_base + "ZZTo4L_25February25_0413_skim__skim_Feb25/singleFileSkimForSubmission-NANO_NANO_9.root"],
+			"ZZ4l": np.char.replace(np.array( os.listdir(background_loc + "ZZTo4L_25February25_0413_skim__skim_Feb25/")), "", background_base + "ZZTo4L_25February25_0413_skim__skim_Feb25/",1).tolist(), 
+			#"TTTo2L2Nu": [background_base + "TTTo2L2Nu_28February25_0613_skim__skim_Feb25/singleFileSkimForSubmission-NANO_NANO_1081.root"],
+			#"TTTo2L2Nu": np.char.replace(np.array( os.listdir(background_loc + "TTTo2L2Nu_28February25_0613_skim__skim_Feb25/")), "", background_base + "TTTo2L2Nu_28February25_0613_skim__skim_Feb25/",1).tolist(), 
+			#"TTToSemiLeptonic": np.char.replace(np.array( os.listdir(background_loc + "TTToSemiLeptonic_28February25_0848_skim__skim_Feb25/")), "", background_base + "TTToSemiLeptonic_28February25_0848_skim__skim_Feb25/",1).tolist(), 
+			#"TTToHadronic": np.char.replace(np.array( os.listdir(background_loc + "TTToHadronic_28February25_0521_skim__skim_Feb25/")), "", background_base + "TTToHadronic_28February25_0521_skim__skim_Feb25/",1).tolist(),
+			#"TTToHadronic": [background_base + "TTToHadronic_28February25_0521_skim__skim_Feb25/singleFileSkimForSubmission-NANO_NANO_1386.root"],
+			#"WJetsToLNu_HT-1200To2500" : [background_base + "WJetsToLNu_HT-1200To2500_OtherPart_28February25_1012_skim__skim_Feb25/singleFileSkimForSubmission-NANO_NANO_80.root"],
+			#"DYJetsToLL_Pt-50To100": np.char.replace(np.array( os.listdir(background_loc + "DYJetsToLL_LHEFilterPtZ-50To100_MatchEWPDG20_21May25_0941_skim__skim_Feb25/")), "", background_base + "DYJetsToLL_LHEFilterPtZ-50To100_MatchEWPDG20_21May25_0941_skim__skim_Feb25/",1).tolist(),
+			"DYJetsToLL_Pt-100To250": np.char.replace(np.array( os.listdir(background_loc + "DYJetsToLL_LHEFilterPtZ-100To250_MatchEWPDG20_21May25_0958_skim__skim_Feb25/")), "", background_base + "DYJetsToLL_LHEFilterPtZ-100To250_MatchEWPDG20_21May25_0958_skim__skim_Feb25/",1).tolist(), 
+			"DYJetsToLL_Pt-250To400": np.char.replace(np.array( os.listdir(background_loc + "DYJetsToLL_LHEFilterPtZ-250To400_MatchEWPDG20_21May25_0955_skim__skim_Feb25/")), "", background_base + "DYJetsToLL_LHEFilterPtZ-250To400_MatchEWPDG20_21May25_0955_skim__skim_Feb25/",1).tolist(), 
+			"DYJetsToLL_Pt-400To650": np.char.replace(np.array( os.listdir(background_loc + "DYJetsToLL_LHEFilterPtZ-400To650_MatchEWPDG20_21May25_0953_skim__skim_Feb25/")), "", background_base + "DYJetsToLL_LHEFilterPtZ-400To650_MatchEWPDG20_21May25_0953_skim__skim_Feb25/",1).tolist(), 
+			"DYJetsToLL_Pt-650ToInf": np.char.replace(np.array( os.listdir(background_loc + "DYJetsToLL_LHEFilterPtZ-650ToInf_MatchEWPDG20_21May25_0954_skim__skim_Feb25/")), "", background_base + "DYJetsToLL_LHEFilterPtZ-650ToInf_MatchEWPDG20_21May25_0954_skim__skim_Feb25/",1).tolist(),
+			"VV2l2nu" : np.char.replace(np.array( os.listdir(background_loc + "WWTo2L2Nu_28February25_1013_skim__skim_Feb25/")), "", background_base + "WWTo2L2Nu_28February25_1013_skim__skim_Feb25/",1).tolist(), 
+			"WZ1l3nu" : np.char.replace(np.array( os.listdir(background_loc + "WZTo1L3Nu_4f_28February25_0951_skim__skim_Feb25/")), "", background_base + "WZTo1L3Nu_4f_28February25_0951_skim__skim_Feb25/",1).tolist(), 
+			"WZ3l1nu" : np.char.replace(np.array( os.listdir(background_loc + "WZTo3L1Nu_4f_21May25_1336_skim__skim_Feb25/")), "", background_base + "WZTo3L1Nu_4f_21May25_1336_skim__skim_Feb25/",1).tolist(),  
+			"ZZ2l2q" : np.char.replace(np.array( os.listdir(background_loc + "ZZTo2Q2L_28February25_0959_skim__skim_Feb25/")), "", background_base + "ZZTo2Q2L_28February25_0959_skim__skim_Feb25/",1).tolist(), 
+			"WZ2l2q" : np.char.replace(np.array( os.listdir(background_loc + "WZTo2L2Q_15May25_1113_skim__skim_Feb25/")), "", background_base + "WZTo2L2Q_15May25_1113_skim__skim_Feb25/",1).tolist(), 
+			"WZ1l1nu2q" : np.char.replace(np.array( os.listdir(background_loc + "WZTo1L1Nu2Q_28February25_0800_skim__skim_Feb25/")), "", background_base + "WZTo1L1Nu2Q_28February25_0800_skim__skim_Feb25/",1).tolist(),
+			"T-tchan" : np.char.replace(np.array( os.listdir(background_loc + "ST_t-channel_top_4f_InclusiveDecays_28February25_0801_skim__skim_Feb25/")), "", background_base + "ST_t-channel_top_4f_InclusiveDecays_28February25_0801_skim__skim_Feb25/",1).tolist(), 
+			"Tbar-tchan" : np.char.replace(np.array( os.listdir(background_loc + "ST_t-channel_antitop_4f_InclusiveDecays_28February25_0734_skim__skim_Feb25/")), "", background_base + "ST_t-channel_antitop_4f_InclusiveDecays_28February25_0734_skim__skim_Feb25/",1).tolist(), 
+			"T-tW" : np.char.replace(np.array( os.listdir(background_loc + "ST_tW_top_5f_inclusiveDecays_28February25_0656_skim__skim_Feb25/")), "", background_base + "ST_tW_top_5f_inclusiveDecays_28February25_0656_skim__skim_Feb25/",1).tolist(), 
+			"Tbar-tW" : np.char.replace(np.array( os.listdir(background_loc + "ST_tW_antitop_5f_inclusiveDecays_28February25_0714_skim__skim_Feb25/")), "", background_base + "ST_tW_antitop_5f_inclusiveDecays_28February25_0714_skim__skim_Feb25/",1).tolist(),
+			#"WJetsToLNu_HT-100To200" : np.char.replace(np.array( os.listdir(background_loc + "WJetsToLNu_HT-100To200_28February25_0723_skim__skim_Feb25/")), "", background_base + "WJetsToLNu_HT-100To200_28February25_0723_skim__skim_Feb25/",1).tolist(),
+			#"WJetsToLNu_HT-200To400" : np.char.replace(np.array( os.listdir(background_loc + "WJetsToLNu_HT-200To400_28February25_0658_skim__skim_Feb25/")), "", background_base + "WJetsToLNu_HT-200To400_28February25_0658_skim__skim_Feb25/",1).tolist(), 
+			#"WJetsToLNu_HT-400To600" : np.concatenate((np.char.replace(np.array( os.listdir(background_loc + "WJetsToLNu_HT-400To600_28February25_0948_skim__skim_Feb25/")), "", background_base + "WJetsToLNu_HT-400To600_28February25_0948_skim__skim_Feb25/",1).tolist(),np.char.replace(np.array( os.listdir(background_loc + "WJetsToLNu_HT-400To600_OtherPart_28February25_0958_skim__skim_Feb25/")), "", background_base + "WJetsToLNu_HT-400To600_OtherPart_28February25_0958_skim__skim_Feb25/",1).tolist())).tolist(), 
+			#"WJetsToLNu_HT-600To800" : np.concatenate((np.char.replace(np.array( os.listdir(background_loc + "WJetsToLNu_HT-600To800_28February25_0610_skim__skim_Feb25/")), "", background_base + "WJetsToLNu_HT-600To800_28February25_0610_skim__skim_Feb25/",1).tolist(),np.char.replace(np.array( os.listdir(background_loc + "WJetsToLNu_HT-600To800_OtherPart_28February25_0654_skim__skim_Feb25/")), "", background_base + "WJetsToLNu_HT-600To800_OtherPart_28February25_0654_skim__skim_Feb25/",1).tolist())).tolist(),
+			#"WJetsToLNu_HT-800To1200" : np.concatenate((np.char.replace(np.array( os.listdir(background_loc + "WJetsToLNu_HT-800To1200_28February25_0609_skim__skim_Feb25/")), "", background_base + "WJetsToLNu_HT-800To1200_28February25_0609_skim__skim_Feb25/",1).tolist(),np.char.replace(np.array( os.listdir(background_loc + "WJetsToLNu_HT-800To1200_OtherPart_28February25_0846_skim__skim_Feb25/")), "", background_base + "WJetsToLNu_HT-800To1200_OtherPart_28February25_0846_skim__skim_Feb25/",1).tolist())).tolist(),
+			#"WJetsToLNu_HT-1200To2500" : np.concatenate((np.char.replace(np.array( os.listdir(background_loc + "WJetsToLNu_HT-1200To2500_28February25_0952_skim__skim_Feb25/")), "", background_base + "WJetsToLNu_HT-1200To2500_28February25_0952_skim__skim_Feb25/",1).tolist(),np.char.replace(np.array( os.listdir(background_loc + "WJetsToLNu_HT-1200To2500_OtherPart_28February25_1012_skim__skim_Feb25/")), "", background_base + "WJetsToLNu_HT-1200To2500_OtherPart_28February25_1012_skim__skim_Feb25/",1).tolist())).tolist(),
+			#"WJetsToLNu_HT-2500ToInf" : np.concatenate((np.char.replace(np.array( os.listdir(background_loc + "WJetsToLNu_HT-2500ToInf_28February25_1025_skim__skim_Feb25/")), "", background_base + "WJetsToLNu_HT-2500ToInf_28February25_1025_skim__skim_Feb25/",1).tolist(),np.char.replace(np.array( os.listdir(background_loc + "WJetsToLNu_HT-2500ToInf_OtherPart_28February25_1022_skim__skim_Feb25/")), "", background_base + "WJetsToLNu_HT-2500ToInf_OtherPart_28February25_1022_skim__skim_Feb25/",1).tolist())).tolist(),
+			#"Data_SingleMuon": [data_base + "SingleMu_Run2018A_22May25_1117_skim__skim_Feb25/singleFileSkimForSubmission-NANO_NANO_9.root"]
+			#"Data_SingleMuon": np.char.replace(np.array(os.listdir(data_loc + "SingleMu_Run2018A_22May25_1117_skim__skim_Feb25/")), "", data_base + "SingleMu_Run2018A_22May25_1117_skim__skim_Feb25/",1).tolist()
+			"Data_SingleMuon": np.concatenate((np.char.replace(np.array(os.listdir(data_loc + "SingleMu_Run2018A_22May25_1117_skim__skim_Feb25/")), "", data_base + "SingleMu_Run2018A_22May25_1117_skim__skim_Feb25/",1).tolist(),
+			np.char.replace(np.array(os.listdir(data_loc + "SingleMu_Run2018B_22May25_0822_skim__skim_Feb25/")), "", data_base + "SingleMu_Run2018B_22May25_0822_skim__skim_Feb25/").tolist(),
+			np.char.replace(np.array(os.listdir(data_loc + "SingleMu_Run2018B_22May25_1054_skim__skim_Feb25/")), "", data_base + "SingleMu_Run2018B_22May25_1054_skim__skim_Feb25/").tolist(),
+			np.char.replace(np.array(os.listdir(data_loc + "SingleMu_Run2018C_22May25_1102_skim__skim_Feb25/")), "", data_base + "SingleMu_Run2018C_22May25_1102_skim__skim_Feb25/").tolist(),
+			np.char.replace(np.array(os.listdir(data_loc + "SingleMu_Run2018D_23May25_0510_skim__skim_Feb25/")), "", data_base + "SingleMu_Run2018D_23May25_0510_skim__skim_Feb25/").tolist())).tolist() 
+			#"Data_SingleMuon": [data_base + "SingleMu_Run2018A_22May25_1117_skim__skim_Feb25/singleFileSkimForSubmission-NANO_NANO_984.root"]
+		}
+		
+		#file_dict["TTToHadronic"].remove(background_base + "TTToHadronic_28February25_0521_skim__skim_Feb25/singleFileSkimForSubmission-NANO_NANO_1386.root")
+		#file_dict["TTTo2L2Nu"].remove(background_base + "TTTo2L2Nu_28February25_0613_skim__skim_Feb25/singleFileSkimForSubmission-NANO_NANO_1081.root")
+	#	
+	#file_dict_data = {
+	#		"Data_SingleMuon": np.concatenate((np.char.replace(np.array(os.listdir(data_loc + "SingleMu_Run2018A_22May25_1117_skim__skim_Feb25/")), "", data_base + "SingleMu_Run2018A_22May25_1117_skim__skim_Feb25/",1).tolist(),
+	#		np.char.replace(np.array(os.listdir(data_loc + "SingleMu_Run2018B_22May25_0822_skim__skim_Feb25/")), "", data_base + "SingleMu_Run2018B_22May25_0822_skim__skim_Feb25/").tolist(),
+	#		np.char.replace(np.array(os.listdir(data_loc + "SingleMu_Run2018B_22May25_1054_skim__skim_Feb25/")), "", data_base + "SingleMu_Run2018B_22May25_1054_skim__skim_Feb25/").tolist(),
+	#		np.char.replace(np.array(os.listdir(data_loc + "SingleMu_Run2018C_22May25_1102_skim__skim_Feb25/")), "", data_base + "SingleMu_Run2018C_22May25_1102_skim__skim_Feb25/").tolist(),
+	#		np.char.replace(np.array(os.listdir(data_loc + "SingleMu_Run2018D_23May25_0510_skim__skim_Feb25/")), "", data_base + "SingleMu_Run2018D_23May25_0510_skim__skim_Feb25/").tolist())).tolist() 
+	#	}
 		
 		#Generate dictionary of number of processed events This logic needs fixing
+		print("About to obtain number of events being prscessed")
 		for key_name, file_array in file_dict.items(): 
-			if (key_name != "Data_JetHT" or key_name != "Data_SingleMuon"): #This logic needs to be fixed
+			print(key_name)
+			if (key_name != "Data_JetHT" and key_name != "Data_SingleMuon"): #This logic needs to be fixed
+				numEvents_Dict[key_name] = 0 #Initialize the number of events dictionary
+				#print("Background:")
+				#print(key_name)
+				#print(file_array)
 				for file in file_array:
 					#print(file)
+					#if (key_name == ""):
+						#tempFile = uproot.open(file)
+						#numEvents_Dict[key_name] =+ tempFile['Runs/genEventCount'].array()[0] #Fixed for nanoAOD (!!This line may cause issues!!)
+					#	print("!!!======================Problem Files==========================!!!")
+					#	print(key_name)
+					#	print(file)
+					#	print("!!!======================Problem Files==========================!!!")
+					#print(file)
 					#tempFile = uproot.open(file[0]) #Get file
-					tempFile = uproot.open(file) #Get file
+					#tempFile = uproot.open(file) #Get file
+					with uproot.open(file) as tempFile:
+						#print("Current number of events: " + str(numEvents_Dict[key_name]))
+						#print("Number of events being added: " + str(tempFile['Runs/genEventCount'].array()[0]))
+						numEvents_Dict[key_name] += tempFile['Runs/genEventCount'].array()[0] #Fixed for nanoAOD (!!This line may cause issues!!)
 					#numEvents_Dict[key_name] = tempFile['hEvents'].member('fEntries')/2
 					#numEvents_Dict[key_name] = tempFile['hcount'].member('fEntries')/2 #This is only good for miniAOD
-					numEvents_Dict[key_name] =+ tempFile['Runs/genEventCount'].array()[0] #Fixed for nanoAOD (!!This line may cause issues!!)
-			else: #Ignore data files
-				continue
 
-		
+			else: #Ignore data files
+				numEvents_Dict[key_name] = 1
+
+		#break	
 		#background_list = [r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"]
-		#background_list = ["Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"]
-		background_list = [r"$ZZ \rightarrow 4l$"]
+		#background_list = ["Di-Bosons", r"$ZZ \rightarrow 4l$"]
+		background_list = ["Di-Bosons", "Single Top", r"Drell-Yan+Jets", r"$ZZ \rightarrow 4l$"]
+		#background_list = [r"$ZZ \rightarrow 4l$"]
 		#background_list = [r"Drell-Yan+Jets"]
+		#background_list = [r"Di-Bosons"]
+		#background_list = ["W+Jets"]
+		#background_list = [r"$t\bar{t}$"]
+		#background_list = [r"$t\bar{t}$",r"$ZZ \rightarrow 4l$"]
 		signal_list = [r"MC Sample $m_\phi$ = %s TeV"%mass[0]]
 		background_plot_names = {r"$t\bar{t}$" : "_ttbar_", r"Drell-Yan+Jets": "_DYJets_", "Di-Bosons" : "_DiBosons_", "Single Top": "_SingleTop+", "QCD" : "_QCD_", "W+Jets" : "_WJets_", r"$ZZ \rightarrow 4l$" : "_ZZ4l_"} #For file names
 		
@@ -2300,6 +2759,7 @@ if __name__ == "__main__":
 				r"Drell-Yan+Jets": ["DYJetsToLL_Pt-50To100","DYJetsToLL_Pt-100To250","DYJetsToLL_Pt-250To400","DYJetsToLL_Pt-400To650","DYJetsToLL_Pt-650ToInf"], 
 				"Di-Bosons": ["WZ3l1nu","WZ2l2q","WZ1l1nu2q","ZZ2l2q", "WZ1l3nu", "VV2l2nu"], "Single Top": ["Tbar-tchan","T-tchan","Tbar-tW","T-tW"], 
 				"W+Jets": ["WJetsToLNu_HT-100To200","WJetsToLNu_HT-200To400","WJetsToLNu_HT-400To600","WJetsToLNu_HT-600To800","WJetsToLNu_HT-800To1200","WJetsToLNu_HT-1200To2500","WJetsToLNu_HT-2500ToInf"],
+				#"W+Jets": ["WJetsToLNu_HT-100To200","WJetsToLNu_HT-200To400","WJetsToLNu_HT-400To600","WJetsToLNu_HT-600To800","WJetsToLNu_HT-800To1200","WJetsToLNu_HT-1200To2500"],
 				r"$ZZ \rightarrow 4l$" : ["ZZ4l"]
 		}
 		
@@ -2463,7 +2923,9 @@ if __name__ == "__main__":
 			}
 			
 			#fourtau_out = iterative_runner(file_dict, treename="Events", processor_instance=FourTauPlotting(trigger_bit=trigger_pair[0], or_trigger=trigger_pair[1],PUWeights = PUWeight, PU_weight_bool =True, signal_mass = mass)) #Modified for NanoAOD (changd treename)
+			print("About to run iterative runner")
 			fourtau_out = iterative_runner(file_dict, treename="Events", processor_instance=FourTauPlotting(trigger_bit=trigger_pair[0], or_trigger=trigger_pair[1],PUWeights = PUWeight, PU_weight_bool =True, signal_mass = mass)) #Modified for NanoAOD (changd treename)
+			print("Ran iterative runner")
 			for hist_name in four_tau_hist_list: #Loop over all histograms
 				#fig,ax = plt.subplots()
 				#fig0,ax0 = plt.subplots()
@@ -2563,6 +3025,7 @@ if __name__ == "__main__":
 							"num_muon_tau_Arr": hist.Hist.new.Regular(5,0,5,label=r"Number of muon identified as taus").Double(),
 						}
 						background_array = []
+						#background_dict = {r"$ZZ \rightarrow 4l$" : ["ZZ4l"]}
 						backgrounds = background_dict[background_type]
 						
 						#Loop over all backgrounds
@@ -2651,17 +3114,17 @@ if __name__ == "__main__":
 						#print("Total amount of data = %d"%(len(fourtau_out["Data_SingleMuon"][hist_name]) + len(fourtau_out["Data_JetHT"][hist_name])))
 						#print("Total amount of data = %d"%(len(fourtau_out["Data_SingleMuon"][hist_name])))
 						#print("Total amount of data = %d"%(len(fourtau_out["Data_JetHT"][hist_name])))
-#						if (trigger_name == "Mu50"):
-#							print("Mu50 Only")
-#							hist_dict_data[hist_name].fill("Data",fourtau_out["Data_SingleMuon"][hist_name]) 
-#						if (trigger_name == "PFHT500_PFMET100_PFMHT100_IDTight"):
-#							print("JetHTMHTMET Only")
-#							hist_dict_data[hist_name].fill("Data",fourtau_out["Data_JetHT"][hist_name]) 
-#						if (trigger_name == "EitherOr_Trigger"):
-#							print("Both Triggers")
-#							hist_dict_data[hist_name].fill("Data",fourtau_out["Data_SingleMuon"][hist_name]) 
-#							hist_dict_data[hist_name].fill("Data",fourtau_out["Data_JetHT"][hist_name]) 
-#							
+						if (trigger_name == "Mu50"):
+							print("Mu50 Only")
+							hist_dict_data[hist_name].fill("Data",fourtau_out["Data_SingleMuon"][hist_name]) 
+						if (trigger_name == "PFHT500_PFMET100_PFMHT100_IDTight"):
+							print("JetHTMHTMET Only")
+							hist_dict_data[hist_name].fill("Data",fourtau_out["Data_JetHT"][hist_name]) 
+						if (trigger_name == "EitherOr_Trigger"):
+							print("Both Triggers")
+							hist_dict_data[hist_name].fill("Data",fourtau_out["Data_SingleMuon"][hist_name]) 
+							hist_dict_data[hist_name].fill("Data",fourtau_out["Data_JetHT"][hist_name]) 
+							
 #							if (hist_name == "num_electron_tau_Arr"):  #and np.pi == np.exp(1)):
 #							    print("Getting final states for data")
 #							    final_state_array_Mu = fin_state_vec(fourtau_out["Data_SingleMuon"]["num_electron_tau_Arr"],fourtau_out["Data_SingleMuon"]["num_muon_tau_Arr"])
@@ -2680,10 +3143,10 @@ if __name__ == "__main__":
 					
 						#Put histograms into stacks and arrays for plotting purposes (is the issue arising here??)
 						background_stack = hist_dict_background[hist_name].stack("background")
-						#signal_stack = hist_dict_signal[hist_name].stack("signal")
-						#data_stack = hist_dict_data[hist_name].stack("data")
+						signal_stack = hist_dict_signal[hist_name].stack("signal")
+						data_stack = hist_dict_data[hist_name].stack("data")
 						#signal_array = [signal_stack["Signal"]]
-						#data_array = [data_stack["Data"]]
+						data_array = [data_stack["Data"]]
 						for background in background_list:
 							background_array.append(background_stack[background])
 
@@ -2695,7 +3158,7 @@ if __name__ == "__main__":
 						fig,ax = plt.subplots()
 						hep.histplot(background_array,ax=ax,stack=True,histtype="fill",label=background_list,facecolor=TABLEAU_COLORS[:len(background_list)],edgecolor=TABLEAU_COLORS[:len(background_list)])
 						#hep.histplot(signal_array,ax=ax,stack=True,histtype="step",label=signal_list,edgecolor=TABLEAU_COLORS[len(background_list)+1],linewidth=2.95)
-						#hep.histplot(data_array,ax=ax,stack=False,histtype="errorbar", yerr=True,label=["Data"],marker="o",color = "k") #,facecolor='black',edgecolor='black') #,mec='k')
+						hep.histplot(data_array,ax=ax,stack=False,histtype="errorbar", yerr=True,label=["Data"],marker="o",color = "k") #,facecolor='black',edgecolor='black') #,mec='k')
 						hep.cms.text("Preliminary",loc=0,fontsize=13)
 						#ax.set_title(hist_name_dict[hist_name],loc = "right")
 						ax.set_title("2018 Data",loc = "right")
@@ -2725,6 +3188,7 @@ if __name__ == "__main__":
 	
     #print("Number of Signal events: %d"%len(fourtau_out["Signal"]["num_electron_tau_Arr"]))
 	#print("Number of Data events: %d"%(len(fourtau_out["Data_SingleMuon"]["num_electron_tau_Arr"]) + len(fourtau_out["Data_JetHT"]["num_electron_tau_Arr"])))
+	print("Number of Data events: %d"%(len(fourtau_out["Data_SingleMuon"]["num_electron_tau_Arr"])))
 	print("Number of Background events: %d"%len(background_state_array))
 
 
