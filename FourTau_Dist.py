@@ -155,6 +155,7 @@ Lumi_2018 = 59830
 
 #Dictionary of number of events (values specified in main loop)
 numEvents_Dict = {}
+working_dir = os.getcwd()
 
 def weight_calc(sample,numEvents=1):
 	return Lumi_2018*xSection_Dictionary[sample]/numEvents
@@ -248,6 +249,7 @@ class FourTauPlotting(processor.ProcessorABC):
 				"nBoostedTau": events.nboostedTau,
 				"charge": events.boostedTau_charge,
 				"iso": events.boostedTau_rawIso,
+				"DBT": events.boostedTau_rawDeepTau2018v2p7VSjet,
 				#"decay": events.boostedTaupfTausDiscriminationByDecayModeFinding,
 				"decay": events.boostedTau_decayMode,
 			},
@@ -797,7 +799,6 @@ class FourTauPlotting(processor.ProcessorABC):
 		else:
 			 #Skip the trigger (??)
 			if ("SingleMuon" in dataset):  #and np.exp(1) == np.pi): #Single Mu
-				print("Running single muon trigger on single muon data")
 				#Muon ID selection
 				#id_cond = np.bitwise_and(muon.IDbit,2) != 0 #Do not delete
 				id_cond = muon.IDSelec
@@ -2345,66 +2346,144 @@ class FourTauPlotting(processor.ProcessorABC):
 		print("===================!!!=Weight Debugging!!!====================")
 		print(event_level.event_weight*weight_Val)
 		print("===================!!!=Weight Debugging!!!====================")
+			
+		#Histogram bining
+		if (self.trigger_bit == 39): #Use reduced binning for JetHT trigger
+			N1 = 6 
+			N2 = 6 
+		else:
+			N1 = 10 
+			N2 = 8 
+		
+		#Create histograms to write out
+		h_FourTauMass = hist.Hist.new.Regular(N1,0,3000, label = r"$m_{4\tau}$ [GeV]").Double()
+		h_HiggsDeltaPhi = hist.Hist.new.Regular(N1,-pi,pi, label = r"Higgs $\Delta \phi$").Double() 
+		h_HiggsDeltaR = hist.Hist.new.Regular(N1,0,5, label = r"Higgs $\Delta$R").Double()
+		h_LeadDiTauDeltaR = hist.Hist.new.Regular(N1,0,5, label = r"Leading di-$\tau$ $\Delta$R").Double()
+		h_SubLeadingDiTauDeltaR = hist.Hist.new.Regular(N1,0,5, label = r"Sub-leading di-$\tau$ $\Delta$R").Double()
+		h_LeadHiggsMass = hist.Hist.new.Regular(N2,0,120, label=r"Leading Higgs Mass (GeV)").Double()
+		h_SubleadingHiggsMass = hist.Hist.new.Regular(N2,0,120, label=r"Sub-Leading Higgs Mass (GeV)").Double()
+		h_RadionpT = hist.Hist.new.Regular(N1,0,200, label=r"Radion $p_T$ (GeV)").Double()
+		h_taupT = hist.Hist.new.Regular(N1,0,400, label=r"$\tau$ $p_T$ (GeV)").Double()
+		h_tauEta = hist.Hist.new.Regular(N1,-5,5, label = r"$\tau \ \eta$").Double()
+		h_ZMult = hist.Hist.new.Regular(6,0,6, label = r"Z Boson Multiplicity").Double()
+		h_ZMultEle = hist.Hist.new.Regular(6,0,6, label = r"Z Boson Multiplicity (electrons only)").Double()
+		h_ZMultMu = hist.Hist.new.Regular(6,0,6, label = r"Z Boson Multiplicity (muons only)").Double()
+		h_ZMultTau = hist.Hist.new.Regular(6,0,6, label = r"Z Boson Multiplicity (from taus)").Double()
+		h_BJetMult = hist.Hist.new.Regular(6,0,6, label = r"BJet Multiplicity").Double()
+		h_LeadTaupT = hist.Hist.new.Regular(N1,0,400, label=r"Leading $\tau$ $p_T$ (GeV)").Double()
+		h_SubleadTaupT = hist.Hist.new.Regular(N1,0,400, label=r"Subleading $\tau$ $p_T$ (GeV)").Double()
+		h_3TaupT = hist.Hist.new.Regular(N1,0,400, label=r"Third leading $\tau$ $p_T$ (GeV)").Double()
+		h_4TaupT = hist.Hist.new.Regular(N1,0,400, label=r"Fourth leading $\tau$ $p_T$ (GeV)").Double()
+		h_LeadDiTauPhi = hist.Hist.new.Regular(N1,-pi,pi, label = r"Leading di-$\tau$ $\Delta \phi$").Double() 
+		h_SubleadDiTauPhi = hist.Hist.new.Regular(N1,-pi,pi, label = r"Subleading di-$\tau$ $\Delta \phi$").Double() 
+		h_RadMETPhi = hist.Hist.new.Regular(N1,-pi,pi, label = r"Radion MET $\Delta \phi$").Double() 
+		h_RadLeadHiggsDeltaR = hist.Hist.new.Regular(N1,0,5, label = r"Leading Higgs Radion $\Delta$R").Double()
+		h_RadSubleadingHiggsDeltaR = hist.Hist.new.Regular(N1,0,5, label = r"Subleading Higgs Radion $\Delta$R").Double()
+		h_METLeadHiggsDeltaPhi = hist.Hist.new.Regular(N1,-pi,pi, label = r"Leading Higgs MET $\Delta \phi$").Double() 
+		h_METSubleadHiggsDeltaPhi = hist.Hist.new.Regular(N1,-pi,pi, label = r"Subleading Higgs MET $\Delta \phi$").Double()
+		h_RadionEta = hist.Hist.new.Regular(N1,-5,5, label = r"Radion $\eta$").Double()
+		h_RadionCharge = hist.Hist.new.Regular(10,-5,5,label = r"Radion Electric Charge").Double()
+		h_LeadHiggsCharge = hist.Hist.new.Regular(8,-4,4,label = r"Leading Higgs Electric Charge").Double()
+		h_SubleadHiggsCharge = hist.Hist.new.Regular(8,-4,4,label = r"Subleading Higgs Electric Charge").Double()
+		h_NElec = hist.Hist.new.Regular(8,0,8,label = r"number of electrons").Double()
+		h_NMuon = hist.Hist.new.Regular(8,0,8,label = r"number of muons").Double()
+		h_MinTauEleDeltaR = hist.Hist.new.Regular(N1,0,1,label = r"Minimized tau to electron $\Delta$R").Double()
+		h_MinTauMuonDeltaR = hist.Hist.new.Regular(N1,0,1,label = r"Minimized tau to muon $\Delta$R").Double()
+		h_NEleTauID = hist.Hist.new.Regular(5,0,5,label=r"Number of electrons identified as taus").Double()
+		h_NMuonTauID= hist.Hist.new.Regular(5,0,5,label=r"Number of muon identified as taus").Double()
+
+		#Fill histograms
+		#if (): #See what the weights and weight_Val is for the background
+		h_FourTauMass.fill(ak.ravel(FourTau_Mass_Arr),weight = event_level.event_weight*weight_Val)
+		h_HiggsDeltaPhi.fill(ak.ravel(Higgs_DeltaPhi_Arr),weight = event_level.event_weight*weight_Val)
+		h_LeadHiggsMass.fill(ak.ravel(LeadingHiggs_mass_Arr),weight = event_level.event_weight*weight_Val)
+		h_SubleadingHiggsMass.fill(ak.ravel(SubLeadingHiggs_mass_Arr),weight = event_level.event_weight*weight_Val)
+		h_HiggsDeltaR.fill(ak.ravel(diHiggs_dR_Arr),weight = event_level.event_weight*weight_Val)
+		h_LeadDiTauDeltaR.fill(ak.ravel(leading_dR_Arr),weight = event_level.event_weight*weight_Val)
+		h_SubLeadingDiTauDeltaR.fill(ak.ravel(subleading_dR_Arr),weight = event_level.event_weight*weight_Val)
+		h_LeadHiggsCharge.fill(ak.ravel(event_level.LeadingHiggs_Charge),weight = event_level.event_weight*weight_Val)
+		h_SubleadHiggsCharge.fill(ak.ravel(event_level.SubleadingHiggs_Charge),weight = event_level.event_weight*weight_Val)
+		
+		h_LeadDiTauPhi.fill(ak.ravel(leading_dPhi_Arr),weight = event_level.event_weight*weight_Val)
+		h_SubleadDiTauPhi.fill(ak.ravel(subleading_dPhi_Arr),weight = event_level.event_weight*weight_Val)
+		h_RadMETPhi.fill(ak.ravel(radionMET_dPhi),weight = event_level.event_weight*weight_Val)
+		h_RadLeadHiggsDeltaR.fill(ak.ravel(leadingHiggs_Rad_dR),weight = event_level.event_weight*weight_Val)
+		h_RadSubleadingHiggsDeltaR.fill(ak.ravel(subleadingHiggs_Rad_dR),weight = event_level.event_weight*weight_Val)
+		h_METLeadHiggsDeltaPhi.fill(ak.ravel(leadingHiggs_MET_dPhi_Arr),weight = event_level.event_weight*weight_Val)
+		h_METSubleadHiggsDeltaPhi.fill(ak.ravel(subleadingHiggs_MET_dPhi_Arr),weight = event_level.event_weight*weight_Val)
+		h_RadionEta.fill(ak.ravel(Radion_Reco.eta),weight = event_level.event_weight*weight_Val)
+		h_RadionCharge.fill(ak.ravel(event_level.Radion_Charge),weight = event_level.event_weight*weight_Val)
+
+		h_RadionpT.fill(ak.ravel(radionPT_Arr),weight = event_level.event_weight*weight_Val)
+		#h_taupT.fill(ak.ravel(tau.pt),weight = event_level.event_weight*weight_Val)
+		h_LeadTaupT.fill(ak.ravel(tau[ak.argsort(tau.pt,axis=-1)][:,3].pt),weight = event_level.event_weight*weight_Val)
+		h_SubleadTaupT.fill(ak.ravel(tau[ak.argsort(tau.pt,axis=-1)][:,2].pt),weight = event_level.event_weight*weight_Val)
+		h_3TaupT.fill(ak.ravel(tau[ak.argsort(tau.pt,axis=-1)][:,1].pt),weight = event_level.event_weight*weight_Val)
+		h_4TaupT.fill(ak.ravel(tau[ak.argsort(tau.pt,axis=-1)][:,0].pt),weight = event_level.event_weight*weight_Val)
+		#h_taupT = h_LeadTaupT + h_SubleadTaupT + h_3TaupT + h_4TaupT
+		#h_tauEta.fill(ak.ravel(tau.eta),weight = event_level.event_weight*weight_Val)
+		h_ZMult.fill(ak.ravel(event_level.ZMult),weight = event_level.event_weight*weight_Val)
+		h_ZMultEle.fill(ak.ravel(event_level.ZMult_e),weight = event_level.event_weight*weight_Val)
+		h_ZMultMu.fill(ak.ravel(event_level.ZMult_mu),weight = event_level.event_weight*weight_Val)
+		h_BJetMult.fill(ak.ravel(event_level.nBJets),weight = event_level.event_weight*weight_Val)
+		h_NElec.fill(ak.ravel(event_level.n_electrons),weight = event_level.event_weight*weight_Val)
+		h_NMuon.fill(ak.ravel(event_level.n_muons),weight = event_level.event_weight*weight_Val)
+		#h_MinTauEleDeltaR.fill(ak.ravel(ak.where(ak.num(electron.tau_min_dR,axis=1)!= 0, electron.tau_min_dR, ak.singletons(np.ones(ak.num(electron.tau_min_dR,axis=0))*999))),weight = event_level.event_weight*weight_Val)
+		#h_MinTauMuonDeltaR.fill(ak.ravel(ak.where(ak.num(muon.tau_min_dR,axis=1) != 0, muon.tau_min_dR, ak.singletons(np.ones(ak.num(muon.tau_min_dR,axis=0))*999))),weight = event_level.event_weight*weight_Val)
+		h_NEleTauID.fill(ak.ravel(event_level.n_tau_electrons),weight = event_level.event_weight*weight_Val)
+		h_NMuonTauID.fill(ak.ravel(event_level.n_tau_muons),weight = event_level.event_weight*weight_Val)
+		#h_.fill(ak.ravel(),weight = event_level.event_weight*weight_Val)
+		#h_.fill(ak.ravel(),weight = event_level.event_weight*weight_Val)
+		#h_.fill(ak.ravel(),weight = event_level.event_weight*weight_Val)
+		#h_.fill(ak.ravel(),weight = event_level.event_weight*weight_Val)
+		#h_.fill(ak.ravel(),weight = event_level.event_weight*weight_Val)
+
 		return{
 			dataset: {
 				#"Weight": weight_Val,
 				"Weight_Val": weight_Val,
 				"Weight": ak.to_list(event_level.event_weight*weight_Val), 
-				"FourTau_Mass_Arr": ak.to_list(FourTau_Mass_Arr),
-				"HiggsDeltaPhi_Arr": ak.to_list(Higgs_DeltaPhi_Arr),
-				"LeadingHiggs_mass": ak.to_list(LeadingHiggs_mass_Arr),
-				"SubLeadingHiggs_mass": ak.to_list(SubLeadingHiggs_mass_Arr),
-				"Higgs_DeltaR_Arr": ak.to_list(diHiggs_dR_Arr),
-				"leading_dR_Arr": ak.to_list(leading_dR_Arr),
-				"subleading_dR_Arr": ak.to_list(subleading_dR_Arr),
-				"LeadingHiggsSgn_Arr" : ak.to_list(event_level.LeadingHiggs_Charge),
-				"SubleadingHiggsSgn_Arr" : ak.to_list(ak.ravel(event_level.SubleadingHiggs_Charge)),
+				"FourTau_Mass_Arr": h_FourTauMass,
+				"HiggsDeltaPhi_Arr": h_HiggsDeltaPhi,
+				"LeadingHiggs_mass": h_LeadHiggsMass,
+				"SubLeadingHiggs_mass": h_SubleadingHiggsMass,
+				"Higgs_DeltaR_Arr": h_HiggsDeltaR,
+				"leading_dR_Arr": h_LeadDiTauDeltaR,
+				"subleading_dR_Arr": h_SubLeadingDiTauDeltaR,
+				"LeadingHiggsSgn_Arr" : h_LeadHiggsCharge,
+				"SubleadingHiggsSgn_Arr" : h_SubleadHiggsCharge,
 				
-				"leading_dPhi_Arr": ak.to_list(leading_dPhi_Arr),
-				"subleading_dPhi_Arr": ak.to_list(subleading_dPhi_Arr),
-				"radionMET_dPhi_Arr": ak.to_list(radionMET_dPhi),
-				"leadingHiggs_Rad_dR_Arr":ak.to_list(leadingHiggs_Rad_dR),
-				"subleadingHiggs_Rad_dR_Arr": ak.to_list(subleadingHiggs_Rad_dR),
-				"leadingHiggs_MET_dPhi_Arr": ak.to_list(leadingHiggs_MET_dPhi_Arr),
-				"subleadingHiggs_MET_dPhi_Arr": ak.to_list(subleadingHiggs_MET_dPhi_Arr),
-				"Radion_eta_Arr": ak.to_list(ak.ravel(Radion_Reco.eta)),
-				"Radion_Charge_Arr": ak.to_list(event_level.Radion_Charge),
+				"leading_dPhi_Arr": h_LeadDiTauPhi,
+				"subleading_dPhi_Arr": h_SubleadDiTauPhi,
+				"radionMET_dPhi_Arr": h_RadMETPhi,
+				"leadingHiggs_Rad_dR_Arr": h_RadLeadHiggsDeltaR,
+				"subleadingHiggs_Rad_dR_Arr": h_RadSubleadingHiggsDeltaR,
+				"leadingHiggs_MET_dPhi_Arr": h_METLeadHiggsDeltaPhi,
+				"subleadingHiggs_MET_dPhi_Arr": h_METSubleadHiggsDeltaPhi,
+				"Radion_eta_Arr": h_RadionEta,
+				"Radion_Charge_Arr": h_RadionCharge,
 				
-				"radionPT_Arr" : ak.to_list(radionPT_Arr),
-				"tau_pt_Arr": ak.to_list(ak.ravel(tau.pt)),
-				"tau_lead_pt_Arr": ak.to_list(ak.ravel(tau[ak.argsort(tau.pt,axis=-1)][:,3].pt)),
-				"tau_sublead_pt_Arr": ak.to_list(ak.ravel(tau[ak.argsort(tau.pt,axis=-1)][:,2].pt)),
-				"tau_3rdlead_pt_Arr": ak.to_list(ak.ravel(tau[ak.argsort(tau.pt,axis=-1)][:,1].pt)),
-				"tau_4thlead_pt_Arr": ak.to_list(ak.ravel(tau[ak.argsort(tau.pt,axis=-1)][:,0].pt)),
-				"tau_eta_Arr": ak.to_list(ak.ravel(tau.eta)),
-				"ZMult_Arr": ak.to_list(ak.ravel(event_level.ZMult)),
-				"ZMult_ele_Arr": ak.to_list(ak.ravel(event_level.ZMult_e)),
-				"ZMult_mu_Arr": ak.to_list(ak.ravel(event_level.ZMult_mu)),
-				#"ZMult_tau_Arr": ak.to_list(ak.ravel(event_level.ZMult_tau)),
-				"BJet_Arr": ak.to_list(ak.ravel(event_level.nBJets)),
+				"radionPT_Arr" : h_RadionpT,
+				#"tau_pt_Arr": h_taupT,
+				"tau_lead_pt_Arr":h_LeadTaupT ,
+				"tau_sublead_pt_Arr":h_SubleadTaupT ,
+				"tau_3rdlead_pt_Arr": h_3TaupT,
+				"tau_4thlead_pt_Arr": h_4TaupT,
+				#"tau_eta_Arr": h_tauEta,
+				"ZMult_Arr": h_ZMult,
+				"ZMult_ele_Arr": h_ZMultEle,
+				"ZMult_mu_Arr": h_ZMultMu,
+				"BJet_Arr": h_BJetMult,
 				"Lumi_Val": Lumi_2018,
 				"CrossSec_Val": crossSecVal,
 				"NEvent_Val": numEvents_Dict[dataset],
-				"Num_Electrons_Arr": ak.to_list(ak.ravel(event_level.n_electrons)),
-				"Num_Muons_Arr": ak.to_list(ak.ravel(event_level.n_muons)),
-				"Electron_tau_dR_Arr": ak.to_list(ak.ravel(ak.where(ak.num(electron.tau_min_dR,axis=1)!= 0, electron.tau_min_dR, ak.singletons(np.ones(ak.num(electron.tau_min_dR,axis=0))*999)))),
-				"Muon_tau_dR_Arr": ak.to_list(ak.ravel(ak.where(ak.num(muon.tau_min_dR,axis=1) != 0, muon.tau_min_dR, ak.singletons(np.ones(ak.num(muon.tau_min_dR,axis=0))*999)))), #muon.tau_min_dR
-                "num_electron_tau_Arr": ak.to_list(ak.ravel(event_level.n_tau_electrons)),
-                "num_muon_tau_Arr": ak.to_list(ak.ravel(event_level.n_tau_muons)),
-				#"LeadTau_h": ak.to_list(ak.ravel(event_level.LeadingTau_h)),	
-				#"PairLeadTau_h": ak.to_list(ak.ravel(event_level.PairedLeadingTau_h)),	
-				#"NextLeadTau_h": ak.to_list(ak.ravel(event_level.NextLeadingTau_h)),	
-				#"PairNextLeadTau_h": ak.to_list(ak.ravel(event_level.PairedNextLeadingTau_h)),	
-				#"LeadTau_ele": ak.to_list(ak.ravel(event_level.LeadingTau_ele)),	
-				#"PairLeadTau_ele": ak.to_list(ak.ravel(event_level.PairedLeadingTau_ele)),	
-				#"NextLeadTau_ele": ak.to_list(ak.ravel(event_level.NextLeadingTau_ele)),	
-				#"PairNextLeadTau_ele": ak.to_list(ak.ravel(event_level.PairedNextLeadingTau_ele)),	
-				#"LeadTau_mu": ak.to_list(ak.ravel(event_level.LeadingTau_mu)),	
-				#"PairLeadTau_mu": ak.to_list(ak.ravel(event_level.PairedLeadingTau_mu)),	
-				#"NextLeadTau_mu": ak.to_list(ak.ravel(event_level.NextLeadingTau_mu)),	
-				#"PairNextLeadTau_mu": ak.to_list(ak.ravel(event_level.PairedNextLeadingTau_mu)),	
-				#"Electron_tau_dR_Arr": electron.tau_min_dR,
-				#"Muon_tau_dR_Arr": muon.tau_min_dR
+				"Num_Electrons_Arr": h_NElec,
+				"Num_Muons_Arr": h_NMuon,
+				#"Electron_tau_dR_Arr": h_MinTauEleDeltaR,
+				#"Muon_tau_dR_Arr": h_MinTauMuonDeltaR, #muon.tau_min_dR
+                "num_electron_tau_Arr": h_NEleTauID,
+                "num_muon_tau_Arr": h_NMuonTauID,
 			}
 		}
 	
@@ -2478,21 +2557,6 @@ if __name__ == "__main__":
 	data_base = "root://cmsxrootd.hep.wisc.edu//store/user/twnelson/HH4Tau_EtAl/Skimmed_Files/2018/Data/" 
 
 	#Xrootd crap
-#	try:
-#	    _x509_path = (
-#        [
-#				line
-#				for line in os.popen("voms-proxy-info").read().split("\n")
-#				if line.startswith("path")
-#			][0]
-#			.split(":")[-1]
-#			.strip()
-#	    )
-#	except Exception as err:
-#		print(f"Could not find voms proxy, but continuing anyway.")
-#		print("Xrootd transfers will most likely fail.")
-        #return None
-
 	_x509_path = move_X509()
 	print(f"x509 path: {_x509_path}")
 	#Condor related stuff
@@ -2502,8 +2566,8 @@ if __name__ == "__main__":
 	
 	cluster = HTCondorCluster(
             cores=1,
-            memory="5 GB",
-            disk="1.5 GB",
+			memory="6 GB",
+            disk="3 GB",
             death_timeout = '60',
             job_extra_directives={
                 "+JobFlavour": '"tomorrow"',
@@ -2511,7 +2575,9 @@ if __name__ == "__main__":
                 "output": "dask_job_output.$(PROCESS).$(CLUSTER).out",
                 "error": "dask_job_output.$(PROCESS).$(CLUSTER).err",
                 "should_transfer_files": "yes",
-                "when_to_transfer_output": "ON_EXIT_OR_EVICT",
+                "when_to_transfer_ouput": "ON_EXIT_OR_EVICT",
+                #"transfer_output_remaps": working_dir,
+				#"transfer_output_files": os.getcwd(), #Dump parquet files in current directory
                 "transfer_executable": "false",
                 "+SingularityImage": '"/cvmfs/unpacked.cern.ch/registry.hub.docker.com/coffeateam/coffea-dask-cc7:latest-py3.10"',
                 #"+SingularityImage": '"/cvmfs/unpacked.cern.ch/registry.hub.docker.com/coffeateam/coffea-base-almalinux9:0.7.25-py3.10"',
@@ -2530,6 +2596,7 @@ if __name__ == "__main__":
 	run_on_condor = True
 	
 	if (run_on_condor):
+		print("Run on Condor")
 		iterative_runner = processor.Runner(
 			#executor = processor.DaskExecutor(client=Client(cluster)),
 			executor = processor.DaskExecutor(client=Client(cluster),status=False),
@@ -2549,7 +2616,7 @@ if __name__ == "__main__":
 	four_tau_hist_list = ["FourTau_Mass_Arr","HiggsDeltaPhi_Arr", "Higgs_DeltaR_Arr","leading_dR_Arr","subleading_dR_Arr","LeadingHiggs_mass","SubLeadingHiggs_mass", "radionPT_Arr", 
 			"ZMult_Arr", "BJet_Arr", "tau_lead_pt_Arr", "tau_sublead_pt_Arr", "tau_3rdlead_pt_Arr", "tau_4thlead_pt_Arr", "leading_dPhi_Arr", "subleading_dPhi_Arr", 
 			"radionMET_dPhi_Arr","leadingHiggs_Rad_dR_Arr","subleadingHiggs_Rad_dR_Arr","leadingHiggs_MET_dPhi_Arr","subleadingHiggs_MET_dPhi_Arr","Radion_eta_Arr", "Radion_Charge_Arr",
-			"LeadingHiggsSgn_Arr", "SubleadingHiggsSgn_Arr","Num_Electrons_Arr","Num_Muons_Arr","num_electron_tau_Arr","num_muon_tau_Arr"] #,"Electron_tau_dR_Arr","Muon_tau_dR_Arr"]
+			"LeadingHiggsSgn_Arr", "SubleadingHiggsSgn_Arr","Num_Electrons_Arr","Num_Muons_Arr"] #,"num_electron_tau_Arr","num_muon_tau_Arr"] #,"Electron_tau_dR_Arr","Muon_tau_dR_Arr"] (Removed num_electron_tau and num_muon_tau for now)
 	#four_tau_hist_list = ["Num_Electrons_Arr","Num_Muons_Arr","Electron_tau_dR_Arr","Muon_tau_dR_Arr"]
 	#four_tau_hist_list = ["ZMult_Arr","ZMult_ele_Arr","ZMult_mu_Arr", "ZMult_tau_Arr"]
 	#four_tau_hist_list = ["leading_dR_Arr"] #Only make 1 histogram for brevity/debugging purposes
@@ -2588,24 +2655,13 @@ if __name__ == "__main__":
 		print("====================Radion Mass = " + mass[0] + "." + mass[1] + " TeV====================")
 		#print(np.char.replace(np.array( os.listdir(background_loc + "ZZTo4L_25February25_0413_skim__skim_Feb25/")), "", background_loc + "ZZTo4L_25February25_0413_skim__skim_Feb25/",1).tolist())
 		file_dict_test = { #Reduced files to run over
-			#"ZZ4l": [background_base + "ZZTo4L_25February25_0413_skim__skim_Feb25/singleFileSkimForSubmission-NANO_NANO_411.root"],
-			#"ZZ4l": ["singleFileSkimForSubmission-NANO_NANO_411.root"],
-			"ZZ4l": np.char.replace(np.array( os.listdir(background_loc + "ZZTo4L_25February25_0413_skim__skim_Feb25/")), "", background_base + "ZZTo4L_25February25_0413_skim__skim_Feb25/",1).tolist(), #Run over allnanoAOD files
-			#"ZZ4l": np.char.replace(np.array( os.listdir(background_loc + "ZZ4l_Small_Sample/")), "", background_base + "ZZ4l_Small_Sample/",1).tolist(), #Run over allnanoAOD files
-			#"ZZ4l": np.char.replace(np.array( os.listdir(background_loc + "Hadd_ZZTo4L/")), "", background_base + "Hadd_ZZTo4L/",1).tolist(), #Run over allnanoAOD files
-			#"ZZ4l": [background_base + "Hadd_ZZTo4L/ZZTo4L_Hadd_9.root"],
-			
-			#"DYJetsToLL_Pt-50To100": [background_base + "DYJetsToLL_Pt-50To100.root"] ,
-			#"DYJetsToLL_Pt-100To250": [ background_base + "DYJetsToLL_Pt-100To250.root"], 
-			#"DYJetsToLL_Pt-250To400": [ background_base + "DYJetsToLL_Pt-250To400.root"], 
-			#"DYJetsToLL_Pt-400To650": [ background_base + "DYJetsToLL_Pt-400To650.root"], 
-			#"DYJetsToLL_Pt-650ToInf": [background_base + "DYJetsToLL_Pt-650ToInf.root"],
-			#"Signal": [signal_base + mass + ".root"],
-			#"Data_SingleMuon": [data_loc + "SingleMu_Run2018A.root"], #, data_loc + "SingleMu_Run2018B.root", data_loc + "SingleMu_Run2018C.root", data_loc + "SingleMu_Run2018D.root"],
-			#"Data_JetHT": [data_loc + "JetHT_Run2018A-17Sep2018-v1.root"] #, data_loc + "JetHT_Run2018B-17Sep2018-v1.root", data_loc + "JetHT_Run2018C-17Sep2018-v1.root",data_loc + "JetHT_Run2018D-PromptReco-v2.root"]
-			#"Data_SingleMuon": [data_loc + "SingleMu_Run2018A.root", data_loc + "SingleMu_Run2018B.root", data_loc + "SingleMu_Run2018C.root", data_loc + "SingleMu_Run2018D.root"],
-			#"Data_JetHT": [data_loc + "JetHT_Run2018A-17Sep2018-v1.root", data_loc + "JetHT_Run2018B-17Sep2018-v1.root", data_loc + "JetHT_Run2018C-17Sep2018-v1.root",data_loc + "JetHT_Run2018D-PromptReco-v2.root"]
-  
+			"ZZ4l": [background_base + "ZZTo4L_26August25_0757_skim_Newskim/ZZTo4L.root"], 
+			"Data_SingleMuon": [data_base + "SingleMu_Run2018A_27August25_0551_skim_Newskim/SingleMu_Run2018A.root", data_base + "SingleMu_Run2018B_27August25_0529_skim_Newskim/SingleMu_Run2018B.root", 
+                                data_base + "SingleMu_Run2018C_27August25_0540_skim_Newskim/SingleMu_Run2018C.root", data_base + "SingleMu_Run2018D_27August25_0613_skim_Newskim/SingleMu_Run2018D.root"],
+			#"Data_SingleMuon": [data_base + "SingleMu_Run2018A_27August25_0551_skim_Newskim/singleFileSkimForSubmission-NANO_NANO_227.root", data_base + "SingleMu_Run2018B_27August25_0529_skim_Newskim/singleFileSkimForSubmission-NANO_NANO_227.root", 
+                                #data_base + "SingleMu_Run2018C_27August25_0540_skim_Newskim/singleFileSkimForSubmission-NANO_NANO_227.root", data_base + "SingleMu_Run2018D_27August25_0613_skim_Newskim/singleFileSkimForSubmission-NANO_NANO_227.root"],#Single skimmed nanoAOD for increased speed for testing
+			"Data_JetHT": [data_base + "JetHT_2018_27August25_0655_skim_Newskim/JetHT_2018.root", data_base + "JetHT_Other_2018_27August25_0522_skim_Newskim/JetHT_Other_2018.root"]
+			#"Data_JetHT": [data_base + "JetHT_2018_27August25_0655_skim_Newskim/singleFileSkimForSubmission-NANO_NANO_227.root", data_base + "JetHT_Other_2018_27August25_0522_skim_Newskim/singleFileSkimForSubmission-NANO_NANO_227.root"] #Single skimmed nanoAOD for increased speed for testing^=
         }
 
 		#file_dict["ZZ4l"].remove("root://cms-xrd-global.cern.ch//store/user/twnelson/HH4Tau_EtAl/Skimmed_Files/2018/MC/Hadd_ZZTo4L/ZZTo4L_Hadd_9.root") #Remove file 9 to fix errors (maybe?)
@@ -2616,92 +2672,40 @@ if __name__ == "__main__":
 		}
 		
 		#Grand Unified Background + Signal + Data Dictionary links file name to location of root file
-		file_dict_full = {
-			"TTToSemiLeptonic": np.char.replace(np.array( os.listdir(background_loc + "TTToSemiLeptonic_28February25_0848_skim__skim_Feb25/")), "", background_base + "TTToSemiLeptonic_28February25_0848_skim__skim_Feb25/",1).tolist(), 
-			"TTTo2L2Nu": np.char.replace(np.array( os.listdir(background_loc + "TTTo2L2Nu_28February25_0613_skim__skim_Feb25/")), "", background_base + "TTTo2L2Nu_28February25_0613_skim__skim_Feb25/",1).tolist(), 
-			"TTToHadronic": np.char.replace(np.array( os.listdir(background_loc + "TTToHadronic_28February25_0521_skim__skim_Feb25/")), "", background_base + "TTToHadronic_28February25_0521_skim__skim_Feb25/",1).tolist(),
-			"ZZ4l": np.char.replace(np.array( os.listdir(background_loc + "ZZTo4L_25February25_0413_skim__skim_Feb25/")), "", background_base + "ZZTo4L_25February25_0413_skim__skim_Feb25/",1).tolist(), 
-			"VV2l2nu" : np.char.replace(np.array( os.listdir(background_loc + "WWTo2L2Nu_28February25_1013_skim__skim_Feb25/")), "", background_base + "WWTo2L2Nu_28February25_1013_skim__skim_Feb25/",1).tolist(), 
-			"WZ1l3nu" : np.char.replace(np.array( os.listdir(background_loc + "WZTo1L3Nu_4f_28February25_0951_skim__skim_Feb25/")), "", background_base + "WZTo1L3Nu_4f_28February25_0951_skim__skim_Feb25/",1).tolist(), 
-			"WZ3l1nu" : np.char.replace(np.array( os.listdir(background_loc + "WZTo3L1Nu_4f_21May25_1336_skim__skim_Feb25/")), "", background_base + "WZTo3L1Nu_4f_21May25_1336_skim__skim_Feb25/",1).tolist(),  
-			"ZZ2l2q" : np.char.replace(np.array( os.listdir(background_loc + "ZZTo2Q2L_28February25_0959_skim__skim_Feb25/")), "", background_base + "ZZTo2Q2L_28February25_0959_skim__skim_Feb25/",1).tolist(), 
-			"WZ2l2q" : np.char.replace(np.array( os.listdir(background_loc + "WZTo2L2Q_15May25_1113_skim__skim_Feb25/")), "", background_base + "WZTo2L2Q_15May25_1113_skim__skim_Feb25/",1).tolist(), 
-			"WZ1l1nu2q" : np.char.replace(np.array( os.listdir(background_loc + "WZTo1L1Nu2Q_28February25_0800_skim__skim_Feb25/")), "", background_base + "WZTo1L1Nu2Q_28February25_0800_skim__skim_Feb25/",1).tolist(),
-			#"DYJetsToLL_Pt-0To50": np.char.replace(np.array( os.listdir(background_loc + "DYJetsToLL_LHEFilterPtZ-0To50_MatchEWPDG20_21May25_0928_skim__skim_Feb25/")), "", background_base + "DYJetsToLL_LHEFilterPtZ-0To50_MatchEWPDG20_21May25_0928_skim__skim_Feb25/",1).tolist(),
-			"DYJetsToLL_Pt-50To100": np.char.replace(np.array( os.listdir(background_loc + "DYJetsToLL_LHEFilterPtZ-50To100_MatchEWPDG20_21May25_0941_skim__skim_Feb25/")), "", background_base + "DYJetsToLL_LHEFilterPtZ-50To100_MatchEWPDG20_21May25_0941_skim__skim_Feb25/",1).tolist(),
-			"DYJetsToLL_Pt-100To250": np.char.replace(np.array( os.listdir(background_loc + "DYJetsToLL_LHEFilterPtZ-100To250_MatchEWPDG20_21May25_0958_skim__skim_Feb25/")), "", background_base + "DYJetsToLL_LHEFilterPtZ-100To250_MatchEWPDG20_21May25_0958_skim__skim_Feb25/",1).tolist(), 
-			"DYJetsToLL_Pt-250To400": np.char.replace(np.array( os.listdir(background_loc + "DYJetsToLL_LHEFilterPtZ-250To400_MatchEWPDG20_21May25_0955_skim__skim_Feb25/")), "", background_base + "DYJetsToLL_LHEFilterPtZ-250To400_MatchEWPDG20_21May25_0955_skim__skim_Feb25/",1).tolist(), 
-			"DYJetsToLL_Pt-400To650": np.char.replace(np.array( os.listdir(background_loc + "DYJetsToLL_LHEFilterPtZ-400To650_MatchEWPDG20_21May25_0953_skim__skim_Feb25/")), "", background_base + "DYJetsToLL_LHEFilterPtZ-400To650_MatchEWPDG20_21May25_0953_skim__skim_Feb25/",1).tolist(), 
-			"DYJetsToLL_Pt-650ToInf": np.char.replace(np.array( os.listdir(background_loc + "DYJetsToLL_LHEFilterPtZ-650ToInf_MatchEWPDG20_21May25_0954_skim__skim_Feb25/")), "", background_base + "DYJetsToLL_LHEFilterPtZ-650ToInf_MatchEWPDG20_21May25_0954_skim__skim_Feb25/",1).tolist(),
-			"T-tchan" : np.char.replace(np.array( os.listdir(background_loc + "ST_t-channel_top_4f_InclusiveDecays_28February25_0801_skim__skim_Feb25/")), "", background_base + "ST_t-channel_top_4f_InclusiveDecays_28February25_0801_skim__skim_Feb25/",1).tolist(), 
-			"Tbar-tchan" : np.char.replace(np.array( os.listdir(background_loc + "ST_t-channel_antitop_4f_InclusiveDecays_28February25_0734_skim__skim_Feb25/")), "", background_base + "ST_t-channel_antitop_4f_InclusiveDecays_28February25_0734_skim__skim_Feb25/",1).tolist(), 
-			"T-tW" : np.char.replace(np.array( os.listdir(background_loc + "ST_tW_top_5f_inclusiveDecays_28February25_0656_skim__skim_Feb25/")), "", background_base + "ST_tW_top_5f_inclusiveDecays_28February25_0656_skim__skim_Feb25/",1).tolist(), 
-			"Tbar-tW" : np.char.replace(np.array( os.listdir(background_loc + "ST_tW_antitop_5f_inclusiveDecays_28February25_0714_skim__skim_Feb25/")), "", background_base + "ST_tW_antitop_5f_inclusiveDecays_28February25_0714_skim__skim_Feb25/",1).tolist(),
-			"WJetsToLNu_HT-100To200" : np.char.replace(np.array( os.listdir(background_loc + "WJetsToLNu_HT-100To200_28February25_0723_skim__skim_Feb25/")), "", background_base + "WJetsToLNu_HT-100To200_28February25_0723_skim__skim_Feb25/",1).tolist(),
-			"WJetsToLNu_HT-200To400" : np.char.replace(np.array( os.listdir(background_loc + "WJetsToLNu_HT-200To400_28February25_0658_skim__skim_Feb25/")), "", background_base + "WJetsToLNu_HT-200To400_28February25_0658_skim__skim_Feb25/",1).tolist(), 
-			"WJetsToLNu_HT-400To600" : np.concatenate((np.char.replace(np.array( os.listdir(background_loc + "WJetsToLNu_HT-400To600_28February25_0948_skim__skim_Feb25/")), "", background_base + "WJetsToLNu_HT-400To600_28February25_0948_skim__skim_Feb25/",1).tolist(),np.char.replace(np.array( os.listdir(background_loc + "WJetsToLNu_HT-400To600_OtherPart_28February25_0958_skim__skim_Feb25/")), "", background_base + "WJetsToLNu_HT-400To600_OtherPart_28February25_0958_skim__skim_Feb25/",1).tolist())).tolist(), 
-			"WJetsToLNu_HT-600To800" : np.concatenate((np.char.replace(np.array( os.listdir(background_loc + "WJetsToLNu_HT-600To800_28February25_0610_skim__skim_Feb25/")), "", background_base + "WJetsToLNu_HT-600To800_28February25_0610_skim__skim_Feb25/",1).tolist(),np.char.replace(np.array( os.listdir(background_loc + "WJetsToLNu_HT-600To800_OtherPart_28February25_0654_skim__skim_Feb25/")), "", background_base + "WJetsToLNu_HT-600To800_OtherPart_28February25_0654_skim__skim_Feb25/",1).tolist())).tolist(),
-			"WJetsToLNu_HT-800To1200" : np.concatenate((np.char.replace(np.array( os.listdir(background_loc + "WJetsToLNu_HT-800To1200_28February25_0609_skim__skim_Feb25/")), "", background_base + "WJetsToLNu_HT-800To1200_28February25_0609_skim__skim_Feb25/",1).tolist(),np.char.replace(np.array( os.listdir(background_loc + "WJetsToLNu_HT-800To1200_OtherPart_28February25_0846_skim__skim_Feb25/")), "", background_base + "WJetsToLNu_HT-800To1200_OtherPart_28February25_0846_skim__skim_Feb25/",1).tolist())).tolist(),
-			"WJetsToLNu_HT-1200To2500" : np.concatenate((np.char.replace(np.array( os.listdir(background_loc + "WJetsToLNu_HT-1200To2500_28February25_0952_skim__skim_Feb25/")), "", background_base + "WJetsToLNu_HT-1200To2500_28February25_0952_skim__skim_Feb25/",1).tolist(),np.char.replace(np.array( os.listdir(background_loc + "WJetsToLNu_HT-1200To2500_OtherPart_28February25_1012_skim__skim_Feb25/")), "", background_base + "WJetsToLNu_HT-1200To2500_OtherPart_28February25_1012_skim__skim_Feb25/",1).tolist())).tolist(),
-			"WJetsToLNu_HT-2500ToInf" : np.concatenate((np.char.replace(np.array( os.listdir(background_loc + "WJetsToLNu_HT-2500ToInf_28February25_1025_skim__skim_Feb25/")), "", background_base + "WJetsToLNu_HT-2500ToInf_28February25_1025_skim__skim_Feb25/",1).tolist(),np.char.replace(np.array( os.listdir(background_loc + "WJetsToLNu_HT-2500ToInf_OtherPart_28February25_1022_skim__skim_Feb25/")), "", background_base + "WJetsToLNu_HT-2500ToInf_OtherPart_28February25_1022_skim__skim_Feb25/",1).tolist())).tolist(),
-			
+		file_dict = {
+			"TTToSemiLeptonic": [background_base + "TTToSemiLeptonic_35August25_0448_skim_Newskim/TTToSemiLeptonic" + str(j) + ".root" for j in range(10)], 
+			"TTTo2L2Nu": [background_base + "TTTo2L2Nu_26August25_0719_skim_Newskim/TTTo2L2Nu.root"], 
+			"TTToHadronic": [background_base + "TTToHadronic_35August25_0419_skim_Newskim/TTToHadronic" + str(j) + ".root" for j in range(10)],
+			"ZZ4l": [background_base + "ZZTo4L_26August25_0757_skim_Newskim/ZZTo4L.root"], 
+			"VV2l2nu": [background_base + "WWTo2L2Nu_26August25_1040_skim_Newskim/WWTo2L2Nu.root"], 
+			"WZ1l3nu": [background_base + "WZTo1L3Nu_4f_26August25_1016_skim_Newskim/WZTo1L3Nu_4f.root"], 
+			"WZ3l1nu": [background_base + "WZTo3L1Nu_4f_26August25_1032_skim_Newskim/WZTo3L1Nu_4f.root"],  
+			"ZZ2l2q": [background_base + "ZZTo2Q2L_26August25_1034_skim_Newskim/ZZTo2Q2L.root"],
+			"WZ2l2q": [background_base + "WZTo2L2Q_26August25_0926_skim_Newskim/WZTo2L2Q.root"],
+			"WZ1l1nu2q" : [background_base + "WZTo1L1Nu2Q_26August25_0840_skim_Newskim/WZTo1L1Nu2Q.root"],
+			"DYJetsToLL_Pt-50To100": [background_base + "DYJetsToLL_LHEFilterPtZ-50To100_MatchEWPDG20_26August25_1018_skim_Newskim/DYJetsToLL_LHEFilterPtZ-50To100_MatchEWPDG20.root"],
+			"DYJetsToLL_Pt-100To250": [background_base + "DYJetsToLL_LHEFilterPtZ-100To250_MatchEWPDG20_26August25_0917_skim_Newskim/DYJetsToLL_LHEFilterPtZ-100To250_MatchEWPDG20.root"], 
+			"DYJetsToLL_Pt-250To400": [background_base + "DYJetsToLL_LHEFilterPtZ-250To400_MatchEWPDG20_26August25_0748_skim_Newskim/DYJetsToLL_LHEFilterPtZ-250To400_MatchEWPDG20.root"], 
+			"DYJetsToLL_Pt-400To650": [background_base + "DYJetsToLL_LHEFilterPtZ-400To650_MatchEWPDG20_26August25_1042_skim_Newskim/DYJetsToLL_LHEFilterPtZ-400To650_MatchEWPDG20.root"], 
+			"DYJetsToLL_Pt-650ToInf": [background_base + "DYJetsToLL_LHEFilterPtZ-650ToInf_MatchEWPDG20_26August25_0842_skim_Newskim/DYJetsToLL_LHEFilterPtZ-650ToInf_MatchEWPDG20.root"],
+			"T-tchan": [background_base + "ST_t-channel_top_4f_InclusiveDecays_26August25_0843_skim_Newskim/ST_t-channel_top_4f_InclusiveDecays.root"], 
+			"Tbar-tchan": [background_base + "ST_t-channel_antitop_4f_InclusiveDecays_26August25_0821_skim_Newskim/ST_t-channel_antitop_4f_InclusiveDecays.root"], 
+			"T-tW": [background_base + "ST_tW_top_5f_inclusiveDecays_26August25_0753_skim_Newskim/ST_tW_top_5f_inclusiveDecays.root"], 
+			"Tbar-tW": [background_base + "ST_tW_antitop_5f_inclusiveDecays_26August25_1030_skim_Newskim/ST_tW_antitop_5f_inclusiveDecays.root"],
+			"WJetsToLNu_HT-100To200": [background_base + "WJetsToLNu_HT-100To200_26August25_0810_skim_Newskim/WJetsToLNu_HT-100To200.root"],
+			"WJetsToLNu_HT-200To400": [background_base + "WJetsToLNu_HT-200To400_26August25_0709_skim_Newskim/WJetsToLNu_HT-200To400.root"], 
+			"WJetsToLNu_HT-400To600": [background_base + "WJetsToLNu_HT-400To600_26August25_1014_skim_Newskim/WJetsToLNu_HT-400To600.root", background_base +"WJetsToLNu_HT-400To600_OtherPart_26August25_1032_skim_Newskim/WJetsToLNu_HT-400To600_OtherPart.root"], 
+			"WJetsToLNu_HT-600To800": [background_base + "WJetsToLNu_HT-600To800_26August25_0755_skim_Newskim/WJetsToLNu_HT-600To800.root", background_base + "WJetsToLNu_HT-600To800_OtherPart_26August25_0752_skim_Newskim/WJetsToLNu_HT-600To800_OtherPart.root"],
+			"WJetsToLNu_HT-800To1200": [background_base + "WJetsToLNu_HT-800To1200_26August25_0708_skim_Newskim/WJetsToLNu_HT-800To1200.root", background_base + "WJetsToLNu_HT-800To1200_OtherPart_26August25_0925_skim_Newskim/WJetsToLNu_HT-800To1200_OtherPart.root"],
+			"WJetsToLNu_HT-1200To2500": [background_base + "WJetsToLNu_HT-1200To2500_26August25_1016_skim_Newskim/WJetsToLNu_HT-1200To2500.root", background_base + "WJetsToLNu_HT-1200To2500_OtherPart_26August25_1041_skim_Newskim/WJetsToLNu_HT-1200To2500_OtherPart.root"],
+			"WJetsToLNu_HT-2500ToInf": [background_base + "WJetsToLNu_HT-2500ToInf_26August25_1047_skim_Newskim/WJetsToLNu_HT-2500ToInf.root", background_base + "WJetsToLNu_HT-2500ToInf_OtherPart_26August25_1043_skim_Newskim/WJetsToLNu_HT-2500ToInf_OtherPart.root"],
 			#"Signal": [signal_base + mass + ".root"],
-			"Data_SingleMuon": np.concatenate((np.char.replace(np.array(os.listdir(data_loc + "SingleMu_Run2018A_22May25_1117_skim__skim_Feb25/")), "", data_base + "SingleMu_Run2018A_22May25_1117_skim__skim_Feb25/",1).tolist(),
-			np.char.replace(np.array(os.listdir(data_loc + "SingleMu_Run2018B_22May25_0822_skim__skim_Feb25/")), "", data_base + "SingleMu_Run2018B_22May25_0822_skim__skim_Feb25/").tolist(),
-			np.char.replace(np.array(os.listdir(data_loc + "SingleMu_Run2018B_22May25_1054_skim__skim_Feb25/")), "", data_base + "SingleMu_Run2018B_22May25_1054_skim__skim_Feb25/").tolist(),
-			np.char.replace(np.array(os.listdir(data_loc + "SingleMu_Run2018C_22May25_1102_skim__skim_Feb25/")), "", data_base + "SingleMu_Run2018C_22May25_1102_skim__skim_Feb25/").tolist(),
-			np.char.replace(np.array(os.listdir(data_loc + "SingleMu_Run2018D_23May25_0510_skim__skim_Feb25/")), "", data_base + "SingleMu_Run2018D_23May25_0510_skim__skim_Feb25/").tolist())).tolist() 
+			"Data_SingleMuon": [data_base + "SingleMu_Run2018A_27August25_0551_skim_Newskim/SingleMu_Run2018A.root", data_base + "SingleMu_Run2018B_27August25_0529_skim_Newskim/SingleMu_Run2018B.root", 
+                                data_base + "SingleMu_Run2018C_27August25_0540_skim_Newskim/SingleMu_Run2018C.root", data_base + "SingleMu_Run2018D_27August25_0613_skim_Newskim/SingleMu_Run2018D.root"],
+			"Data_JetHT": [data_base + "JetHT_2018_27August25_0655_skim_Newskim/JetHT_2018.root", data_base + "JetHT_Other_2018_27August25_0522_skim_Newskim/JetHT_Other_2018.root"]
 			#"Data_JetHT": [data_loc + "JetHT_Run2018A-17Sep2018-v1.root", data_loc + "JetHT_Run2018B-17Sep2018-v1.root", data_loc + "JetHT_Run2018C-17Sep2018-v1.root",data_loc + "JetHT_Run2018D-PromptReco-v2.root"]
 		}
 
-		#Removing the problem files
-		#file_dict_full["WJetsToLNu_HT-1200To2500"].remove(background_base + "WJetsToLNu_HT-1200To2500_OtherPart_28February25_1012_skim__skim_Feb25/singleFileSkimForSubmission-NANO_NANO_80.root")
-		file_dict_full["TTToHadronic"].remove(background_base + "TTToHadronic_28February25_0521_skim__skim_Feb25/singleFileSkimForSubmission-NANO_NANO_1386.root")
-
-		#file_dict_singleMuSignal = {
-		file_dict = {
-			#"ZZ4l": [background_base + "ZZTo4L_25February25_0413_skim__skim_Feb25/singleFileSkimForSubmission-NANO_NANO_9.root"],
-			"ZZ4l": np.char.replace(np.array( os.listdir(background_loc + "ZZTo4L_25February25_0413_skim__skim_Feb25/")), "", background_base + "ZZTo4L_25February25_0413_skim__skim_Feb25/",1).tolist(), 
-			#"TTTo2L2Nu": [background_base + "TTTo2L2Nu_28February25_0613_skim__skim_Feb25/singleFileSkimForSubmission-NANO_NANO_1081.root"],
-			#"TTTo2L2Nu": np.char.replace(np.array( os.listdir(background_loc + "TTTo2L2Nu_28February25_0613_skim__skim_Feb25/")), "", background_base + "TTTo2L2Nu_28February25_0613_skim__skim_Feb25/",1).tolist(), 
-			#"TTToSemiLeptonic": np.char.replace(np.array( os.listdir(background_loc + "TTToSemiLeptonic_28February25_0848_skim__skim_Feb25/")), "", background_base + "TTToSemiLeptonic_28February25_0848_skim__skim_Feb25/",1).tolist(), 
-			#"TTToHadronic": np.char.replace(np.array( os.listdir(background_loc + "TTToHadronic_28February25_0521_skim__skim_Feb25/")), "", background_base + "TTToHadronic_28February25_0521_skim__skim_Feb25/",1).tolist(),
-			#"TTToHadronic": [background_base + "TTToHadronic_28February25_0521_skim__skim_Feb25/singleFileSkimForSubmission-NANO_NANO_1386.root"],
-			#"WJetsToLNu_HT-1200To2500" : [background_base + "WJetsToLNu_HT-1200To2500_OtherPart_28February25_1012_skim__skim_Feb25/singleFileSkimForSubmission-NANO_NANO_80.root"],
-			#"DYJetsToLL_Pt-50To100": np.char.replace(np.array( os.listdir(background_loc + "DYJetsToLL_LHEFilterPtZ-50To100_MatchEWPDG20_21May25_0941_skim__skim_Feb25/")), "", background_base + "DYJetsToLL_LHEFilterPtZ-50To100_MatchEWPDG20_21May25_0941_skim__skim_Feb25/",1).tolist(),
-			"DYJetsToLL_Pt-100To250": np.char.replace(np.array( os.listdir(background_loc + "DYJetsToLL_LHEFilterPtZ-100To250_MatchEWPDG20_21May25_0958_skim__skim_Feb25/")), "", background_base + "DYJetsToLL_LHEFilterPtZ-100To250_MatchEWPDG20_21May25_0958_skim__skim_Feb25/",1).tolist(), 
-			"DYJetsToLL_Pt-250To400": np.char.replace(np.array( os.listdir(background_loc + "DYJetsToLL_LHEFilterPtZ-250To400_MatchEWPDG20_21May25_0955_skim__skim_Feb25/")), "", background_base + "DYJetsToLL_LHEFilterPtZ-250To400_MatchEWPDG20_21May25_0955_skim__skim_Feb25/",1).tolist(), 
-			"DYJetsToLL_Pt-400To650": np.char.replace(np.array( os.listdir(background_loc + "DYJetsToLL_LHEFilterPtZ-400To650_MatchEWPDG20_21May25_0953_skim__skim_Feb25/")), "", background_base + "DYJetsToLL_LHEFilterPtZ-400To650_MatchEWPDG20_21May25_0953_skim__skim_Feb25/",1).tolist(), 
-			"DYJetsToLL_Pt-650ToInf": np.char.replace(np.array( os.listdir(background_loc + "DYJetsToLL_LHEFilterPtZ-650ToInf_MatchEWPDG20_21May25_0954_skim__skim_Feb25/")), "", background_base + "DYJetsToLL_LHEFilterPtZ-650ToInf_MatchEWPDG20_21May25_0954_skim__skim_Feb25/",1).tolist(),
-			"VV2l2nu" : np.char.replace(np.array( os.listdir(background_loc + "WWTo2L2Nu_28February25_1013_skim__skim_Feb25/")), "", background_base + "WWTo2L2Nu_28February25_1013_skim__skim_Feb25/",1).tolist(), 
-			"WZ1l3nu" : np.char.replace(np.array( os.listdir(background_loc + "WZTo1L3Nu_4f_28February25_0951_skim__skim_Feb25/")), "", background_base + "WZTo1L3Nu_4f_28February25_0951_skim__skim_Feb25/",1).tolist(), 
-			"WZ3l1nu" : np.char.replace(np.array( os.listdir(background_loc + "WZTo3L1Nu_4f_21May25_1336_skim__skim_Feb25/")), "", background_base + "WZTo3L1Nu_4f_21May25_1336_skim__skim_Feb25/",1).tolist(),  
-			"ZZ2l2q" : np.char.replace(np.array( os.listdir(background_loc + "ZZTo2Q2L_28February25_0959_skim__skim_Feb25/")), "", background_base + "ZZTo2Q2L_28February25_0959_skim__skim_Feb25/",1).tolist(), 
-			"WZ2l2q" : np.char.replace(np.array( os.listdir(background_loc + "WZTo2L2Q_15May25_1113_skim__skim_Feb25/")), "", background_base + "WZTo2L2Q_15May25_1113_skim__skim_Feb25/",1).tolist(), 
-			"WZ1l1nu2q" : np.char.replace(np.array( os.listdir(background_loc + "WZTo1L1Nu2Q_28February25_0800_skim__skim_Feb25/")), "", background_base + "WZTo1L1Nu2Q_28February25_0800_skim__skim_Feb25/",1).tolist(),
-			"T-tchan" : np.char.replace(np.array( os.listdir(background_loc + "ST_t-channel_top_4f_InclusiveDecays_28February25_0801_skim__skim_Feb25/")), "", background_base + "ST_t-channel_top_4f_InclusiveDecays_28February25_0801_skim__skim_Feb25/",1).tolist(), 
-			"Tbar-tchan" : np.char.replace(np.array( os.listdir(background_loc + "ST_t-channel_antitop_4f_InclusiveDecays_28February25_0734_skim__skim_Feb25/")), "", background_base + "ST_t-channel_antitop_4f_InclusiveDecays_28February25_0734_skim__skim_Feb25/",1).tolist(), 
-			"T-tW" : np.char.replace(np.array( os.listdir(background_loc + "ST_tW_top_5f_inclusiveDecays_28February25_0656_skim__skim_Feb25/")), "", background_base + "ST_tW_top_5f_inclusiveDecays_28February25_0656_skim__skim_Feb25/",1).tolist(), 
-			"Tbar-tW" : np.char.replace(np.array( os.listdir(background_loc + "ST_tW_antitop_5f_inclusiveDecays_28February25_0714_skim__skim_Feb25/")), "", background_base + "ST_tW_antitop_5f_inclusiveDecays_28February25_0714_skim__skim_Feb25/",1).tolist(),
-			#"WJetsToLNu_HT-100To200" : np.char.replace(np.array( os.listdir(background_loc + "WJetsToLNu_HT-100To200_28February25_0723_skim__skim_Feb25/")), "", background_base + "WJetsToLNu_HT-100To200_28February25_0723_skim__skim_Feb25/",1).tolist(),
-			#"WJetsToLNu_HT-200To400" : np.char.replace(np.array( os.listdir(background_loc + "WJetsToLNu_HT-200To400_28February25_0658_skim__skim_Feb25/")), "", background_base + "WJetsToLNu_HT-200To400_28February25_0658_skim__skim_Feb25/",1).tolist(), 
-			#"WJetsToLNu_HT-400To600" : np.concatenate((np.char.replace(np.array( os.listdir(background_loc + "WJetsToLNu_HT-400To600_28February25_0948_skim__skim_Feb25/")), "", background_base + "WJetsToLNu_HT-400To600_28February25_0948_skim__skim_Feb25/",1).tolist(),np.char.replace(np.array( os.listdir(background_loc + "WJetsToLNu_HT-400To600_OtherPart_28February25_0958_skim__skim_Feb25/")), "", background_base + "WJetsToLNu_HT-400To600_OtherPart_28February25_0958_skim__skim_Feb25/",1).tolist())).tolist(), 
-			#"WJetsToLNu_HT-600To800" : np.concatenate((np.char.replace(np.array( os.listdir(background_loc + "WJetsToLNu_HT-600To800_28February25_0610_skim__skim_Feb25/")), "", background_base + "WJetsToLNu_HT-600To800_28February25_0610_skim__skim_Feb25/",1).tolist(),np.char.replace(np.array( os.listdir(background_loc + "WJetsToLNu_HT-600To800_OtherPart_28February25_0654_skim__skim_Feb25/")), "", background_base + "WJetsToLNu_HT-600To800_OtherPart_28February25_0654_skim__skim_Feb25/",1).tolist())).tolist(),
-			#"WJetsToLNu_HT-800To1200" : np.concatenate((np.char.replace(np.array( os.listdir(background_loc + "WJetsToLNu_HT-800To1200_28February25_0609_skim__skim_Feb25/")), "", background_base + "WJetsToLNu_HT-800To1200_28February25_0609_skim__skim_Feb25/",1).tolist(),np.char.replace(np.array( os.listdir(background_loc + "WJetsToLNu_HT-800To1200_OtherPart_28February25_0846_skim__skim_Feb25/")), "", background_base + "WJetsToLNu_HT-800To1200_OtherPart_28February25_0846_skim__skim_Feb25/",1).tolist())).tolist(),
-			#"WJetsToLNu_HT-1200To2500" : np.concatenate((np.char.replace(np.array( os.listdir(background_loc + "WJetsToLNu_HT-1200To2500_28February25_0952_skim__skim_Feb25/")), "", background_base + "WJetsToLNu_HT-1200To2500_28February25_0952_skim__skim_Feb25/",1).tolist(),np.char.replace(np.array( os.listdir(background_loc + "WJetsToLNu_HT-1200To2500_OtherPart_28February25_1012_skim__skim_Feb25/")), "", background_base + "WJetsToLNu_HT-1200To2500_OtherPart_28February25_1012_skim__skim_Feb25/",1).tolist())).tolist(),
-			#"WJetsToLNu_HT-2500ToInf" : np.concatenate((np.char.replace(np.array( os.listdir(background_loc + "WJetsToLNu_HT-2500ToInf_28February25_1025_skim__skim_Feb25/")), "", background_base + "WJetsToLNu_HT-2500ToInf_28February25_1025_skim__skim_Feb25/",1).tolist(),np.char.replace(np.array( os.listdir(background_loc + "WJetsToLNu_HT-2500ToInf_OtherPart_28February25_1022_skim__skim_Feb25/")), "", background_base + "WJetsToLNu_HT-2500ToInf_OtherPart_28February25_1022_skim__skim_Feb25/",1).tolist())).tolist(),
-			#"Data_SingleMuon": [data_base + "SingleMu_Run2018A_22May25_1117_skim__skim_Feb25/singleFileSkimForSubmission-NANO_NANO_9.root"]
-			#"Data_SingleMuon": np.char.replace(np.array(os.listdir(data_loc + "SingleMu_Run2018A_22May25_1117_skim__skim_Feb25/")), "", data_base + "SingleMu_Run2018A_22May25_1117_skim__skim_Feb25/",1).tolist()
-			"Data_SingleMuon": np.concatenate((np.char.replace(np.array(os.listdir(data_loc + "SingleMu_Run2018A_22May25_1117_skim__skim_Feb25/")), "", data_base + "SingleMu_Run2018A_22May25_1117_skim__skim_Feb25/",1).tolist(),
-			np.char.replace(np.array(os.listdir(data_loc + "SingleMu_Run2018B_22May25_0822_skim__skim_Feb25/")), "", data_base + "SingleMu_Run2018B_22May25_0822_skim__skim_Feb25/").tolist(),
-			np.char.replace(np.array(os.listdir(data_loc + "SingleMu_Run2018B_22May25_1054_skim__skim_Feb25/")), "", data_base + "SingleMu_Run2018B_22May25_1054_skim__skim_Feb25/").tolist(),
-			np.char.replace(np.array(os.listdir(data_loc + "SingleMu_Run2018C_22May25_1102_skim__skim_Feb25/")), "", data_base + "SingleMu_Run2018C_22May25_1102_skim__skim_Feb25/").tolist(),
-			np.char.replace(np.array(os.listdir(data_loc + "SingleMu_Run2018D_23May25_0510_skim__skim_Feb25/")), "", data_base + "SingleMu_Run2018D_23May25_0510_skim__skim_Feb25/").tolist())).tolist() 
-			#"Data_SingleMuon": [data_base + "SingleMu_Run2018A_22May25_1117_skim__skim_Feb25/singleFileSkimForSubmission-NANO_NANO_984.root"]
-		}
-		
-		#file_dict["TTToHadronic"].remove(background_base + "TTToHadronic_28February25_0521_skim__skim_Feb25/singleFileSkimForSubmission-NANO_NANO_1386.root")
-		#file_dict["TTTo2L2Nu"].remove(background_base + "TTTo2L2Nu_28February25_0613_skim__skim_Feb25/singleFileSkimForSubmission-NANO_NANO_1081.root")
 	#	
 	#file_dict_data = {
 	#		"Data_SingleMuon": np.concatenate((np.char.replace(np.array(os.listdir(data_loc + "SingleMu_Run2018A_22May25_1117_skim__skim_Feb25/")), "", data_base + "SingleMu_Run2018A_22May25_1117_skim__skim_Feb25/",1).tolist(),
@@ -2712,7 +2716,7 @@ if __name__ == "__main__":
 	#	}
 		
 		#Generate dictionary of number of processed events This logic needs fixing
-		print("About to obtain number of events being prscessed")
+		#print("About to obtain number of events being proscessed")
 		for key_name, file_array in file_dict.items(): 
 			print(key_name)
 			if (key_name != "Data_JetHT" and key_name != "Data_SingleMuon"): #This logic needs to be fixed
@@ -2733,9 +2737,11 @@ if __name__ == "__main__":
 					#tempFile = uproot.open(file[0]) #Get file
 					#tempFile = uproot.open(file) #Get file
 					with uproot.open(file) as tempFile:
+						print(file)
 						#print("Current number of events: " + str(numEvents_Dict[key_name]))
 						#print("Number of events being added: " + str(tempFile['Runs/genEventCount'].array()[0]))
-						numEvents_Dict[key_name] += tempFile['Runs/genEventCount'].array()[0] #Fixed for nanoAOD (!!This line may cause issues!!)
+						#numEvents_Dict[key_name] += tempFile['Runs/genEventCount'].array()[0] #Fixed for nanoAOD (!!This line may cause issues!!)
+						numEvents_Dict[key_name] += np.sum(tempFile['Runs/genEventCount'].array()) #Fixed for nanoAOD (!!This line may cause issues!!)
 					#numEvents_Dict[key_name] = tempFile['hEvents'].member('fEntries')/2
 					#numEvents_Dict[key_name] = tempFile['hcount'].member('fEntries')/2 #This is only good for miniAOD
 
@@ -2743,159 +2749,32 @@ if __name__ == "__main__":
 				numEvents_Dict[key_name] = 1
 
 		#break	
-		#background_list = [r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"]
-		#background_list = ["Di-Bosons", r"$ZZ \rightarrow 4l$"]
-		background_list = ["Di-Bosons", "Single Top", r"Drell-Yan+Jets", r"$ZZ \rightarrow 4l$"]
+		background_list = [r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"]
 		#background_list = [r"$ZZ \rightarrow 4l$"]
+		#background_list = ["Di-Bosons", r"$ZZ \rightarrow 4l$"]
+		#background_list = ["Di-Bosons", "Single Top", r"Drell-Yan+Jets", r"$ZZ \rightarrow 4l$"]
 		#background_list = [r"Drell-Yan+Jets"]
 		#background_list = [r"Di-Bosons"]
 		#background_list = ["W+Jets"]
 		#background_list = [r"$t\bar{t}$"]
 		#background_list = [r"$t\bar{t}$",r"$ZZ \rightarrow 4l$"]
 		signal_list = [r"MC Sample $m_\phi$ = %s TeV"%mass[0]]
-		background_plot_names = {r"$t\bar{t}$" : "_ttbar_", r"Drell-Yan+Jets": "_DYJets_", "Di-Bosons" : "_DiBosons_", "Single Top": "_SingleTop+", "QCD" : "_QCD_", "W+Jets" : "_WJets_", r"$ZZ \rightarrow 4l$" : "_ZZ4l_"} #For file names
+		background_plot_names = {r"$t\bar{t}$" : "_ttbar_", r"Drell-Yan+Jets": "_DYJets_", "Di-Bosons" : "_DiBosons_", "Single Top": "_SingleTop_", "QCD" : "_QCD_", "W+Jets" : "_WJets_", r"$ZZ \rightarrow 4l$" : "_ZZ4l_"} #For file names
 		
 		background_dict = {r"$t\bar{t}$" : ["TTToSemiLeptonic","TTTo2L2Nu","TTToHadronic"], 
 				r"Drell-Yan+Jets": ["DYJetsToLL_Pt-50To100","DYJetsToLL_Pt-100To250","DYJetsToLL_Pt-250To400","DYJetsToLL_Pt-400To650","DYJetsToLL_Pt-650ToInf"], 
 				"Di-Bosons": ["WZ3l1nu","WZ2l2q","WZ1l1nu2q","ZZ2l2q", "WZ1l3nu", "VV2l2nu"], "Single Top": ["Tbar-tchan","T-tchan","Tbar-tW","T-tW"], 
 				"W+Jets": ["WJetsToLNu_HT-100To200","WJetsToLNu_HT-200To400","WJetsToLNu_HT-400To600","WJetsToLNu_HT-600To800","WJetsToLNu_HT-800To1200","WJetsToLNu_HT-1200To2500","WJetsToLNu_HT-2500ToInf"],
-				#"W+Jets": ["WJetsToLNu_HT-100To200","WJetsToLNu_HT-200To400","WJetsToLNu_HT-400To600","WJetsToLNu_HT-600To800","WJetsToLNu_HT-800To1200","WJetsToLNu_HT-1200To2500"],
 				r"$ZZ \rightarrow 4l$" : ["ZZ4l"]
 		}
 		
-		#background_dict = {r"$ZZ \rightarrow 4l$" : ["ZZ4l"]}
-		#background_dict = {r"Drell-Yan+Jets" : ["DYJetsToLL_Pt-50To100","DYJetsToLL_Pt-100To250","DYJetsToLL_Pt-250To400","DYJetsToLL_Pt-400To650","DYJetsToLL_Pt-650ToInf"]}
 
 		for trigger_name, trigger_pair in trigger_dict.items(): #Run over all triggers/combinations of interest
-			#Histogram bining
-			if (trigger_pair[0] == 39): #Use reduced binning for JetHT trigger
-				N1 = 6 
-				N2 = 6 
-			else:
-				N1 = 10 
-				N2 = 8 
-			
 			#Dictionaries of histograms for background, signal and data
-			hist_dict_background = {
-					"FourTau_Mass_Arr": hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name="background").Regular(N1,0,3000, label = r"$m_{4\tau}$ [GeV]").Double(), 
-					"HiggsDeltaPhi_Arr": hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name="background").Reg(N1,-pi,pi, label = r"Higgs $\Delta \phi$").Double(), 
-				"Higgs_DeltaR_Arr": hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name="background").Reg(N1,0,5, label = r"Higgs $\Delta$R").Double(), 
-				"leading_dR_Arr": hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name="background").Reg(N1,0,5, label = r"Leading di-$\tau$ $\Delta$R").Double(), 
-				"subleading_dR_Arr": hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name="background").Reg(N1,0,5, label = r"Sub-leading di-$\tau$ $\Delta$R").Double(), 
-				"LeadingHiggs_mass" : hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name="background").Reg(N2,0,120, label=r"Leading di-$\tau$ Mass (GeV)").Double(), 
-				"SubLeadingHiggs_mass" : hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name="background").Reg(N2,0,120, label=r"Sub-Leading di-$\tau$ Mass (GeV)").Double(), 
-				"radionPT_Arr" : hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name="background").Reg(N1,0,500, label=r"Radion $p_T$ (GeV)").Double(), 
-				"tau_pt_Arr": hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name="background").Reg(N1,0,400, label=r"$\tau$ $p_T$ (GeV)").Double(),
-				"tau_eta_Arr": hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name="background").Reg(N1,-5,5, label = r"$\tau \ \eta$").Double(),
-				"ZMult_Arr": hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name="background").Reg(6,0,6, label = r"Z Boson Multiplicity").Double(),
-				"ZMult_ele_Arr": hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name="background").Reg(6,0,6, label = r"Z Boson Multiplicity (electrons only)").Double(),
-				"ZMult_mu_Arr": hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name="background").Reg(6,0,6, label = r"Z Boson Multiplicity (muons only)").Double(),
-				"ZMult_tau_Arr": hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name="background").Reg(6,0,6, label = r"Z Boson Multiplicity (from taus)").Double(),
-				"BJet_Arr": hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name="background").Reg(6,0,6, label = r"B Jet Multiplicity").Double(),
-				"tau_lead_pt_Arr": hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name="background").Reg(N1,0,400, label=r"Leading $\tau$ $p_T$ (GeV)").Double(),
-				"tau_sublead_pt_Arr": hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name="background").Reg(N1,0,400, label=r"Subleading $\tau$ $p_T$ (GeV)").Double(),
-				"tau_3rdlead_pt_Arr": hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name="background").Reg(N1,0,400, label=r"Third Leading $\tau$ $p_T$ (GeV)").Double(),
-				"tau_4thlead_pt_Arr": hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name="background").Reg(N1,0,400, label=r"Fourth Leading $\tau$ $p_T$ (GeV)").Double(),
-				
-				"leading_dPhi_Arr": hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name="background").Reg(N1,-pi,pi, label = r"Leading di-$\tau$ $\Delta \phi$").Double(), 
-				"subleading_dPhi_Arr": hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name="background").Reg(N1,-pi,pi, label = r"Subleading di-$\tau$ $\Delta \phi$").Double(), 
-				"radionMET_dPhi_Arr": hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name="background").Reg(N1,-pi,pi, label = r"Radion MET $\Delta \phi$").Double(), 
-				"leadingHiggs_Rad_dR_Arr": hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name="background").Reg(N1,0,5, label = r"Leading Higgs Radion $\Delta$R").Double(),
-				"subleadingHiggs_Rad_dR_Arr": hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name="background").Reg(N1,0,5, label = r"Subleading Higgs Radion $\Delta$R").Double(),
-				"leadingHiggs_MET_dPhi_Arr": hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name="background").Reg(N1,-pi,pi, label = r"Leading Higgs MET $\Delta \phi$").Double(), 
-				"subleadingHiggs_MET_dPhi_Arr": hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name="background").Reg(N1,-pi,pi, label = r"Subleading Higgs MET $\Delta \phi$").Double(),
-				"Radion_eta_Arr": hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name="background").Reg(N1,-5,5, label = r"Radion $\eta$").Double(),
-				"Radion_Charge_Arr": hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name = "background").Reg(10,-5,5,label = r"Radion Electric Charge").Double(),
-				"LeadingHiggsSgn_Arr": hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name = "background").Reg(8,-4,4,label = r"Leading Higgs Electric Charge").Double(),
-				"SubleadingHiggsSgn_Arr": hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name = "background").Reg(8,-4,4,label = r"Subleading Higgs Electric Charge").Double(),
-				"Num_Electrons_Arr": hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name = "background").Reg(8,0,8,label = r"number of electrons").Double(),
-				"Num_Muons_Arr" : hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name = "background").Reg(8,0,8,label = r"number of muons").Double(),
-				"Electron_tau_dR_Arr" : hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name = "background").Reg(N1,0,1,label = r"Minimized tau to electron").Double(),
-				"Muon_tau_dR_Arr" : hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name = "background").Reg(N1,0,1,label = r"Minimized tau to muon").Double(),
-				"num_electron_tau_Arr": hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name = "background").Reg(5,0,5,label=r"Number of electrons identified as taus").Double(),
-				"num_muon_tau_Arr": hist.Hist.new.StrCat([r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"],name = "background").Reg(5,0,5,label=r"Number of muon identified as taus").Double(),
-
-			}
+			hist_dict_background = dict.fromkeys(four_tau_hist_list)
+			hist_dict_signal = dict.fromkeys(four_tau_hist_list)
+			hist_dict_data = dict.fromkeys(four_tau_hist_list)
 			
-			hist_dict_signal = {
-				"FourTau_Mass_Arr": hist.Hist.new.StrCat(["Signal"],name="signal").Regular(N1,0,3000, label = r"$m_{4\tau}$ [GeV]").Double(),
-				"HiggsDeltaPhi_Arr": hist.Hist.new.StrCat(["Signal"],name="signal").Reg(N1,-pi,pi, label = r"Higgs $\Delta \phi$").Double(), 
-				"Higgs_DeltaR_Arr": hist.Hist.new.StrCat(["Signal"],name="signal").Reg(N1,0,5, label = r"Higgs $\Delta$R").Double(),
-				"leading_dR_Arr": hist.Hist.new.StrCat(["Signal"],name="signal").Reg(N1,0,5, label = r"Leading di-$\tau$ $\Delta$R").Double(),
-				"subleading_dR_Arr": hist.Hist.new.StrCat(["Signal"],name="signal").Reg(N1,0,5, label = r"Sub-leading di-$\tau$ $\Delta$R").Double(),
-				"LeadingHiggs_mass" : hist.Hist.new.StrCat(["Signal"],name="signal").Reg(N2,0,120, label=r"Leading di-$\tau$ Mass (GeV)").Double(),
-				"SubLeadingHiggs_mass" : hist.Hist.new.StrCat(["Signal"],name="signal").Reg(N2,0,120, label=r"Sub-Leading di-$\tau$ Mass (GeV)").Double(),
-				"radionPT_Arr" : hist.Hist.new.StrCat(["Signal"],name="signal").Reg(N1,0,500, label=r"Radion $p_T$ (GeV)").Double(),
-				"tau_pt_Arr": hist.Hist.new.StrCat(["Signal"],name="signal").Reg(N1,0,400, label=r"$\tau$ $p_T$ (GeV)").Double(),
-				"tau_eta_Arr": hist.Hist.new.StrCat(["Signal"],name="signal").Reg(N1,-5,5, label = r"$\tau \ \eta$").Double(),
-				"ZMult_Arr": hist.Hist.new.StrCat(["Signal"],name="signal").Reg(6,0,6, label = r"Z Boson Multiplicity").Double(),
-				"ZMult_ele_Arr": hist.Hist.new.StrCat(["Signal"],name="signal").Reg(6,0,6, label = r"Z Boson Multiplicity (electrons only)").Double(),
-				"ZMult_mu_Arr": hist.Hist.new.StrCat(["Signal"],name="signal").Reg(6,0,6, label = r"Z Boson Multiplicity (muons only)").Double(),
-				"ZMult_tau_Arr": hist.Hist.new.StrCat(["Signal"],name="signal").Reg(6,0,6, label = r"Z Boson Multiplicity (from taus)").Double(),
-				"BJet_Arr": hist.Hist.new.StrCat(["Signal"],name="signal").Reg(6,0,6, label = r"B Jet Multiplicity").Double(),
-				"tau_lead_pt_Arr": hist.Hist.new.StrCat(["Signal"],name="signal").Reg(N1,0,400, label=r"Leading $\tau$ $p_T$ (GeV)").Double(),
-				"tau_sublead_pt_Arr": hist.Hist.new.StrCat(["Signal"],name="signal").Reg(N1,0,400, label=r"Subleading $\tau$ $p_T$ (GeV)").Double(),
-				"tau_3rdlead_pt_Arr": hist.Hist.new.StrCat(["Signal"],name="signal").Reg(N1,0,400, label=r"Third leading $\tau$ $p_T$ (GeV)").Double(),
-				"tau_4thlead_pt_Arr": hist.Hist.new.StrCat(["Signal"],name="signal").Reg(N1,0,400, label=r"Fourth leading $\tau$ $p_T$ (GeV)").Double(),
-				"leading_dPhi_Arr": hist.Hist.new.StrCat(["Signal"],name="signal").Reg(N1,-pi,pi, label = r"Leading di-$\tau$ $\Delta \phi$").Double(), 
-				"subleading_dPhi_Arr": hist.Hist.new.StrCat(["Signal"],name="signal").Reg(N1,-pi,pi, label = r"Subleading di-$\tau$ $\Delta \phi$").Double(), 
-				"radionMET_dPhi_Arr": hist.Hist.new.StrCat(["Signal"],name="signal").Reg(N1,-pi,pi, label = r"Radion MET $\Delta \phi$").Double(), 
-				"leadingHiggs_Rad_dR_Arr": hist.Hist.new.StrCat(["Signal"],name="signal").Reg(N1,0,5, label = r"Leading Higgs Radion $\Delta$R").Double(),
-				"subleadingHiggs_Rad_dR_Arr": hist.Hist.new.StrCat(["Signal"],name="signal").Reg(N1,0,5, label = r"Subleading Higgs Radion $\Delta$R").Double(),
-				"leadingHiggs_MET_dPhi_Arr": hist.Hist.new.StrCat(["Signal"],name="signal").Reg(N1,-pi,pi, label = r"Leading Higgs MET $\Delta \phi$").Double(), 
-				"subleadingHiggs_MET_dPhi_Arr": hist.Hist.new.StrCat(["Signal"],name="signal").Reg(N1,-pi,pi, label = r"Subleading Higgs MET $\Delta \phi$").Double(),
-				"Radion_eta_Arr": hist.Hist.new.StrCat(["Signal"],name="signal").Reg(N1,-5,5, label = r"Radion $\eta$").Double(),
-				"Radion_Charge_Arr": hist.Hist.new.StrCat(["Signal"],name = "signal").Reg(10,-5,5,label = r"Radion Electric Charge").Double(),
-				"LeadingHiggsSgn_Arr": hist.Hist.new.StrCat(["Signal"],name = "signal").Reg(8,-4,4,label = r"Leading Higgs Electric Charge").Double(),
-				"SubleadingHiggsSgn_Arr": hist.Hist.new.StrCat(["Signal"],name = "signal").Reg(8,-4,4,label = r"Subleading Higgs Electric Charge").Double(),
-				"Num_Electrons_Arr": hist.Hist.new.StrCat(["Signal"],name = "signal").Reg(8,0,8,label = r"number of electrons").Double(),
-				"Num_Muons_Arr" : hist.Hist.new.StrCat(["Signal"],name = "signal").Reg(8,0,8,label = r"number of muons").Double(),
-				"Electron_tau_dR_Arr" : hist.Hist.new.StrCat(["Signal"],name = "signal").Reg(N1,0,1,label = r"Minimized tau to electron").Double(),
-				"Muon_tau_dR_Arr" : hist.Hist.new.StrCat(["Signal"],name = "signal").Reg(N1,0,1,label = r"Minimized tau to muon").Double(),
-				"num_electron_tau_Arr": hist.Hist.new.StrCat(["Signal"],name = "signal").Reg(5,0,5,label=r"Number of electrons identified as taus").Double(),
-				"num_muon_tau_Arr": hist.Hist.new.StrCat(["Signal"],name = "signal").Reg(5,0,5,label=r"Number of muon identified as taus").Double(),
-
-
-			}
-			hist_dict_data = {
-				"FourTau_Mass_Arr": hist.Hist.new.StrCat(["Data"],name="data").Regular(N1,0,3000, label = r"$m_{4\tau}$ [GeV]").Double(),
-				"HiggsDeltaPhi_Arr": hist.Hist.new.StrCat(["Data"],name="data").Reg(N1,-pi,pi, label = r"Higgs $\Delta \phi$").Double(), 
-				"Higgs_DeltaR_Arr": hist.Hist.new.StrCat(["Data"],name="data").Reg(N1,0,5, label = r"Higgs $\Delta$R").Double(),
-				"leading_dR_Arr": hist.Hist.new.StrCat(["Data"],name="data").Reg(N1,0,5, label = r"Leading di-$\tau$ $\Delta$R").Double(),
-				"subleading_dR_Arr": hist.Hist.new.StrCat(["Data"],name="data").Reg(N1,0,5, label = r"Sub-leading di-$\tau$ $\Delta$R").Double(),
-				"LeadingHiggs_mass" : hist.Hist.new.StrCat(["Data"],name="data").Reg(N2,0,120, label=r"Leading di-$\tau$ Mass (GeV)").Double(),
-				"SubLeadingHiggs_mass" : hist.Hist.new.StrCat(["Data"],name="data").Reg(N2,0,120, label=r"Sub-Leading di-$\tau$ Mass (GeV)").Double(),
-				"radionPT_Arr" : hist.Hist.new.StrCat(["Data"],name="data").Reg(N1,0,500, label=r"Radion $p_T$ (GeV)").Double(),
-				"tau_pt_Arr": hist.Hist.new.StrCat(["Data"],name="data").Reg(N1,0,400, label=r"$\tau$ $p_T$ (GeV)").Double(),
-				"tau_eta_Arr": hist.Hist.new.StrCat(["Data"],name="data").Reg(N1,-5,5, label = r"$\tau \ \eta$").Double(),
-				"ZMult_Arr": hist.Hist.new.StrCat(["Data"],name="data").Reg(6,0,6, label = r"Z Boson Multiplicity").Double(),
-				"ZMult_ele_Arr": hist.Hist.new.StrCat(["Data"],name="data").Reg(6,0,6, label = r"Z Boson Multiplicity (electrons only)").Double(),
-				"ZMult_mu_Arr": hist.Hist.new.StrCat(["Data"],name="data").Reg(6,0,6, label = r"Z Boson Multiplicity (muons only)").Double(),
-				"ZMult_tau_Arr": hist.Hist.new.StrCat(["Data"],name="data").Reg(6,0,6, label = r"Z Boson Multiplicity (from taus)").Double(),
-				"BJet_Arr": hist.Hist.new.StrCat(["Data"],name="data").Reg(6,0,6, label = r"B Jet Multiplicity").Double(),
-				"tau_lead_pt_Arr": hist.Hist.new.StrCat(["Data"],name="data").Reg(N1,0,400, label=r"Leading $\tau$ $p_T$ (GeV)").Double(),
-				"tau_sublead_pt_Arr": hist.Hist.new.StrCat(["Data"],name="data").Reg(N1,0,400, label=r"Subleading $\tau$ $p_T$ (GeV)").Double(),
-				"tau_3rdlead_pt_Arr": hist.Hist.new.StrCat(["Data"],name="data").Reg(N1,0,400, label=r"Third leading $\tau$ $p_T$ (GeV)").Double(),
-				"tau_4thlead_pt_Arr": hist.Hist.new.StrCat(["Data"],name="data").Reg(N1,0,400, label=r"Fourth leading $\tau$ $p_T$ (GeV)").Double(),
-				"leading_dPhi_Arr": hist.Hist.new.StrCat(["Data"],name="data").Reg(N1,-pi,pi, label = r"Leading di-$\tau$ $\Delta \phi$").Double(), 
-				"subleading_dPhi_Arr": hist.Hist.new.StrCat(["Data"],name="data").Reg(N1,-pi,pi, label = r"Subleading di-$\tau$ $\Delta \phi$").Double(), 
-				"radionMET_dPhi_Arr": hist.Hist.new.StrCat(["Data"],name="data").Reg(N1,-pi,pi, label = r"Radion MET $\Delta \phi$").Double(), 
-				"leadingHiggs_Rad_dR_Arr": hist.Hist.new.StrCat(["Data"],name="data").Reg(N1,0,5, label = r"Leading Higgs Radion $\Delta$R").Double(),
-				"subleadingHiggs_Rad_dR_Arr": hist.Hist.new.StrCat(["Data"],name="data").Reg(N1,0,5, label = r"Subleading Higgs Radion $\Delta$R").Double(),
-				"leadingHiggs_MET_dPhi_Arr": hist.Hist.new.StrCat(["Data"],name="data").Reg(N1,-pi,pi, label = r"Leading Higgs MET $\Delta \phi$").Double(), 
-				"subleadingHiggs_MET_dPhi_Arr": hist.Hist.new.StrCat(["Data"],name="data").Reg(N1,-pi,pi, label = r"Subleading Higgs MET $\Delta \phi$").Double(),
-				"Radion_eta_Arr": hist.Hist.new.StrCat(["Data"],name="data").Reg(N1,-5,5, label = r"Radion $\eta$").Double(),
-				"Radion_Charge_Arr": hist.Hist.new.StrCat(["Data"],name = "data").Reg(10,-5,5,label = r"Radion Electric Charge").Double(),
-				"LeadingHiggsSgn_Arr": hist.Hist.new.StrCat(["Data"],name = "data").Reg(8,-4,4,label = r"Leading Higgs Electric Charge").Double(),
-				"SubleadingHiggsSgn_Arr": hist.Hist.new.StrCat(["Data"],name = "data").Reg(8,-4,4,label = r"Subleading Higgs Electric Charge").Double(),
-				"Num_Electrons_Arr": hist.Hist.new.StrCat(["Data"],name = "data").Reg(8,0,8,label = r"number of electrons").Double(),
-				"Num_Muons_Arr" : hist.Hist.new.StrCat(["Data"],name = "data").Reg(8,0,8,label = r"number of muons").Double(),
-				"Electron_tau_dR_Arr" : hist.Hist.new.StrCat(["Data"],name = "data").Reg(N1,0,1,label = r"Minimized tau to electron").Double(),
-				"Muon_tau_dR_Arr" : hist.Hist.new.StrCat(["Data"],name = "data").Reg(N1,0,1,label = r"Minimized tau to muon").Double(),
-				"num_electron_tau_Arr": hist.Hist.new.StrCat(["Data"],name = "data").Reg(5,0,5,label=r"Number of electrons identified as taus").Double(),
-				"num_muon_tau_Arr": hist.Hist.new.StrCat(["Data"],name = "data").Reg(5,0,5,label=r"Number of muon identified as taus").Double(),
-			}
-				
 			#Dictinary with file names
 			four_tau_names = {"FourTau_Mass_Arr": "FourTauMass_" + mass + "-" + trigger_name, "HiggsDeltaPhi_Arr": "HiggsDeltaPhi_" + mass + "-" + trigger_name, 
 				"Pair_DeltaPhi_Hist": "TauPair_DeltaPhi_" + mass + "-" + trigger_name, "RadionPTComp_Hist": "pTReco_Comp_"+mass+ "-"+ trigger_name,
@@ -2929,45 +2808,6 @@ if __name__ == "__main__":
 			for hist_name in four_tau_hist_list: #Loop over all histograms
 				#fig,ax = plt.subplots()
 				#fig0,ax0 = plt.subplots()
-#				if (hist_name != "Pair_DeltaPhi_Hist" and hist_name != "RadionPTComp_Hist"):
-#					hist_dict_only_signal = {
-#						"FourTau_Mass_Arr": hist.Hist.new.Regular(N1,0,3000, label = r"$m_{4\tau}$ [GeV]").Double(),
-#						"HiggsDeltaPhi_Arr": hist.Hist.new.Regular(N1,-pi,pi, label = r"Higgs $\Delta \phi$").Double(), 
-#						"Higgs_DeltaR_Arr": hist.Hist.new.Regular(N1,0,5, label = r"Higgs $\Delta$R").Double(),
-#						"leading_dR_Arr": hist.Hist.new.Regular(N1,0,5, label = r"Leading di-$\tau$ $\Delta$R").Double(),
-#						"subleading_dR_Arr": hist.Hist.new.Regular(N1,0,5, label = r"Sub-leading di-$\tau$ $\Delta$R").Double(),
-#						"LeadingHiggs_mass" : hist.Hist.new.Regular(N2,0,120, label=r"Leading Higgs Mass (GeV)").Double(),
-#						"SubLeadingHiggs_mass" : hist.Hist.new.Regular(N2,0,120, label=r"Sub-Leading Higgs Mass (GeV)").Double(),
-#						"radionPT_Arr" : hist.Hist.new.Regular(N1,0,500, label=r"Radion $p_T$ (GeV)").Double(),
-#						"tau_pt_Arr": hist.Hist.new.Regular(N1,0,400, label=r"$\tau$ $p_T$ (GeV)").Double(),
-#						"tau_eta_Arr": hist.Hist.new.Regular(N1,-5,5, label = r"$\tau \ \eta$").Double(),
-#						"ZMult_Arr": hist.Hist.new.Regular(6,0,6, label = r"Z Boson Multiplicity").Double(),
-#						"ZMult_ele_Arr": hist.Hist.new.Regular(6,0,6, label = r"Z Boson Multiplicity (electrons only)").Double(),
-#						"ZMult_mu_Arr": hist.Hist.new.Regular(6,0,6, label = r"Z Boson Multiplicity (muons only)").Double(),
-#						"ZMult_tau_Arr": hist.Hist.new.Regular(6,0,6, label = r"Z Boson Multiplicity (from taus)").Double(),
-#						"BJet_Arr": hist.Hist.new.Regular(6,0,6, label = r"BJet Multiplicity").Double(),
-#						"tau_lead_pt_Arr" : hist.Hist.new.Regular(N1,0,400, label=r"Leading $\tau$ $p_T$ (GeV)").Double(),
-#						"tau_sublead_pt_Arr" : hist.Hist.new.Regular(N1,0,400, label=r"Subleading $\tau$ $p_T$ (GeV)").Double(),
-#						"tau_3rdlead_pt_Arr" : hist.Hist.new.Regular(N1,0,400, label=r"Third leading $\tau$ $p_T$ (GeV)").Double(),
-#						"tau_4thlead_pt_Arr" : hist.Hist.new.Regular(N1,0,400, label=r"Fourth leading $\tau$ $p_T$ (GeV)").Double(),
-#						"leading_dPhi_Arr": hist.Hist.new.Regular(N1,-pi,pi, label = r"Leading di-$\tau$ $\Delta \phi$").Double(), 
-#						"subleading_dPhi_Arr": hist.Hist.new.Regular(N1,-pi,pi, label = r"Subleading di-$\tau$ $\Delta \phi$").Double(), 
-#						"radionMET_dPhi_Arr": hist.Hist.new.Regular(N1,-pi,pi, label = r"Radion MET $\Delta \phi$").Double(), 
-#						"leadingHiggs_Rad_dR_Arr": hist.Hist.new.Regular(N1,0,5, label = r"Leading Higgs Radion $\Delta$R").Double(),
-#						"subleadingHiggs_Rad_dR_Arr": hist.Hist.new.Regular(N1,0,5, label = r"Subleading Higgs Radion $\Delta$R").Double(),
-#						"leadingHiggs_MET_dPhi_Arr": hist.Hist.new.Regular(N1,-pi,pi, label = r"Leading Higgs MET $\Delta \phi$").Double(), 
-#						"subleadingHiggs_MET_dPhi_Arr": hist.Hist.new.Regular(N1,-pi,pi, label = r"Subleading Higgs MET $\Delta \phi$").Double(),
-#						"Radion_eta_Arr": hist.Hist.new.Regular(N1,-5,5, label = r"Radion $\eta$").Double(),
-#						"Radion_Charge_Arr": hist.Hist.new.Regular(10,-5,5,label = r"Radion Electric Charge").Double(),
-#						"LeadingHiggsSgn_Arr": hist.Hist.new.Regular(8,-4,4,label = r"Leading Higgs Electric Charge").Double(),
-#						"SubleadingHiggsSgn_Arr": hist.Hist.new.Regular(8,-4,4,label = r"Subleading Higgs Electric Charge").Double(),
-#						"Num_Electrons_Arr": hist.Hist.new.Regular(8,0,8,label = r"number of electrons").Double(),
-#						"Num_Muons_Arr" : hist.Hist.new.Regular(8,0,8,label = r"number of muons").Double(),
-#						"Electron_tau_dR_Arr" : hist.Hist.new.Regular(N1,0,1,label = r"Minimized tau to electron $\Delta$R").Double(),
-#						"Muon_tau_dR_Arr" : hist.Hist.new.Regular(N1,0,1,label = r"Minimized tau to muon $\Delta$R").Double(),
-#						"num_electron_tau_Arr": hist.Hist.new.Regular(5,0,5,label=r"Number of electrons identified as taus").Double(),
-#						"num_muon_tau_Arr": hist.Hist.new.Regular(5,0,5,label=r"Number of muon identified as taus").Double(),
-#					}
 					#if (hist_name == "Electron_tau_dR_Arr" or hist_name == "Muon_tau_dR_Arr"):
 						#print(fourtau_out["Signal"][hist_name])
 						#Drop events with no leptons
@@ -2984,52 +2824,18 @@ if __name__ == "__main__":
 					#plt.savefig("SignalSingle" + four_tau_names[hist_name])
 					#plt.close()
 
+				#back_hist_dict = {} #Dictionary of all histogram backgrounds for 
 				if (hist_name != "Pair_DeltaPhi_Hist" and hist_name != "RadionPTComp_Hist"):
+					temp_hist_dict = dict.fromkeys(background_list) # create dictionary of histograms for each background type
 					for background_type in background_list:
-						hist_dict_single_background = {
-							"FourTau_Mass_Arr": hist.Hist.new.Regular(N1,0,3000, label = r"$m_{4\tau}$ [GeV]").Double(),
-							"HiggsDeltaPhi_Arr": hist.Hist.new.Regular(N1,-pi,pi, label = r"Higgs $\Delta \phi$").Double(), 
-							"Higgs_DeltaR_Arr": hist.Hist.new.Regular(N1,0,5, label = r"Higgs $\Delta$R").Double(),
-							"leading_dR_Arr": hist.Hist.new.Regular(N1,0,5, label = r"Leading di-$\tau$ $\Delta$R").Double(),
-							"subleading_dR_Arr": hist.Hist.new.Regular(N1,0,5, label = r"Sub-leading di-$\tau$ $\Delta$R").Double(),
-							"LeadingHiggs_mass" : hist.Hist.new.Regular(N2,0,120, label=r"Leading Higgs Mass (GeV)").Double(),
-							"SubLeadingHiggs_mass" : hist.Hist.new.Regular(N2,0,120, label=r"Sub-Leading Higgs Mass (GeV)").Double(),
-							"radionPT_Arr" : hist.Hist.new.Regular(N1,0,200, label=r"Radion $p_T$ (GeV)").Double(),
-							"tau_pt_Arr": hist.Hist.new.Regular(N1,0,400, label=r"$\tau$ $p_T$ (GeV)").Double(),
-							"tau_eta_Arr": hist.Hist.new.Regular(N1,-5,5, label = r"$\tau \ \eta$").Double(),
-							"ZMult_Arr": hist.Hist.new.Regular(6,0,6, label = r"Z Boson Multiplicity").Double(),
-							"ZMult_ele_Arr": hist.Hist.new.Regular(6,0,6, label = r"Z Boson Multiplicity (electrons only)").Double(),
-							"ZMult_mu_Arr": hist.Hist.new.Regular(6,0,6, label = r"Z Boson Multiplicity (muons only)").Double(),
-							"ZMult_tau_Arr": hist.Hist.new.Regular(6,0,6, label = r"Z Boson Multiplicity (from taus)").Double(),
-							"BJet_Arr": hist.Hist.new.Regular(6,0,6, label = r"BJet Multiplicity").Double(),
-							"tau_lead_pt_Arr" : hist.Hist.new.Regular(N1,0,200, label=r"Leading $\tau$ $p_T$ (GeV)").Double(),
-							"tau_sublead_pt_Arr" : hist.Hist.new.Regular(N1,0,400, label=r"Subleading $\tau$ $p_T$ (GeV)").Double(),
-							"tau_3rdlead_pt_Arr" : hist.Hist.new.Regular(N1,0,400, label=r"Third leading $\tau$ $p_T$ (GeV)").Double(),
-							"tau_4thlead_pt_Arr" : hist.Hist.new.Regular(N1,0,400, label=r"Fourth leading $\tau$ $p_T$ (GeV)").Double(),
-							"leading_dPhi_Arr": hist.Hist.new.Regular(N1,-pi,pi, label = r"Leading di-$\tau$ $\Delta \phi$").Double(), 
-							"subleading_dPhi_Arr": hist.Hist.new.Regular(N1,-pi,pi, label = r"Subleading di-$\tau$ $\Delta \phi$").Double(), 
-							"radionMET_dPhi_Arr": hist.Hist.new.Regular(N1,-pi,pi, label = r"Radion MET $\Delta \phi$").Double(), 
-							"leadingHiggs_Rad_dR_Arr": hist.Hist.new.Regular(N1,0,5, label = r"Leading Higgs Radion $\Delta$R").Double(),
-							"subleadingHiggs_Rad_dR_Arr": hist.Hist.new.Regular(N1,0,5, label = r"Subleading Higgs Radion $\Delta$R").Double(),
-							"leadingHiggs_MET_dPhi_Arr": hist.Hist.new.Regular(N1,-pi,pi, label = r"Leading Higgs MET $\Delta \phi$").Double(), 
-							"subleadingHiggs_MET_dPhi_Arr": hist.Hist.new.Regular(N1,-pi,pi, label = r"Subleading Higgs MET $\Delta \phi$").Double(),
-							"Radion_eta_Arr": hist.Hist.new.Regular(N1,-5,5, label = r"Radion $\eta$").Double(),
-							"Radion_Charge_Arr": hist.Hist.new.Regular(10,-5,5,label = r"Radion Electric Charge").Double(),
-							"LeadingHiggsSgn_Arr": hist.Hist.new.Regular(8,-4,4,label = r"Leading Higgs Electric Charge").Double(),
-							"SubleadingHiggsSgn_Arr": hist.Hist.new.Regular(8,-4,4,label = r"Subleading Higgs Electric Charge").Double(),
-							"Num_Electrons_Arr": hist.Hist.new.Regular(8,0,8,label = r"number of electrons").Double(),
-							"Num_Muons_Arr" : hist.Hist.new.Regular(8,0,8,label = r"number of muons").Double(),
-							"Electron_tau_dR_Arr" : hist.Hist.new.Regular(N1,0,1,label = r"Minimized tau to electron $\Delta$R").Double(),
-							"Muon_tau_dR_Arr" : hist.Hist.new.Regular(N1,0,1,label = r"Minimized tau to muon $\Delta$R").Double(),
-							"num_electron_tau_Arr": hist.Hist.new.Regular(5,0,5,label=r"Number of electrons identified as taus").Double(),
-							"num_muon_tau_Arr": hist.Hist.new.Regular(5,0,5,label=r"Number of muon identified as taus").Double(),
-						}
+						print("Background type %s"%background_type)
 						background_array = []
 						#background_dict = {r"$ZZ \rightarrow 4l$" : ["ZZ4l"]}
 						backgrounds = background_dict[background_type]
 						
 						#Loop over all backgrounds
 						for background in backgrounds:
+							print("%s"%background)
 							if (mass == "2000"): #Only need to generate single background once
 								if (hist_name == "Radion_Charge_Arr"):
 									lumi_table_data["MC Sample"].append(background)
@@ -3040,10 +2846,10 @@ if __name__ == "__main__":
 								
 								fig2, ax2 = plt.subplots()
 								if (hist_name != "Electron_tau_dR_Arr" and hist_name != "Muon_tau_dR_Arr"):
-									hist_dict_single_background[hist_name].fill(fourtau_out[background][hist_name],weight = fourtau_out[background]["Weight"]) #Obtain background distributions 
+									#hist_dict_single_background[hist_name].fill(fourtau_out[background][hist_name],weight = fourtau_out[background]["Weight"]) #Obtain background distributions 
 
 									#print(hist_dict_single_background[hist_name].values())
-									hist_dict_single_background[hist_name].plot1d(ax=ax2)
+									fourtau_out[background][hist_name].plot1d(ax=ax2)
 									plt.title(background_type)
 									plt.savefig("SingleBackground" + background_plot_names[background_type] + four_tau_names[hist_name])
 									plt.close()
@@ -3055,10 +2861,11 @@ if __name__ == "__main__":
 
 								else: #lepton-tau delta R 
 									#hist_dict_single_background[hist_name].fill(fourtau_out[background][hist_name]) #Obtain background distributions 
-									fill_Arr = ak.from_iter(fourtau_out[background][hist_name])
-									fill_Arr = fill_Arr[fill_Arr != 999]
-									hist_dict_single_background[hist_name].fill(fill_Arr) #Obtain background distributions 
-									hist_dict_single_background[hist_name].plot1d(ax=ax2)
+									#fill_Arr = ak.from_iter(fourtau_out[background][hist_name])
+									#fill_Arr = fill_Arr[fill_Arr != 999]
+									#hist_dict_single_background[hist_name].fill(fill_Arr) #Obtain background distributions 
+									#hist_dict_single_background[hist_name].plot1d(ax=ax2)
+									fourtau_out[background][hist_name].plot1d(ax=ax2)
 									ax2.set_yscale('log')
 									plt.title(background_type)
 									plt.savefig("SingleBackground" + background_plot_names[background_type] + four_tau_names[hist_name])
@@ -3079,7 +2886,14 @@ if __name__ == "__main__":
 							#Could there be issues here in terms of how the backgrounds are being combined???
 							if (hist_name != "Electron_tau_dR_Arr"): # and hist_name != "Muon_tau_dR_Arr"): #Skip the lepton-tau delta R
 								#print(fourtau_out[background]["Weight"])
-								hist_dict_background[hist_name].fill(background_type,fourtau_out[background][hist_name],weight = fourtau_out[background]["Weight"]) #Obtain background distributions
+								if (temp_hist_dict[background_type] == None): #Combine distirbutions of like background types together
+									temp_hist_dict[background_type] = fourtau_out[background][hist_name]
+									print("First histogram added")
+								else:
+									temp_hist_dict[background_type] += fourtau_out[background][hist_name]
+									print("Additional Histogram added")
+
+								#hist_dict_background[hist_name].fill(background_type,fourtau_out[background][hist_name],weight = fourtau_out[background]["Weight"]) #Obtain background distributions
 								print("Background %s added"%background)
 								print("Showing histogram:" + hist_name)
 								#hist_dict_background[hist_name].show(background_type)
@@ -3091,11 +2905,16 @@ if __name__ == "__main__":
 							if (hist_name == "num_electron_tau_Arr"): # and np.pi == np.exp(1)): #Count final states
 								background_state_array += fin_state_vec(fourtau_out[background]["num_electron_tau_Arr"],fourtau_out[background]["num_muon_tau_Arr"]).tolist()
 
+					#Combine the backgrounds together
+					hist_dict_background[hist_name] = hist.Stack.from_dict(temp_hist_dict) #This line won't work with 
+
+
 
 							
 					
 				#	if (hist_name != "Electron_tau_dR_Arr" and hist_name != "Muon_tau_dR_Arr"): #Skip the lepton-tau delta R 
 				#		hist_dict_signal[hist_name].fill("Signal",fourtau_out["Signal"][hist_name],weight = fourtau_out["Signal"]["Weight"]) #Obtain signal distribution
+				#		hist_dict_signal[hist_name] = fourtau_out["Signal"][hist_name] #Obtain signal distribution
 				#		if (hist_name == "num_electron_tau_Arr"): # and np.exp(1) == np.pi): # and np.pi == np.exp(1)): #Count final states
 				#			print("Getting final states for signal MC")
 				#			final_state_array = fin_state_vec(fourtau_out["Signal"]["num_electron_tau_Arr"],fourtau_out["Signal"]["num_muon_tau_Arr"])
@@ -3109,22 +2928,22 @@ if __name__ == "__main__":
                         
 
 					
-						#Obtain data distributions
-						print("==================Hist %s================"%hist_name)
-						#print("Total amount of data = %d"%(len(fourtau_out["Data_SingleMuon"][hist_name]) + len(fourtau_out["Data_JetHT"][hist_name])))
-						#print("Total amount of data = %d"%(len(fourtau_out["Data_SingleMuon"][hist_name])))
-						#print("Total amount of data = %d"%(len(fourtau_out["Data_JetHT"][hist_name])))
-						if (trigger_name == "Mu50"):
-							print("Mu50 Only")
-							hist_dict_data[hist_name].fill("Data",fourtau_out["Data_SingleMuon"][hist_name]) 
-						if (trigger_name == "PFHT500_PFMET100_PFMHT100_IDTight"):
-							print("JetHTMHTMET Only")
-							hist_dict_data[hist_name].fill("Data",fourtau_out["Data_JetHT"][hist_name]) 
-						if (trigger_name == "EitherOr_Trigger"):
-							print("Both Triggers")
-							hist_dict_data[hist_name].fill("Data",fourtau_out["Data_SingleMuon"][hist_name]) 
-							hist_dict_data[hist_name].fill("Data",fourtau_out["Data_JetHT"][hist_name]) 
-							
+					#Obtain data distributions
+					print("==================Hist %s================"%hist_name)
+					#print("Total amount of data = %d"%(len(fourtau_out["Data_SingleMuon"][hist_name]) + len(fourtau_out["Data_JetHT"][hist_name])))
+					#print("Total amount of data = %d"%(len(fourtau_out["Data_SingleMuon"][hist_name])))
+					#print("Total amount of data = %d"%(len(fourtau_out["Data_JetHT"][hist_name])))
+					if (trigger_name == "Mu50"):
+						print("Mu50 Only")
+						hist_dict_data[hist_name] = fourtau_out["Data_SingleMuon"][hist_name] #.fill("Data",fourtau_out["Data_SingleMuon"][hist_name]) 
+					if (trigger_name == "PFHT500_PFMET100_PFMHT100_IDTight"):
+						print("JetHTMHTMET Only")
+						hist_dict_data[hist_name] = fourtau_out["Data_JetHT"][hist_name]#.fill("Data",fourtau_out["Data_JetHT"][hist_name]) 
+					if (trigger_name == "EitherOr_Trigger"):
+						print("Both Triggers")
+						hist_dict_data[hist_name] = fourtau_out["Data_SingleMuon"][hist_name]
+						hist_dict_data[hist_name] += fourtau_out["Data_JetHT"][hist_name]
+						
 #							if (hist_name == "num_electron_tau_Arr"):  #and np.pi == np.exp(1)):
 #							    print("Getting final states for data")
 #							    final_state_array_Mu = fin_state_vec(fourtau_out["Data_SingleMuon"]["num_electron_tau_Arr"],fourtau_out["Data_SingleMuon"]["num_muon_tau_Arr"])
@@ -3139,108 +2958,91 @@ if __name__ == "__main__":
 #								    final_state_dict_data_error[state] = np.sqrt(final_state_dict_data[state]*(len(fourtau_out["Data_SingleMuon"]["num_electron_tau_Arr"]) + len(fourtau_out["Data_JetHT"]["num_electron_tau_Arr"])))
 #								    final_state_dict_data_error[state] /= (len(fourtau_out["Data_SingleMuon"]["num_electron_tau_Arr"]) + len(fourtau_out["Data_JetHT"]["num_electron_tau_Arr"]))
 
-						#print("Number of Jet HT entries: %d"%len(fourtau_out["Data_JetHT"][hist_name]))
-					
-						#Put histograms into stacks and arrays for plotting purposes (is the issue arising here??)
-						background_stack = hist_dict_background[hist_name].stack("background")
-						signal_stack = hist_dict_signal[hist_name].stack("signal")
-						data_stack = hist_dict_data[hist_name].stack("data")
-						#signal_array = [signal_stack["Signal"]]
-						data_array = [data_stack["Data"]]
-						for background in background_list:
-							background_array.append(background_stack[background])
+					#print("Number of Jet HT entries: %d"%len(fourtau_out["Data_JetHT"][hist_name]))
+				
+					#Put histograms into stacks and arrays for plotting purposes (is the issue arising here??) (This logic may be outdated the .stack(name) may not be needed anymore)
+					background_stack = hist_dict_background[hist_name] #hist_dict_background[hist_name].stack("background")
+					#signal_stack = hist_dict_signal[hist_name].stack("signal")
+					data_stack = hist_dict_data[hist_name] #.stack("data")    
+					#signal_array = [signal_stack["Signal"]]
+					data_array = [data_stack] #["Data"]]
+					#data_array = []
+					for background in background_list:
+						background_array.append(background_stack[background])
 
-						if (hist_name == "Radion_Charge_Arr"):
-							print("Background Histogram Sum: %f"%hist_dict_background[hist_name].sum())	
-							print("Data Histogram Sum: %f"%hist_dict_data[hist_name].sum())
-					
-						#Stack background distributions and plot signal + data distribution
-						fig,ax = plt.subplots()
-						hep.histplot(background_array,ax=ax,stack=True,histtype="fill",label=background_list,facecolor=TABLEAU_COLORS[:len(background_list)],edgecolor=TABLEAU_COLORS[:len(background_list)])
-						#hep.histplot(signal_array,ax=ax,stack=True,histtype="step",label=signal_list,edgecolor=TABLEAU_COLORS[len(background_list)+1],linewidth=2.95)
-						hep.histplot(data_array,ax=ax,stack=False,histtype="errorbar", yerr=True,label=["Data"],marker="o",color = "k") #,facecolor='black',edgecolor='black') #,mec='k')
-						hep.cms.text("Preliminary",loc=0,fontsize=13)
-						#ax.set_title(hist_name_dict[hist_name],loc = "right")
-						ax.set_title("2018 Data",loc = "right")
-						ax.legend(fontsize=10, loc='upper right')
-						plt.savefig(four_tau_names[hist_name])
-						plt.close()
+					#if (hist_name == "Radion_Charge_Arr"): #These lines are broken with the way that I now handle output
+					#	print("Background Histogram Sum: %f"%hist_dict_background[hist_name].sum())	
+					#	print("Data Histogram Sum: %f"%hist_dict_data[hist_name].sum())
+				
+					#Stack background distributions and plot signal + data distribution
+					fig,ax = plt.subplots()
+					hep.histplot(background_array,ax=ax,stack=True,histtype="fill",label=background_list,facecolor=TABLEAU_COLORS[:len(background_list)],edgecolor=TABLEAU_COLORS[:len(background_list)])
+					#hep.histplot(signal_array,ax=ax,stack=True,histtype="step",label=signal_list,edgecolor=TABLEAU_COLORS[len(background_list)+1],linewidth=2.95)
+					hep.histplot(data_array,ax=ax,stack=False,histtype="errorbar", yerr=True,label=["Data"],marker="o",color = "k") #,facecolor='black',edgecolor='black') #,mec='k')
+					hep.cms.text("Preliminary",loc=0,fontsize=13)
+					#ax.set_title(hist_name_dict[hist_name],loc = "right")
+					ax.set_title("2018 Data",loc = "right")
+					ax.legend(fontsize=10, loc='upper right')
+					plt.savefig(four_tau_names[hist_name])
+					plt.close()
 	
-	#Store final states in tables
-	for state in background_state_array:
-		final_state_dict_background[state] += 1/len(background_state_array)
-
-	#Obtain error bars
-	for state in final_state_dict_background:
-		final_state_dict_background_error[state] = np.sqrt(final_state_dict_background[state]*len(background_state_array))
-		final_state_dict_background_error[state] /= len(background_state_array)
-	
-	#for state in final_state_dict_signal_full:
-	#	final_state_dict_signal_full[state].append(final_state_dict_signal[state])
-	#for state in final_state_dict_data_full:
-	#	final_state_dict_data_full[state].append(final_state_dict_data[state])
-	#for state in final_state_dict_background_full:
-	#	final_state_dict_background_full[state].append(final_state_dict_background[state])
-    
-	#print(final_state_dict_signal)	
-	#print(final_state_dict_data)	
-	#print(final_state_dict_background)
-	
-    #print("Number of Signal events: %d"%len(fourtau_out["Signal"]["num_electron_tau_Arr"]))
-	#print("Number of Data events: %d"%(len(fourtau_out["Data_SingleMuon"]["num_electron_tau_Arr"]) + len(fourtau_out["Data_JetHT"]["num_electron_tau_Arr"])))
-	print("Number of Data events: %d"%(len(fourtau_out["Data_SingleMuon"]["num_electron_tau_Arr"])))
-	print("Number of Background events: %d"%len(background_state_array))
-
-
-	#Store information in tex table
-	store_tau_states = True
-	if (store_tau_states):
-		#file = open("Final_State_Table_Gen.tex","w")
-		file = open("Final_State_Table_Reco_errorbars_05.tex","w")
-
-		#Set up the tex document
-		file.write("\\documentclass{article} \n")
-		file.write("\\usepackage{multirow} \n")
-		file.write("\\usepackage{multirow} \n")
-		file.write("\\usepackage{lscape}\n")
-		file.write("\\begin{document} \n")
-		file.write("\\begin{landscape} \n")
-		file.write("\\centering \n")
-
-		#Set up the table
-		file.write("\\begin{tabular}{|p{4.5cm}|p{3cm}|p{3cm}|p{3cm}|}")
-		file.write("\\hline \n")
-		file.write("\\multicolumn{4}{|c|}{Final State Table (Reco \\(\\Delta R < 0.05\\))} \\\\ \n")
-		file.write("\\hline \n")
-		file.write("4$\\tau$ Channel & 2 TeV Signal & Drell-Yan + Jets & Theory \\\\ \n")
-		file.write("\\hline \n")
-		for state in final_state_dict_signal:
-			file.write(state + " & %.3f"%final_state_dict_signal[state] + " $\\pm$ %.3f"%final_state_dict_signal_error[state] + 
-					" & %.3f"%final_state_dict_background[state] + "$\\pm$ %.3f"%final_state_dict_background_error[state] +
-					" & %.3f"%(final_state_dict_theory[state]) + "\\\\")
-					#" & %.3f"%final_state_dict_data[state] + " $\\pm$ %.3f"%final_state_dict_data_error[state] + "\\\\")
-			file.write("\n")
-			file.write("\\hline \n")
-		file.write("\\end{tabular} \n")
-		file.write("\\end{landscape} \n")
-		file.write("\\end{document}")
-		file.close()
-	
-	#final_state_frame_data = pd.DataFrame(final_state_dict_data_full)
-	#final_state_frame_signal = pd.DataFrame(final_state_dict_signal_full)
-	#final_state_frame_background = pd.DataFrame(final_state_dict_background_full)
-	
-	#final_state_frame_data.to_csv("Final_State_Table_Data.csv",sep=",")
-	#final_state_frame_signal.to_csv("Final_State_Table_Signal.csv",sep=",")
-	#final_state_frame_background.to_csv("Final_State_Table_Background.csv",sep=",")
-
-	#Store luminosity Weighting debugging table
-	#fig, ax = plt.subplots()
-	#fig.patch.set_visible(False)
-	#ax.axis('off')
-	#ax.axis('tight')
-	#lumi_frame = pd.DataFrame(lumi_table_data)
-	#lumi_frame.to_csv("Lumi_Weight_Table_Debugging.csv", sep='\t')
-	#outTable = ax.table(cellText=lumi_frame.values, colLabels=lumi_frame.columns, loc='center', cellLoc='center')	
-	
+	#Store final states in tables (Commented out on 2 September 2025, do not delete yet)
+#	for state in background_state_array:
+#		final_state_dict_background[state] += 1/len(background_state_array)
+#
+#	#Obtain error bars
+#	for state in final_state_dict_background:
+#		final_state_dict_background_error[state] = np.sqrt(final_state_dict_background[state]*len(background_state_array))
+#		final_state_dict_background_error[state] /= len(background_state_array)
+#	
+#	#for state in final_state_dict_signal_full:
+#	#	final_state_dict_signal_full[state].append(final_state_dict_signal[state])
+#	#for state in final_state_dict_data_full:
+#	#	final_state_dict_data_full[state].append(final_state_dict_data[state])
+#	#for state in final_state_dict_background_full:
+#	#	final_state_dict_background_full[state].append(final_state_dict_background[state])
+#    
+#	#print(final_state_dict_signal)	
+#	#print(final_state_dict_data)	
+#	#print(final_state_dict_background)
+#	
+#    #print("Number of Signal events: %d"%len(fourtau_out["Signal"]["num_electron_tau_Arr"]))
+#	#print("Number of Data events: %d"%(len(fourtau_out["Data_SingleMuon"]["num_electron_tau_Arr"]) + len(fourtau_out["Data_JetHT"]["num_electron_tau_Arr"])))
+#	print("Number of Data events: %d"%(len(fourtau_out["Data_SingleMuon"]["num_electron_tau_Arr"])))
+#	print("Number of Background events: %d"%len(background_state_array))
+#
+#
+#	#Store information about taus in tex table
+#	store_tau_states = True
+#	if (store_tau_states):
+#		#file = open("Final_State_Table_Gen.tex","w")
+#		file = open("Final_State_Table_Reco_errorbars_05.tex","w")
+#
+#		#Set up the tex document
+#		file.write("\\documentclass{article} \n")
+#		file.write("\\usepackage{multirow} \n")
+#		file.write("\\usepackage{multirow} \n")
+#		file.write("\\usepackage{lscape}\n")
+#		file.write("\\begin{document} \n")
+#		file.write("\\begin{landscape} \n")
+#		file.write("\\centering \n")
+#
+#		#Set up the table
+#		file.write("\\begin{tabular}{|p{4.5cm}|p{3cm}|p{3cm}|p{3cm}|}")
+#		file.write("\\hline \n")
+#		file.write("\\multicolumn{4}{|c|}{Final State Table (Reco \\(\\Delta R < 0.05\\))} \\\\ \n")
+#		file.write("\\hline \n")
+#		file.write("4$\\tau$ Channel & 2 TeV Signal & Drell-Yan + Jets & Theory \\\\ \n")
+#		file.write("\\hline \n")
+#		for state in final_state_dict_signal:
+#			file.write(state + " & %.3f"%final_state_dict_signal[state] + " $\\pm$ %.3f"%final_state_dict_signal_error[state] + 
+#					" & %.3f"%final_state_dict_background[state] + "$\\pm$ %.3f"%final_state_dict_background_error[state] +
+#					" & %.3f"%(final_state_dict_theory[state]) + "\\\\")
+#					#" & %.3f"%final_state_dict_data[state] + " $\\pm$ %.3f"%final_state_dict_data_error[state] + "\\\\")
+#			file.write("\n")
+#			file.write("\\hline \n")
+#		file.write("\\end{tabular} \n")
+#		file.write("\\end{landscape} \n")
+#		file.write("\\end{document}")
+#		file.close()
 	
