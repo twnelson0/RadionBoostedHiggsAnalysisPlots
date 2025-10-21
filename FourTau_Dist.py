@@ -17,6 +17,7 @@ import os
 import time
 from distributed import Client
 from dask_jobqueue import HTCondorCluster
+from cutflow_producer import cutflow_producer
 #import glob
 
 
@@ -223,7 +224,7 @@ class FourTauPlotting(processor.ProcessorABC):
 				"Mu_Trigger": events.HLT_Mu50,
 				"pfMET": events.MET_pt,
 				"pfMETPhi": events.MET_phi,
-				"event_weight": ak.ones_like(events.MET_pt)*0.9,
+				"event_weight": ak.ones_like(events.MET_pt), #*0.9,
 				"n_electrons": ak.zeros_like(events.MET_pt),
 				"n_muons": ak.zeros_like(events.MET_pt),
 				"n_tau_electrons": ak.zeros_like(events.MET_pt),
@@ -231,7 +232,8 @@ class FourTauPlotting(processor.ProcessorABC):
 				"n_tau_hadronic": ak.zeros_like(events.MET_pt),
 				"event_num": events.event,
 				"run": events.run,
-				"Lumi" : events.luminosityBlock
+				"Lumi" : events.luminosityBlock,
+				#"genWeight": events.genWeight
 			},
 			with_name="EventArray",
 			behavior=candidate.behavior,
@@ -248,10 +250,11 @@ class FourTauPlotting(processor.ProcessorABC):
 				"phi": events.boostedTau_phi,
 				"nBoostedTau": events.nboostedTau,
 				"charge": events.boostedTau_charge,
-				"iso": events.boostedTau_rawIso,
+				#"iso": events.boostedTau_rawDeepTau2018v2p7VSjet,
+				"iso": events.boostedTau_idDeepTau2018v2p7VSjet,
 				"DBT": events.boostedTau_rawDeepTau2018v2p7VSjet,
 				#"decay": events.boostedTaupfTausDiscriminationByDecayModeFinding,
-				"decay": events.boostedTau_decayMode,
+				"decay": events.boostedTau_idDecayModeOldDMs,
 			},
 			with_name="TauArray",
 			behavior=candidate.behavior,
@@ -342,6 +345,7 @@ class FourTauPlotting(processor.ProcessorABC):
 				behavior=candidate.behavior,
 			)
 
+
 			PU_Info = ak.zip({
 				#"puTrue": events.puTrue[:,0] #I have no idea where this info is contained in the nanoAOD
                 #"puTrue": events.Pileup_nPU #Possiblity 1
@@ -354,9 +358,9 @@ class FourTauPlotting(processor.ProcessorABC):
             
 			#GenTau_Num = ak.num(np.bitwise_and(np.abs(Gen_Info.MCId) == 15, np.abs(Gen_Info.MotherId) != 15),axis=1) #Get the number of Generated taus that decayed from something
 			GenTau_Num = ak.num(Gen_Info[np.abs(Gen_Info.MCId) == 15],axis=1)
-			print("=============================================================================")
-			print(event_level.event_weight)
-			event_level["event_weight"] = event_level.event_weight**GenTau_Num #GenTau_Num #Apply weightings based on Gen Taus
+			#event_level["event_weight"] = event_level.event_weight**GenTau_Num #GenTau_Num #Apply weightings based on Gen Taus
+			event_level["event_weight"] = np.multiply(events.genWeight, (event_level.event_weight*0.9)**GenTau_Num) #GenTau_Num #Apply weightings based on Gen Taus
+			#event_level["event_weight"] = events.genWeight #GenTau_Num #Apply weightings based on Gen Taus
 			dummy_weight = event_level["event_weight"]
 			#Debugg/test Gen Tau Weighting
 			#for i in range(len(GenTau_Num)):
@@ -390,33 +394,26 @@ class FourTauPlotting(processor.ProcessorABC):
 			    	#print("!!Event gen weighting mistmatch!!")
 				#print("Event weight: %f"%event_leve.event_weight[i])
 				#print("Expected weight: %f"%dummy_weight[i]*events.genWeight[i])
-			print(event_level.event_weight)
+			#print(event_level.event_weight)
 			dummy_weight = event_level["event_weight"]
 			print("Applied gen weights")
 
 			if (self.PU_bool): #Apply PU reweighting scheme
 				PU_Arr = np.array(np.rint(ak.flatten(PU_Info.puTrue,axis=-1)),dtype = np.int8)
-				PU_Corr = self.PUWeights[PU_Arr]
+				PU_Corr = self.PUWeights[PU_Arr] #This may be causing problmes, though I'm not sure, do I need the golden JSON thing to correctly do PU reweighting??? 
 				event_level["event_weight"] = np.multiply(event_level.event_weight,PU_Corr) #Is this line screwing things up??
 				#Debugg/gest PU reweighting
-				for i in range(len(event_level.event_weight)):
-					if (dummy_weight[i]*PU_Corr[i] != event_level.event_weight[i]):
-					    print("!!Event gen weighting mistmatch!!")
-					    print("Event weight: %f"%event_level.event_weight[i])
-					    print("Expected weight: %f"%dummy_weight[i]*PU_Corr[i])
+				#for i in range(len(event_level.event_weight)):
+				#	if (dummy_weight[i]*PU_Corr[i] != event_level.event_weight[i]):
+				#	    print("!!Event gen weighting mistmatch!!")
+				#	    print("Event weight: %f"%event_level.event_weight[i])
+				#	    print("Expected weight: %f"%dummy_weight[i]*PU_Corr[i])
 				#print(event_level.event_weight)
 
 
 
 		
-		#Histograms 4 tau
-		#TauDeltaPhi_all_hist = (
-		#	hist.Hist.new
-		#	.StrCat(["Leading pair","Subleading pair"], name = "delta_phi")
-		#	.Reg(50, -pi, pi, name="delta_phD")
-	        #Force taus to be ordered via transverse momenta (if they are not already)
-		#tau = tau[ak.argsort(tau.pt,axis=1)]
-
+		#tau = tau[ak.argsort(tau.pt,axis=1)] #Force tau pT Ordering
 		print("!!!=====Dataset=====!!!!")	
 		print(type(dataset))
 		print(dataset)
@@ -425,41 +422,6 @@ class FourTauPlotting(processor.ProcessorABC):
 		print("Number of events before selection + Trigger: %d"%ak.num(tau,axis=0))
 
 		#Look at the problem events before anything is applied
-		print("============================Problem Event (Before anything is done)============================")
-		if (dataset == "TTToHadronic"):
-			print("Problem ttbar Hadronic file")
-			print("Event number: " + str(event_level[event_level.event_num == 205226271].event_num))
-			print("Event run number: " + str(event_level[event_level.event_num == 205226271].run))
-			print("Event lumiblock: " + str(event_level[event_level.event_num == 205226271].Lumi))
-			print("Problem tau properties")
-			print("E: " + str(tau[event_level.event_num == 205226271].E))
-			print("Px: " + str(tau[event_level.event_num == 205226271].Px))
-			print("Py: " + str(tau[event_level.event_num == 205226271].Py))
-			print("Pz: " + str(tau[event_level.event_num == 205226271].Pz))
-			print("Pt: " + str(tau[event_level.event_num == 205226271].pt))
-			print("Number of boosted taus: " + str(tau[event_level.event_num == 205226271].nBoostedTau))
-		if (dataset == "WJetsToLNu_HT-1200To2500"):
-			print("Problem ttbar Hadronic file")
-			print("Event number: " + str(event_level[event_level.event_num == 72103573].event_num))
-			print("Problem tau properties")
-			print("E: " + str(tau[event_level.event_num == 72103573].E))
-			print("Px: " + str(tau[event_level.event_num == 72103573].Px))
-			print("Py: " + str(tau[event_level.event_num == 72103573].Py))
-			print("Pz: " + str(tau[event_level.event_num == 72103573].Pz))
-			print("Pt: " + str(tau[event_level.event_num == 72103573].pt))
-		if (dataset == "TTTo2L2Nu"):
-			print("Problem ttbar Hadronic file")
-			print("Event number: " + str(event_level[event_level.event_num == 90513344].event_num))
-			print("Event run number: " + str(event_level[event_level.event_num == 90513344].run))
-			print("Event lumiblock: " + str(event_level[event_level.event_num == 90513344].Lumi))
-			print("Problem tau properties")
-			print("E: " + str(tau[event_level.event_num == 90513344].E))
-			print("Px: " + str(tau[event_level.event_num == 90513344].Px))
-			print("Py: " + str(tau[event_level.event_num == 90513344].Py))
-			print("Pz: " + str(tau[event_level.event_num == 90513344].Pz))
-			print("Pt: " + str(tau[event_level.event_num == 90513344].pt))
-			print("Number of boosted taus: " + str(tau[event_level.event_num == 90513344].nBoostedTau))
-
 		#Construct HT and MHT variables (and give them their own object)
 		Jet_MHT = Jet[Jet.Pt > 30]
 		Jet_MHT = Jet_MHT[np.abs(Jet_MHT.eta) < 5]
@@ -470,84 +432,12 @@ class FourTauPlotting(processor.ProcessorABC):
 		#Jet_MHT["MHT"] = np.sqrt(Jet_MHT.MHT_x**2 + Jet_MHT.MHT_y**2)
 		event_level["MHT"] = np.sqrt(event_level.MHT_x**2 + event_level.MHT_y**2) 
 		
-		#Look at the problem events after MHT is obtained
-		print("============================Problem Event (After Jet MHT is obtained)============================")
-		if (dataset == "TTToHadronic"):
-			print("Problem ttbar Hadronic file")
-			print("Event number: " + str(event_level[event_level.event_num == 205226271].event_num))
-			print("Event run number: " + str(event_level[event_level.event_num == 205226271].run))
-			print("Event lumiblock: " + str(event_level[event_level.event_num == 205226271].Lumi))
-			print("Problem tau properties")
-			print("E: " + str(tau[event_level.event_num == 205226271].E))
-			print("Px: " + str(tau[event_level.event_num == 205226271].Px))
-			print("Py: " + str(tau[event_level.event_num == 205226271].Py))
-			print("Pz: " + str(tau[event_level.event_num == 205226271].Pz))
-			print("Pt: " + str(tau[event_level.event_num == 205226271].pt))
-			print("Number of boosted taus: " + str(tau[event_level.event_num == 205226271].nBoostedTau))
-		if (dataset == "WJetsToLNu_HT-1200To2500"):
-			print("Problem ttbar Hadronic file")
-			print("Event number: " + str(event_level[event_level.event_num == 72103573].event_num))
-			print("Problem tau properties")
-			print("E: " + str(tau[event_level.event_num == 72103573].E))
-			print("Px: " + str(tau[event_level.event_num == 72103573].Px))
-			print("Py: " + str(tau[event_level.event_num == 72103573].Py))
-			print("Pz: " + str(tau[event_level.event_num == 72103573].Pz))
-			print("Pt: " + str(tau[event_level.event_num == 72103573].pt))
-		if (dataset == "TTTo2L2Nu"):
-			print("Problem ttbar Hadronic file")
-			print("Event number: " + str(event_level[event_level.event_num == 90513344].event_num))
-			print("Event run number: " + str(event_level[event_level.event_num == 90513344].run))
-			print("Event lumiblock: " + str(event_level[event_level.event_num == 90513344].Lumi))
-			print("Problem tau properties")
-			print("E: " + str(tau[event_level.event_num == 90513344].E))
-			print("Px: " + str(tau[event_level.event_num == 90513344].Px))
-			print("Py: " + str(tau[event_level.event_num == 90513344].Py))
-			print("Pz: " + str(tau[event_level.event_num == 90513344].Pz))
-			print("Pt: " + str(tau[event_level.event_num == 90513344].pt))
-			print("Number of boosted taus: " + str(tau[event_level.event_num == 90513344].nBoostedTau))
-		
 		#HT Seleciton (new)
 		#tau_temp1,HT_Jet_Cand = ak.unzip(ak.cartesian([tau,Jet_MHT], axis = 1, nested = True))
 		Jet_HT = Jet[Jet.Pt > 30]
 		Jet_HT = Jet_HT[np.abs(Jet_HT.eta) < 3]
 		Jet_HT = Jet_HT[Jet_HT.PFLooseId > 0.5]
 		event_level["HT"] = ak.sum(Jet_HT.Pt, axis = 1, keepdims=False)
-		
-		#Look at the problem events after Jet HT is calculated
-		print("============================Problem Event (After Jet HT is calculated)============================")
-		if (dataset == "TTToHadronic"):
-			print("Problem ttbar Hadronic file")
-			print("Event number: " + str(event_level[event_level.event_num == 205226271].event_num))
-			print("Event run number: " + str(event_level[event_level.event_num == 205226271].run))
-			print("Event lumiblock: " + str(event_level[event_level.event_num == 205226271].Lumi))
-			print("Problem tau properties")
-			print("E: " + str(tau[event_level.event_num == 205226271].E))
-			print("Px: " + str(tau[event_level.event_num == 205226271].Px))
-			print("Py: " + str(tau[event_level.event_num == 205226271].Py))
-			print("Pz: " + str(tau[event_level.event_num == 205226271].Pz))
-			print("Pt: " + str(tau[event_level.event_num == 205226271].pt))
-			print("Number of boosted taus: " + str(tau[event_level.event_num == 205226271].nBoostedTau))
-		if (dataset == "WJetsToLNu_HT-1200To2500"):
-			print("Problem ttbar Hadronic file")
-			print("Event number: " + str(event_level[event_level.event_num == 72103573].event_num))
-			print("Problem tau properties")
-			print("E: " + str(tau[event_level.event_num == 72103573].E))
-			print("Px: " + str(tau[event_level.event_num == 72103573].Px))
-			print("Py: " + str(tau[event_level.event_num == 72103573].Py))
-			print("Pz: " + str(tau[event_level.event_num == 72103573].Pz))
-			print("Pt: " + str(tau[event_level.event_num == 72103573].pt))
-		if (dataset == "TTTo2L2Nu"):
-			print("Problem ttbar Hadronic file")
-			print("Event number: " + str(event_level[event_level.event_num == 90513344].event_num))
-			print("Event run number: " + str(event_level[event_level.event_num == 90513344].run))
-			print("Event lumiblock: " + str(event_level[event_level.event_num == 90513344].Lumi))
-			print("Problem tau properties")
-			print("E: " + str(tau[event_level.event_num == 90513344].E))
-			print("Px: " + str(tau[event_level.event_num == 90513344].Px))
-			print("Py: " + str(tau[event_level.event_num == 90513344].Py))
-			print("Pz: " + str(tau[event_level.event_num == 90513344].Pz))
-			print("Pt: " + str(tau[event_level.event_num == 90513344].pt))
-			print("Number of boosted taus: " + str(tau[event_level.event_num == 90513344].nBoostedTau))
 		
 		#Apply trigger weights
 		#if not(self.isData):
@@ -903,41 +793,6 @@ class FourTauPlotting(processor.ProcessorABC):
 			print("# of events after Trigger + Selection: %d"%ak.num(tau,axis=0))
 			print("# of events after Trigger + Selection (dropping empty arrays): %d"%ak.num(tau[ak.num(tau,axis=1) > 0],axis=0))
 				
-		#Look at the problem events after trigger is applied
-		print("============================Problem Event (After trigger is applied)============================")
-		if (dataset == "TTToHadronic"):
-			print("Problem ttbar Hadronic file")
-			print("Event number: " + str(event_level[event_level.event_num == 205226271].event_num))
-			print("Event run number: " + str(event_level[event_level.event_num == 205226271].run))
-			print("Event lumiblock: " + str(event_level[event_level.event_num == 205226271].Lumi))
-			print("Problem tau properties")
-			print("E: " + str(tau[event_level.event_num == 205226271].E))
-			print("Px: " + str(tau[event_level.event_num == 205226271].Px))
-			print("Py: " + str(tau[event_level.event_num == 205226271].Py))
-			print("Pz: " + str(tau[event_level.event_num == 205226271].Pz))
-			print("Pt: " + str(tau[event_level.event_num == 205226271].pt))
-			print("Number of boosted taus: " + str(tau[event_level.event_num == 205226271].nBoostedTau))
-		if (dataset == "WJetsToLNu_HT-1200To2500"):
-			print("Problem ttbar Hadronic file")
-			print("Event number: " + str(event_level[event_level.event_num == 72103573].event_num))
-			print("Problem tau properties")
-			print("E: " + str(tau[event_level.event_num == 72103573].E))
-			print("Px: " + str(tau[event_level.event_num == 72103573].Px))
-			print("Py: " + str(tau[event_level.event_num == 72103573].Py))
-			print("Pz: " + str(tau[event_level.event_num == 72103573].Pz))
-			print("Pt: " + str(tau[event_level.event_num == 72103573].pt))
-		if (dataset == "TTTo2L2Nu"):
-			print("Problem ttbar Hadronic file")
-			print("Event number: " + str(event_level[event_level.event_num == 90513344].event_num))
-			print("Event run number: " + str(event_level[event_level.event_num == 90513344].run))
-			print("Event lumiblock: " + str(event_level[event_level.event_num == 90513344].Lumi))
-			print("Problem tau properties")
-			print("E: " + str(tau[event_level.event_num == 90513344].E))
-			print("Px: " + str(tau[event_level.event_num == 90513344].Px))
-			print("Py: " + str(tau[event_level.event_num == 90513344].Py))
-			print("Pz: " + str(tau[event_level.event_num == 90513344].Pz))
-			print("Pt: " + str(tau[event_level.event_num == 90513344].pt))
-			print("Number of boosted taus: " + str(tau[event_level.event_num == 90513344].nBoostedTau))
 		#Get the number of electrons + muons after trigger
 		#Apply electron and muon selections first
 		muon = muon[muon.pt > 20]
@@ -963,7 +818,6 @@ class FourTauPlotting(processor.ProcessorABC):
 		#	muon_fourVec = ak.zip({"x": Gen_Info[np.abs(Gen_Info.MCId) == 13].Px, "y": Gen_Info[np.abs(Gen_Info.MCId) == 13].Py, "z": Gen_Info[np.abs(Gen_Info.MCId) == 13].Pz,"t": Gen_Info[np.abs(Gen_Info.MCId) == 13].E},with_name = "LorentzVector")
 		
 		tau_fourVec = ak.zip({"x": tau.Px, "y": tau.Py, "z": tau.Pz,"t": tau.E},with_name = "LorentzVector")
-		#electron_fourVec = ak.zip({})
 
 		#electrons,taus = ak.unzip(ak.cartesian([electron_fourVec,tau_fourVec],axis=1, nested = True))
 		#muons,taus = ak.unzip(ak.cartesian([muon_fourVec,tau_fourVec],axis=1, nested = True))
@@ -982,29 +836,18 @@ class FourTauPlotting(processor.ProcessorABC):
 		min_tau_ele = electron_fourVec.nearest(tau_fourVec)
 		min_tau_mu = muon_fourVec.nearest(tau_fourVec)
 		
-		#Some sort of debugging thing I don't remember why I put this in 
-		#for j in range(ak.num(tau,axis=0)): #Debugging work
-		#	if (len(min_tau_ele[j]) != len(electron_fourVec[j])):
-		#		print("!!Electron electron-tau dR mismatch!!")
-		#		print("Min Electron-Tau dR length: %d"%len(min_tau_ele[j]))
-		#		print("Electron length: %d"%len(electron_fourVec[j]))
-		#	if (len(min_tau_mu[j]) != len(muon_fourVec[j])):
-		#		print("!!Electron electron-tau dR mismatch!!")
-		#		print("Min Muon-tau dR length: %d"%len(min_tau_mu[j]))
-		#		print("Moun length: %d"%len(muon_fourVec[j]))
-
-		#print("There are %d electrons in total"%ak.sum(ak.num(electron.pt,axis=1)))
-		#print("There are %d muons in total"%ak.sum(ak.num(muon.pt,axis=1)))
-
 		ele_dR_collection = electron_fourVec.delta_r(min_tau_ele)
 		mu_dR_collection = muon_fourVec.delta_r(min_tau_mu)
-		#if (self.isData):
 		electron["tau_min_dR"] = ele_dR_collection 
 		muon["tau_min_dR"] = mu_dR_collection
-		#else:
-		#	electron["tau_min_dR"] = ak.zeros_like(electron.pt) 
-		#	muon["tau_min_dR"] = ak.zeros_like(muon.pt)
-            
+		
+		#Set up cutflow dictionary
+		cutflow_dict = dict.fromkeys(["No_Selec","Tau_pT","Tau_eta","decay","deepboosted"])
+		cutflow_table = hist.Hist.new.Reg(6,0,6,label="Cut flow",underflow = True, overflow = True).Double()
+		cutflow_dict["No_Selec"] = ak.num(tau,axis=0) #Initial number of events
+		cutflow_table.fill(0,weight = ak.num(tau,axis=0))
+		print("Number of events (no selections): %d"%cutflow_dict["No_Selec"])
+		print("Should also be Number of events (no selections): %d"%len(np.zeros(ak.num(tau,axis=0))))
 		
 		#Apply selections
 		tau = tau[tau.pt > 30] #pT selection
@@ -1018,50 +861,62 @@ class FourTauPlotting(processor.ProcessorABC):
 		if (not(self.isData)): # and self.isData):
 			Gen_Info = Gen_Info[ak.num(tau) >= 4] 
 		tau = tau[ak.num(tau) >= 4] #4 tau events
-		if (self.isData or not(self.isData)):
+		cutflow_dict["Tau_pT"] = ak.num(tau,axis=0) #Initial number of events after pt selection
+		cutflow_table.fill(1, weight = ak.num(tau,axis=0))
+	
+		#if (self.isData or not(self.isData)):
+		if (not(self.isData)):
 			print("# of events after pT cut (dropping empty arrays): %d"%ak.num(tau[ak.num(tau,axis=1) > 0],axis=0))
-		#tau = tau[np.abs(tau.eta) < 2.3] #eta selection
+		tau = tau[np.abs(tau.eta) < 2.3] #eta selection
 		
 		#Remove events with fewer than 4 taus	
-		#AK8Jet = AK8Jet[ak.num(tau) >= 4]
-		#event_level = event_level[ak.num(tau) >= 4]
-		#Jet = Jet[ak.num(tau) >= 4]
-		#electron = electron[ak.num(tau) >= 4] 
-		#muon = muon[ak.num(tau) >= 4] 
-		#if (not(self.isData)): # and self.isData):
-		#	Gen_Info = Gen_Info[ak.num(tau) >= 4] 
-		#tau = tau[ak.num(tau) >= 4] #4 tau events
+		AK8Jet = AK8Jet[ak.num(tau) >= 4]
+		event_level = event_level[ak.num(tau) >= 4]
+		Jet = Jet[ak.num(tau) >= 4]
+		electron = electron[ak.num(tau) >= 4] 
+		muon = muon[ak.num(tau) >= 4] 
+		if (not(self.isData)): # and self.isData):
+			Gen_Info = Gen_Info[ak.num(tau) >= 4] 
+		tau = tau[ak.num(tau) >= 4] #4 tau events
+		cutflow_dict["Tau_eta"] = ak.num(tau,axis=0) #Number of events after eta selection
+		cutflow_table.fill(2,weight=ak.num(tau,axis=0))
 		#if (self.isData or not(self.isData)):
-		#	print("# of events after eta cut (dropping empty arrays): %d"%ak.num(tau[ak.num(tau,axis=1) > 0],axis=0))
+		if (not(self.isData)):
+			print("# of events after eta cut (dropping empty arrays): %d"%ak.num(tau[ak.num(tau,axis=1) > 0],axis=0))
 		
 		
 		#Isolation and decay selections
-		#tau = tau[tau.decay >= 0.5]
+		tau = tau[tau.decay >= 0.5]
 		
 		#Remove events with fewer than 4 taus	
-		#AK8Jet = AK8Jet[ak.num(tau) >= 4]
-		#event_level = event_level[ak.num(tau) >= 4]
-		#Jet = Jet[ak.num(tau) >= 4]
-		#electron = electron[ak.num(tau) >= 4] 
-		#muon = muon[ak.num(tau) >= 4] 
-		#if (not(self.isData)): # and self.isData):
-		#	Gen_Info = Gen_Info[ak.num(tau) >= 4] 
-		#tau = tau[ak.num(tau) >= 4] #4 tau events
+		AK8Jet = AK8Jet[ak.num(tau) >= 4]
+		event_level = event_level[ak.num(tau) >= 4]
+		Jet = Jet[ak.num(tau) >= 4]
+		electron = electron[ak.num(tau) >= 4] 
+		muon = muon[ak.num(tau) >= 4] 
+		if (not(self.isData)): # and self.isData):
+			Gen_Info = Gen_Info[ak.num(tau) >= 4] 
+		tau = tau[ak.num(tau) >= 4] #4 tau events
+		cutflow_dict["decay"] = ak.num(tau,axis=0) #Number of events after deay mode
+		cutflow_table.fill(3,weight = ak.num(tau,axis=0))
 		#if (self.isData or not(self.isData)):
 		#	print("# of events after decay cut (dropping empty arrays): %d"%ak.num(tau[ak.num(tau,axis=1) > 0],axis=0))
 		
-		#tau = tau[tau.iso >= 0.0] #Make loose to ensure high number of statistics
+		tau = tau[tau.iso >= 0.85] #Make loose to ensure high number of statistics
 		#Remove events with fewer than 4 taus	
-		#AK8Jet = AK8Jet[ak.num(tau) >= 4]
-		#event_level = event_level[ak.num(tau) >= 4]
-		#Jet = Jet[ak.num(tau) >= 4]
-		#electron = electron[ak.num(tau) >= 4] 
-		#muon = muon[ak.num(tau) >= 4] 
-		#if (not(self.isData)): # and self.isData):
-		#	Gen_Info = Gen_Info[ak.num(tau) >= 4] 
-		#tau = tau[ak.num(tau) >= 4] #4 tau events
+		AK8Jet = AK8Jet[ak.num(tau) >= 4]
+		event_level = event_level[ak.num(tau) >= 4]
+		Jet = Jet[ak.num(tau) >= 4]
+		electron = electron[ak.num(tau) >= 4] 
+		muon = muon[ak.num(tau) >= 4] 
+		if (not(self.isData)): # and self.isData):
+			Gen_Info = Gen_Info[ak.num(tau) >= 4] 
+		tau = tau[ak.num(tau) >= 4] #4 tau events
+		cutflow_dict["deepboosted"] = ak.num(tau,axis=0) #Number of events after isolation
+		cutflow_table.fill(4,weight= ak.num(tau,axis=0))
 		#if (self.isData or not(self.isData)):
-		#	print("# of events after isolation cut (dropping empty arrays): %d"%ak.num(tau[ak.num(tau,axis=1) > 0],axis=0))
+		if (not(self.isData)):
+			print("# of events after isolation cut (dropping empty arrays): %d"%ak.num(tau[ak.num(tau,axis=1) > 0],axis=0))
 
 
 		#Delta R Cut on taus (identifiy and remove jets incorrectly reconstructed as taus)
@@ -1101,53 +956,11 @@ class FourTauPlotting(processor.ProcessorABC):
 		#Z Mutliplticity of taus
 		event_level["ZMult_tau"] = find_Z_Candidates(tau,ak.ArrayBuilder()).snapshot()
 		
-
-
-		
-        #print(ele_dR_collection)
-		#print(mu_dR_collection)
-
 		
 		#electron["tau_min_dR"] = ak.where(ak.num(ele_dR_collection,axis=1) != 0, ele_dR_collection, ak.singletons(np.ones(ak.num(ele_dR_collection,axis=0))))
 		#muon["tau_min_dR"] = ak.where(ak.num(mu_dR_collection,axis=1) != 0, mu_dR_collection, ak.singletons(np.ones(ak.num(mu_dR_collection,axis=0))))
 		#print(electron[0].tau_min_dR)
 		#min_tau_mu = tau_fourVec.nearest(muon_fourVec)
-			
-		#Look at the problem events before pairing is applied
-		print("============================Problem Event (After selections before pairing)============================")
-		if (dataset == "TTToHadronic"):
-			print("Problem ttbar Hadronic file")
-			print("Event number: " + str(event_level[event_level.event_num == 205226271].event_num))
-			print("Event run number: " + str(event_level[event_level.event_num == 205226271].run))
-			print("Event lumiblock: " + str(event_level[event_level.event_num == 205226271].Lumi))
-			print("Problem tau properties")
-			print("E: " + str(tau[event_level.event_num == 205226271].E))
-			print("Px: " + str(tau[event_level.event_num == 205226271].Px))
-			print("Py: " + str(tau[event_level.event_num == 205226271].Py))
-			print("Pz: " + str(tau[event_level.event_num == 205226271].Pz))
-			print("Pt: " + str(tau[event_level.event_num == 205226271].pt))
-			print("Number of boosted taus: " + str(tau[event_level.event_num == 205226271].nBoostedTau))
-		if (dataset == "WJetsToLNu_HT-1200To2500"):
-			print("Problem ttbar Hadronic file")
-			print("Event number: " + str(event_level[event_level.event_num == 72103573].event_num))
-			print("Problem tau properties")
-			print("E: " + str(tau[event_level.event_num == 72103573].E))
-			print("Px: " + str(tau[event_level.event_num == 72103573].Px))
-			print("Py: " + str(tau[event_level.event_num == 72103573].Py))
-			print("Pz: " + str(tau[event_level.event_num == 72103573].Pz))
-			print("Pt: " + str(tau[event_level.event_num == 72103573].pt))
-		if (dataset == "TTTo2L2Nu"):
-			print("Problem ttbar Hadronic file")
-			print("Event number: " + str(event_level[event_level.event_num == 90513344].event_num))
-			print("Event run number: " + str(event_level[event_level.event_num == 90513344].run))
-			print("Event lumiblock: " + str(event_level[event_level.event_num == 90513344].Lumi))
-			print("Problem tau properties")
-			print("E: " + str(tau[event_level.event_num == 90513344].E))
-			print("Px: " + str(tau[event_level.event_num == 90513344].Px))
-			print("Py: " + str(tau[event_level.event_num == 90513344].Py))
-			print("Pz: " + str(tau[event_level.event_num == 90513344].Pz))
-			print("Pt: " + str(tau[event_level.event_num == 90513344].pt))
-			print("Number of boosted taus: " + str(tau[event_level.event_num == 90513344].nBoostedTau))
 
 		#Add Topology Cuts (only if there's anything left to cut on)
 		if (ak.num(event_level.MHT,axis=0) > 0):
@@ -1187,18 +1000,14 @@ class FourTauPlotting(processor.ProcessorABC):
 			#Obtain leading pair
 			tau_4vec = ak.zip({"t": tau.E, "x": tau.Px, "y": tau.Py, "z": tau.Pz},with_name="Momentum4D")
 			tau_lead,tau_other = ak.unzip(ak.cartesian([tau_4vec[:,0],tau_4vec], axis = 1, nested = False))
-			#deltaR_Arr = deltaR(tau_lead,tau) #Delta R Between leading tau and all other taus in event
-			#print("Tau_lead object:")
-			#type(tau_lead)
 			deltaR_Arr = ak.values_astype(tau_lead, np.float64).deltaR(ak.values_astype(tau_4vec, np.float64))
-			#deltaphi_Arr = delta_phi(tau_lead,tau) #Debugg the delta phi values
 
 			#Remove leading tau from consideration
 			leadingTau_Pair = tau[deltaR_Arr != 0]
 			charge_Arr = charge_Arr[deltaR_Arr != 0]
 			deltaR_Arr = deltaR_Arr[deltaR_Arr != 0]
 
-			#Select OS tau that minimizes delta R	
+			#Select tau that minimizes delta R	
 			leadingTau_Pair = leadingTau_Pair[deltaR_Arr == ak.min(deltaR_Arr,axis=1)] #Paired tau is selected as the one that minimized deltaR with leading tau
 			charge_Arr = charge_Arr[deltaR_Arr == ak.min(deltaR_Arr,axis=1)]
 			deltaR_Arr = ak.min(deltaR_Arr,axis=1)
@@ -1206,11 +1015,6 @@ class FourTauPlotting(processor.ProcessorABC):
 	
 			#Remove any empty/invalid pairings
 			tau = tau[ak.num(leadingTau_Pair) > 0]
-			#un_matched_tau = 0
-			#for x in ak.num(leadingTau_Pair):
-			#	if (x == 0):
-			#		un_matched_tau += 1
-			#print("Number of unmatched taus: %d"%un_matched_tau)
 			tau_4vec = tau_4vec[ak.num(leadingTau_Pair) > 0]
 			Jet = Jet[ak.num(leadingTau_Pair) > 0]
 			AK8Jet = AK8Jet[ak.num(leadingTau_Pair) > 0]
@@ -1220,7 +1024,6 @@ class FourTauPlotting(processor.ProcessorABC):
 			leadingTau_Pair = leadingTau_Pair[ak.num(leadingTau_Pair) > 0]
 
 			#Find second pair
-			#tau_lead = tau[tau.pt == tau[:,0].pt] #Is this wrong??
 			tau_lead = ak.singletons(tau[:,0])
 
 			tau_lead_4vec = ak.firsts(ak.zip({"t": tau_lead.E, "x": tau_lead.Px, "y": tau_lead.Py, "z": tau_lead.Pz},with_name="Momentum4D"))
@@ -1229,136 +1032,10 @@ class FourTauPlotting(processor.ProcessorABC):
 			leadingPairpT = leadingTau_Pair.pt
 			tau_rem = tau[ak.values_astype(tau_lead_4vec, np.float64).deltaR(ak.values_astype(tau_4vec, np.float64)) != 0] #Select leading tau by deltaR
 			
-            #Look at how many events have a delta R = 0
-			#n_multiRemove = 0
-			#deltaR_temp_arr = ak.values_astype(tau_lead_4vec, np.float64).deltaR(ak.values_astype(tau_4vec, np.float64)) #Force 64 bit floating point values to prevent eps issues
-			#num_0_arr = ak.num(deltaR_temp_arr[deltaR_temp_arr == 0], axis=1)
-			##metricTable_arr = tau_lead.NanoAODSchema.metric_table(tau) #I can't use metric table since I'm using the base schema not the nanoAOD schema
-			#trouble_indx = 0
-			#for x in num_0_arr:
-			#	if x > 1:
-			#		print(x)
-			#		n_multiRemove += 1
-			#		print("Problem indx four momenta")
-			#		print("E: " + str(tau[trouble_indx].E))
-			#		print("Px: " + str(tau[trouble_indx].Px))
-			#		print("Py: " + str(tau[trouble_indx].Py))
-			#		print("Pz: " + str(tau[trouble_indx].Pz))
-			#		print("Problem index Delta R")
-			#		print(str(deltaR_temp_arr[trouble_indx]))
-			#		for j in range(1,4): #Look at indvidiual delta Rs to confirm the results
-			#			print("Lead " + str(j) + "tau DeltaR: " + str(tau_lead_4vec[trouble_indx].deltaR(tau_4vec[trouble_indx][j])))
-			#			#print("Lead Third DeltaR: " + str(tau_lead_4vec[trouble_indx].deltaR(tau_4vec[trouble_indx][3])))
-			#			#print("Lead Fourth DeltaR: " + str(tau_lead_4vec[trouble_indx].deltaR(tau_4vec[trouble_indx][4])))
-			#		#print("Problem index metric table")
-			#		#print(str(metricTable_arr[trouble_indx]))
-			#	trouble_indx += 1
-			#print("Number of events with multiple removed taus: %d"%n_multiRemove)
-			##Look at how many events have < 3 events left after selection (should be 0 in theory)
-			#n_less3 = 0
-			#for x in ak.num(tau_rem.pt,axis=1):
-			#	if (x < 3):
-			#		n_less3 += 1
-			#print("Number of events with fewer than 3 taus after one tau (in theory) is removed: %d"%n_less3)
 
 			tau_rem_4vec = ak.zip({"t": tau_rem.E, "x": tau_rem.Px, "y": tau_rem.Py, "z": tau_rem.Pz},with_name="Momentum4D")
 			tau_rem = tau_rem[ak.values_astype(tau_leadPair_4vec,np.float64).deltaR(ak.values_astype(tau_rem_4vec,np.float64)) != 0]
 		
-			if (dataset == "TTToHadronic"):
-				print("Problem TT To Hadronic file")
-				print("===================================Tau Rem===================================")
-				print("Event number: " + str(event_level[event_level.event_num == 205226271].event_num))
-				print("Problem tau properties")
-				print("E: " + str(tau_rem[event_level.event_num == 205226271].E))
-				print("Px: " + str(tau_rem[event_level.event_num == 205226271].Px))
-				print("Py: " + str(tau_rem[event_level.event_num == 205226271].Py))
-				print("Pz: " + str(tau_rem[event_level.event_num == 205226271].Pz))
-				print("Pt: " + str(tau_rem[event_level.event_num == 205226271].pt))
-			if (dataset == "WJetsToLNu_HT-1200To2500"): #Print remaining taus
-				print("Problem WJets file")
-				print("===================================Tau Rem===================================")
-				print("Event number: " + str(event_level[event_level.event_num == 72103573].event_num))
-				print("Problem tau properties")
-				print("E: " + str(tau_rem[event_level.event_num == 72103573].E))
-				print("Px: " + str(tau_rem[event_level.event_num == 72103573].Px))
-				print("Py: " + str(tau_rem[event_level.event_num == 72103573].Py))
-				print("Pz: " + str(tau_rem[event_level.event_num == 72103573].Pz))
-				print("Pt: " + str(tau_rem[event_level.event_num == 72103573].pt))
-			if (dataset == "TTTo2L2Nu"):
-				print("Problem ttbar Hadronic file")
-				print("===================================Tau Rem===================================")
-				print("Event number: " + str(event_level[event_level.event_num == 90513344].event_num))
-				print("Event run number: " + str(event_level[event_level.event_num == 90513344].run))
-				print("Event lumiblock: " + str(event_level[event_level.event_num == 90513344].Lumi))
-				print("Problem tau properties")
-				print("E: " + str(tau_rem[event_level.event_num == 90513344].E))
-				print("Px: " + str(tau_rem[event_level.event_num == 90513344].Px))
-				print("Py: " + str(tau_rem[event_level.event_num == 90513344].Py))
-				print("Pz: " + str(tau_rem[event_level.event_num == 90513344].Pz))
-				print("Pt: " + str(tau_rem[event_level.event_num == 90513344].pt))
-				print("Number of boosted taus: " + str(tau[event_level.event_num == 90513344].nBoostedTau))
-
-			if (dataset == "TTToHadronic"):
-				print("Problem TT To Hadronic file")
-				print("===================================Leading and Paired Tau===================================")
-				print("Event number: " + str(event_level[event_level.event_num == 205226271].event_num))
-				print("Leading tau properties:")
-				print("E: " + str(tau_lead[event_level.event_num == 205226271].E))
-				print("Px: " + str(tau_lead[event_level.event_num == 205226271].Px))
-				print("Py: " + str(tau_lead[event_level.event_num == 205226271].Py))
-				print("Pz: " + str(tau_lead[event_level.event_num == 205226271].Pz))
-				print("Pt: " + str(tau_lead[event_level.event_num == 205226271].pt))
-				print("Paired tau properties:")
-				print("E: " + str(leadingTau_Pair[event_level.event_num == 205226271].E))
-				print("Px: " + str(leadingTau_Pair[event_level.event_num == 205226271].Px))
-				print("Py: " + str(leadingTau_Pair[event_level.event_num == 205226271].Py))
-				print("Pz: " + str(leadingTau_Pair[event_level.event_num == 205226271].Pz))
-				print("Pt: " + str(leadingTau_Pair[event_level.event_num == 205226271].pt))
-			if (dataset == "WJetsToLNu_HT-1200To2500"): #Print remaining taus
-				print("Problem WJets file")
-				print("===================================Leading and Paired Tau===================================")
-				print("Event number: " + str(event_level[event_level.event_num == 72103573].event_num))
-				print("Leading tau properties:")
-				print("E: " + str(tau_lead[event_level.event_num == 72103573].E))
-				print("Px: " + str(tau_lead[event_level.event_num == 72103573].Px))
-				print("Py: " + str(tau_lead[event_level.event_num == 72103573].Py))
-				print("Pz: " + str(tau_lead[event_level.event_num == 72103573].Pz))
-				print("Pt: " + str(tau_lead[event_level.event_num == 72103573].pt))
-				print("Paired tau properties:")
-				print("E: " + str(leadingTau_Pair[event_level.event_num == 72103573].E))
-				print("Px: " + str(leadingTau_Pair[event_level.event_num == 72103573].Px))
-				print("Py: " + str(leadingTau_Pair[event_level.event_num == 72103573].Py))
-				print("Pz: " + str(leadingTau_Pair[event_level.event_num == 72103573].Pz))
-				print("Pt: " + str(leadingTau_Pair[event_level.event_num == 72103573].pt))
-			if (dataset == "TTTo2L2Nu"):
-				print("Problem TT To Leptonic file")
-				print("===================================Leading and Paired Tau===================================")
-				print("Event number: " + str(event_level[event_level.event_num == 90513344].event_num))
-				print("Leading tau properties:")
-				print("E: " + str(tau_lead[event_level.event_num == 90513344].E))
-				print("Px: " + str(tau_lead[event_level.event_num == 90513344].Px))
-				print("Py: " + str(tau_lead[event_level.event_num == 90513344].Py))
-				print("Pz: " + str(tau_lead[event_level.event_num == 90513344].Pz))
-				print("Pt: " + str(tau_lead[event_level.event_num == 90513344].pt))
-				print("Paired tau properties:")
-				print("E: " + str(leadingTau_Pair[event_level.event_num == 90513344].E))
-				print("Px: " + str(leadingTau_Pair[event_level.event_num == 90513344].Px))
-				print("Py: " + str(leadingTau_Pair[event_level.event_num == 90513344].Py))
-				print("Pz: " + str(leadingTau_Pair[event_level.event_num == 90513344].Pz))
-				print("Pt: " + str(leadingTau_Pair[event_level.event_num == 90513344].pt))
-
-			#Look at how many taus are left after the leading and paired tau removal
-			#print("Number of events with 2 remaining taus: %d"%ak.num(tau_rem[ak.num(tau_rem.pt,axis=1) == 2].pt,axis=0))
-			#print("Number of events with > 2 remaining taus: %d"%ak.num(tau_rem[ak.num(tau_rem.pt,axis=1) > 2].pt,axis=0))
-
-			#In theory there should be >= 2 taus left, check this
-			#n_lessthan2 = 0
-			#for x in ak.num(tau_rem):
-			#	if (x < 2):
-			#		print(x)
-			#		n_lessthan2 += 1
-			#print("number with fewer than 2 taus left: %d"%n_lessthan2)
-
 			#Drop events with no oposite signs
 			charge_Arr = totalCharge(tau_rem[:,0],tau_rem)
 		
@@ -1377,55 +1054,6 @@ class FourTauPlotting(processor.ProcessorABC):
 			pair2_charge = charge_Arr
 			deltaR_temp = deltaR_temp[deltaR_temp == ak.min(deltaR_temp,axis=1)]
 			
-			#print("Subleading Pair minimized delta R:")
-			#for i in range(test_range):
-			#	print(deltaR_temp[i])
-			
-			#print("Charge of subleading Piar")
-			#for i in range(test_range):
-			#	print(pair2_charge[i])
-	
-			#print("There are %d subleading pairs with an electric charge of 0"%numZeroCharge_sublead)
-			#print("There are %d subleading pairs with an electric charge of +/- 2"%numNonZeroCharge_sublead)
-
-			#Determine what is signal and what is faking signal (if sum and product of total charge of both pairs are 0 than it's signal otherwise it's a fake)
-			#print("Tau length for debugging (pre signal condition)")
-			#print(len(tau))
-			#print(ak.num(pair1_charge,axis=0))
-			#print(ak.num(pair2_charge,axis=0))
-			#foo1 = pair1_charge + pair2_charge
-			#foo2 = pair1_charge * pair2_charge
-			#signal_cond = np.bitwise_and(ak.all(pair1_charge + pair2_charge,axis=1) == 0, np.sign(ak.all(pair1_charge * pair2_charge,axis=1)) == -1) #Had previoulsy been 0 which I think is wrong
-    
-			#Drop all but signal (OSOS Higgs)
-			#tau_rem = tau_rem[signal_cond]
-			#tau_lead = tau_lead[signal_cond]
-			#leadingTau_Pair = leadingTau_Pair[signal_cond]
-			#leadingTau_NextPair = leadingTau_NextPair[signal_cond]
-			#charge_Arr = charge_Arr[signal_cond]
-			#tau = tau[signal_cond]
-			#Jet = Jet[signal_cond]
-			#AK8Jet = AK8Jet[signal_cond]
-			#event_level = event_level[signal_cond]
-			#muon = muon[signal_cond]
-			#electron = electron[signal_cond]
-            
-			#print("Tau length for debugging (post signal condition)")
-			#print(len(tau))
-			
-			#num_leadTau_0 = 0
-			#for x in ak.num(tau_lead.pt,axis=1):
-			#	if (x != 1):
-			#		num_leadTau_0 += 1
-			#		print(x)
-			#print("Number of incorrect leading tau events (before empty/invalid pair removal code):")
-			#print(num_leadTau_0)
-
-			##Take a look at what's being dropped
-			#print("What's being dropped:")
-			#for pt in tau_lead[ak.num(leadingTau_NextPair) == 0]:
-			#	print(pt)
-			
 			#Remove any empty/invalid pairings (this may be vegistal at best but I'm not sure)
 			tau_lead = tau_lead[ak.num(leadingTau_NextPair) != 0]
 			#print("Here's what the selection array looks like:")
@@ -1439,79 +1067,6 @@ class FourTauPlotting(processor.ProcessorABC):
 			#tau_nextlead = tau_rem[tau_rem.pt == tau_rem[:,0].pt]
 			tau_nextlead = ak.singletons(tau_rem[:,0])
 			
-			if (dataset == "TTToHadronic"):
-				print("Problem TT To Hadronic file")
-				print("===================================Next Leading and Its Paired Tau===================================")
-				print("Event number: " + str(event_level[event_level.event_num == 205226271].event_num))
-				print("Next Leading tau properties:")
-				print("E: " + str(tau_nextlead[event_level.event_num == 205226271].E))
-				print("Px: " + str(tau_nextlead[event_level.event_num == 205226271].Px))
-				print("Py: " + str(tau_nextlead[event_level.event_num == 205226271].Py))
-				print("Pz: " + str(tau_nextlead[event_level.event_num == 205226271].Pz))
-				print("Pt: " + str(tau_nextlead[event_level.event_num == 205226271].pt))
-				print("Paired tau properties:")
-				print("E: " + str(leadingTau_NextPair[event_level.event_num == 205226271].E))
-				print("Px: " + str(leadingTau_NextPair[event_level.event_num == 205226271].Px))
-				print("Py: " + str(leadingTau_NextPair[event_level.event_num == 205226271].Py))
-				print("Pz: " + str(leadingTau_NextPair[event_level.event_num == 205226271].Pz))
-				print("Pt: " + str(leadingTau_NextPair[event_level.event_num == 205226271].pt))
-			#Look at the next leading tau and its paired tau
-			if (dataset == "WJetsToLNu_HT-1200To2500"): #Print remaining taus
-				print("Problem WJets file")
-				print("===================================Next Leading and Its Paired Tau===================================")
-				print("Event number: " + str(event_level[event_level.event_num == 72103573].event_num))
-				print("Next Leading tau properties:")
-				print("E: " + str(tau_nextlead[event_level.event_num == 72103573].E))
-				print("Px: " + str(tau_nextlead[event_level.event_num == 72103573].Px))
-				print("Py: " + str(tau_nextlead[event_level.event_num == 72103573].Py))
-				print("Pz: " + str(tau_nextlead[event_level.event_num == 72103573].Pz))
-				print("Pt: " + str(tau_nextlead[event_level.event_num == 72103573].pt))
-				print("Paired tau properties:")
-				print("E: " + str(leadingTau_NextPair[event_level.event_num == 72103573].E))
-				print("Px: " + str(leadingTau_NextPair[event_level.event_num == 72103573].Px))
-				print("Py: " + str(leadingTau_NextPair[event_level.event_num == 72103573].Py))
-				print("Pz: " + str(leadingTau_NextPair[event_level.event_num == 72103573].Pz))
-				print("Pt: " + str(leadingTau_NextPair[event_level.event_num == 72103573].pt))
-			if (dataset == "TTTo2L2Nu"):
-				print("Problem TT To Hadronic file")
-				print("===================================Next Leading and Its Paired Tau===================================")
-				print("Event number: " + str(event_level[event_level.event_num == 90513344].event_num))
-				print("Next Leading tau properties:")
-				print("E: " + str(tau_nextlead[event_level.event_num == 90513344].E))
-				print("Px: " + str(tau_nextlead[event_level.event_num == 90513344].Px))
-				print("Py: " + str(tau_nextlead[event_level.event_num == 90513344].Py))
-				print("Pz: " + str(tau_nextlead[event_level.event_num == 90513344].Pz))
-				print("Pt: " + str(tau_nextlead[event_level.event_num == 90513344].pt))
-				print("Paired tau properties:")
-				print("E: " + str(leadingTau_NextPair[event_level.event_num == 90513344].E))
-				print("Px: " + str(leadingTau_NextPair[event_level.event_num == 90513344].Px))
-				print("Py: " + str(leadingTau_NextPair[event_level.event_num == 90513344].Py))
-				print("Pz: " + str(leadingTau_NextPair[event_level.event_num == 90513344].Pz))
-				print("Pt: " + str(leadingTau_NextPair[event_level.event_num == 90513344].pt))
-
-			#Check size of taus
-			#print("Leading Tau %d"%len(tau_lead))
-			#print(tau_lead.pt)
-			#print("Leading Tau Pair %d"%len(leadingTau_Pair))
-			#print(leadingTau_Pair.pt)
-			#print("Next Leading Tau %d"%len(tau_nextlead))
-			#print(tau_nextlead.pt)
-			#print("Next Leading Tau Pair %d"%len(leadingTau_NextPair))
-			#print(leadingTau_NextPair.pt)
-
-			#num_leadTau_0 = 0
-			#for x in ak.num(tau_lead.pt,axis=1):
-			#	if (x != 1):
-			#		num_leadTau_0 += 1
-			#		print(x)
-			#print("Number of incorrect leading tau events:")
-			#print(num_leadTau_0)
-
-			#Look at the number of taus that have been selected (determine where duplicated tau slipping in)
-			#print("Number of leading taus with 2 taus: %d"%ak.num(tau_lead[ak.num(tau_lead,axis=1) == 2].pt,axis=0))
-			#print("Number of taus paired to leading tau with 2 taus: %d"%ak.num(leadingTau_Pair[ak.num(leadingTau_Pair,axis=1) == 2].pt,axis=0))
-			#print("Number of next leading taus with 2 taus: %d"%ak.num(tau_nextlead[ak.num(tau_nextlead,axis=1) == 2].pt,axis=0))
-			#print("Number of taus paired to next leading tau with 2 taus: %d"%ak.num(leadingTau_NextPair[ak.num(leadingTau_NextPair,axis=1) == 2].pt,axis=0))
 
 			#Reconstruct tau object in order of pairings 
 			tau = ak.concatenate((tau_lead,leadingTau_Pair),axis=1)
@@ -1768,15 +1323,6 @@ class FourTauPlotting(processor.ProcessorABC):
 				not_prev_id_elec = np.bitwise_and(not_prev_id_elec,np.bitwise_not(misId_ele_cond*ak.ravel(use_ele)))
 				not_prev_id_muon = np.bitwise_and(not_prev_id_muon,np.bitwise_not(misId_mu_cond*ak.ravel(use_mu)))
 				
-				#hadronic_debug = np.bitwise_and(use_ele,use_mu)
-                
-				#for x in hadronic_debug:
-				#	if not(x):
-				#	    #print("!!!Hadronic Tau!!!")
-				#		n_hadron
-
-				#Check use_ele and use_mu
-
 				#Count number of taus originating from leptons (Is this logic broken??)
 				event_level["n_tau_electrons"] = ak.where(ak.all(ak.singletons(use_ele) == True,axis=1),event_level["n_tau_electrons"] + 1, event_level["n_tau_electrons"])
 				event_level["n_tau_muons"] = ak.where(ak.all(ak.singletons(use_mu) == True,axis=1),event_level["n_tau_muons"] + 1, event_level["n_tau_muons"]) 
@@ -1826,8 +1372,9 @@ class FourTauPlotting(processor.ProcessorABC):
 				#event_level[electron_Dict[i]] = use_ele
 				#event_level[muon_Dict[i]] = use_mu
 
-				tau_fourVec = ak.where(use_ele, misId_ele, tau_fourVec) #Replace lead tau with electron when applicable
-				tau_fourVec = ak.where(use_mu, misId_mu, tau_fourVec) #Replace lead tau with electron when applicable
+				#Keep these lines meant to swich in electrons and muons when tau misidentified as them
+				#tau_fourVec = ak.where(use_ele, misId_ele, tau_fourVec) #Replace lead tau with electron when applicable
+				#tau_fourVec = ak.where(use_mu, misId_mu, tau_fourVec) #Replace lead tau with electron when applicable
 				
 				#if (i == 0):
 				#	misId_ele = electron_fourVec[misId_ele_cond]
@@ -1903,58 +1450,13 @@ class FourTauPlotting(processor.ProcessorABC):
 				tau[:,i]["Py"] = tau_fourVec.y
 				tau[:,i]["Pz"] = tau_fourVec.z
 				
-			
-			#Check taus are not pairing to the same leptons #(Commented out 8 June 2025 for (hopefully) increased speed)
-			#for evnt in range(ak.num(tau,axis=0)):
-			#	if (tau[:,0][evnt].E == tau[:,1][evnt].E and tau[:,0][evnt].Px == tau[:,1][evnt].Px and tau[:,0][evnt].Py == tau[:,1][evnt].Py and tau[:,0][evnt].Pz == tau[:,1][evnt].Pz):
-			#		print("!!!Leading tau and paired tau appear to be matching to the same lepton!!!")
-			#	if (tau[:,0][evnt].E == tau[:,2][evnt].E) and tau[:,0][evnt].Px == tau[:,2][evnt].Px and tau[:,0][evnt].Py == tau[:,2][evnt].Py and tau[:,0][evnt].Pz == tau[:,2][evnt].Pz:
-			#		print("!!!Leading tau and subleading tau appear to be matching to the same lepton!!!")
-			#	if (tau[:,2][evnt].E == tau[:,3][evnt].E and tau[:,2][evnt].Px == tau[:,3][evnt].Px and tau[:,2][evnt].Py == tau[:,3][evnt].Py and tau[:,2][evnt].Pz == tau[:,3][evnt].Pz):
-			#		print("!!!Subleading tau and paired tau appear to be matching to the same lepton!!!")
-			#	if (tau[:,1][evnt].E == tau[:,3][evnt].E and tau[:,1][evnt].Px == tau[:,3][evnt].Px and tau[:,1][evnt].Py == tau[:,3][evnt].Py and tau[:,1][evnt].Pz == tau[:,3][evnt].Pz):
-			#		print("!!!Paired taus appear to be matching to the same lepton!!!")
-			#	if (tau[:,0][evnt].E == tau[:,3][evnt].E and tau[:,0][evnt].Px == tau[:,3][evnt].Px and tau[:,0][evnt].Py == tau[:,3][evnt].Py and tau[:,0][evnt].Pz == tau[:,3][evnt].Pz):
-			#		print("!!!Leading tau and subleading paired taus appear to be matching to the same lepton!!!")
-			#	if (tau[:,1][evnt].E == tau[:,2][evnt].E and tau[:,1][evnt].Px == tau[:,2][evnt].Px and tau[:,1][evnt].Py == tau[:,2][evnt].Py and tau[:,1][evnt].Pz == tau[:,2][evnt].Pz):
-			#		print("!!!Subleading tau matched to leading paired taus appear to be matching to the same lepton!!!")
-
-				
-
-			
-            #reduced_deltaR = deltaR_Arr[deltaR_Arr != 0]			
-			#for x in reduced_deltaR:
-			#	print(x)
-
-			#tau_plus1, tau_plus2 = ak.unzip(ak.combinations(tau[tau.charge > 0],2))
-			#tau_minus1, tau_minus2 = ak.unzip(ak.combinations(tau[tau.charge < 0],2))
-
-			#for t1,t2 in zip(ak.ravel(tau_plus1.pt), ak.ravel(tau_plus2.pt)):
-			#	if (t1 < t2):
-			#		print("Fundamental Assumption broken")
-			#for t1,t2 in zip(ak.ravel(tau_minus1.pt), ak.ravel(tau_minus2.pt)):
-			#	if (t1 < t2):
-			#		print("Fundamental Assumption broken")
-
 			#Obtain di-tau delta R and higgs delta R (if there are any events left)
 			if (ak.num(tau,axis=0) > 0):
 				tau1 = tau[np.bitwise_and(tau.E == tau[:,0].E,np.bitwise_and(np.bitwise_and(tau.Px == tau[:,0].Px, tau.Py == tau[:,0].Py), tau.Pz == tau[:,0].Pz))]
 				tau2 = tau[np.bitwise_and(tau.E == tau[:,1].E,np.bitwise_and(np.bitwise_and(tau.Px == tau[:,1].Px, tau.Py == tau[:,1].Py), tau.Pz == tau[:,1].Pz))]
 				tau3 = tau[np.bitwise_and(tau.E == tau[:,2].E,np.bitwise_and(np.bitwise_and(tau.Px == tau[:,2].Px, tau.Py == tau[:,2].Py), tau.Pz == tau[:,2].Pz))]
 				tau4 = tau[np.bitwise_and(tau.E == tau[:,3].E,np.bitwise_and(np.bitwise_and(tau.Px == tau[:,3].Px, tau.Py == tau[:,3].Py), tau.Pz == tau[:,3].Pz))]
-			#	tau1 = tau[tau.pt == tau[:,0].pt]
-			#	tau2 = tau[tau.pt == tau[:,1].pt]
-			#	tau3 = tau[tau.pt == tau[:,2].pt]
-			#	tau4 = tau[tau.pt == tau[:,3].pt]
 	
-				#print("Tau length for debugging")
-				#print(len(tau))
-				#for t in tau:
-				#	if len(t) != 4:
-				#		print("Event does not have 4 events")
-				
-				#leading_deltaR = deltaR(tau1,tau2)
-				#next_deltaR = deltaR(tau3,tau4)
 				#Check on the number of taus
 				tau_num_arr = ak.num(tau.pt,axis=1)
 				
@@ -2054,15 +1556,16 @@ class FourTauPlotting(processor.ProcessorABC):
 					leading_higgs = leading_higgs[vis_cond]
 					nextleading_higgs = nextleading_higgs[vis_cond]
 					event_level = event_level[vis_cond]
+
+					cutflow_table.fill(5,weight = ak.num(tau,axis=0))
 					if (self.isData or not(self.isData)):
 						print("# of events after visible mass cut (dropping empty arrays): %d"%ak.num(tau[ak.num(tau,axis=1) > 0],axis=0))
 
 
 				#higgs_dR = deltaR(leading_higgs, nextleading_higgs) 
 				higgs_dR = leading_higgs.deltaR(nextleading_higgs) #Use vector library for delta R calculations
-				#ditau_dR = ak.concatenate((leading_deltaR, next_deltaR),axis=1)
 
-				higgs_cond = ak.all(higgs_dR >= 2.0, axis = 1)
+				higgs_cond = ak.all(higgs_dR >= 2.0, axis = 1) #Require Higgs to have seperation deltaR >= 2
 				#tau_cond = ak.all(ditau_dR < 0.8,axis = 1)
 				#topo_cond = np.bitwise_and(tau_cond, higgs_cond) 
 				topo_cond = higgs_cond
@@ -2076,6 +1579,7 @@ class FourTauPlotting(processor.ProcessorABC):
 				event_level = event_level[higgs_cond]
 				leading_higgs = leading_higgs[higgs_cond]
 				nextleading_higgs = nextleading_higgs[higgs_cond]
+				cutflow_table.fill(6,weight = ak.num(tau,axis=0))
 				#tau_cond = tau_cond[higgs_cond]
 				if (self.isData or not(self.isData)):
 					print("# of events after Higgs cut (dropping empty arrays): %d"%ak.num(tau[ak.num(tau,axis=1) > 0],axis=0))
@@ -2110,19 +1614,6 @@ class FourTauPlotting(processor.ProcessorABC):
 		Jet_B = Jet_B[Jet_B.DeepCSVTags_b > 0.7527]
 		NumBJets = ak.num(Jet_B,axis=1)
 		event_level["nBJets"] = NumBJets
-
-		#Cut events with non-zero b jets
-		#tau = tau[event_level.nBJets == 0]
-		#Jet = Jet[event_level.nBJets == 0]
-		#AK8Jet = AK8Jet[event_level.nBJets == 0]
-		#electron = electron[event_level.nBJets == 0]
-		#muon = muon[event_level.nBJets == 0]
-		#event_level = event_level[event_level.nBJets == 0]
-		if (self.isData or not(self.isData)):
-			print("# of events after b-jet cut (dropping empty arrays): %d"%ak.num(tau[ak.num(tau,axis=1) > 0],axis=0))
-		#print(len(muon))
-		#print(len(tau))
-		#print(len(event_level))
 
 		#Z Multiplicity function
 		def Z_Mult_Function(lepton,lep_flavor): 
@@ -2262,12 +1753,12 @@ class FourTauPlotting(processor.ProcessorABC):
 	
 		#Obtain the weight	
 		if (self.isData):
-			weight_Val = 1 
+			CrossSec_Weight = 1 
 		else:
-			weight_Val = weight_calc(dataset,numEvents_Dict[dataset])
+			CrossSec_Weight = weight_calc(dataset,numEvents_Dict[dataset])
 			print("=========!!!Weight Debugging!!!=========")
 			print(dataset)
-			print("Luminosity Weight = %f"%weight_Val)
+			print("Luminosity Weight = %f"%CrossSec_Weight)
 			print("Luminosity = %f"%Lumi_2018)
 			print("Cross section = %f"%xSection_Dictionary[dataset])
 			print("Number of events Processed: %d"%numEvents_Dict[dataset])
@@ -2308,7 +1799,7 @@ class FourTauPlotting(processor.ProcessorABC):
 				"ZMult": ak.ravel(event_level.ZMult), 
 				"numBJet": event_level.nBJets,
 				"RecoRadion_Mass": FourTau_Mass_Arr,
-				"weight": event_level.event_weight*weight_Val,
+				"weight": event_level.event_weight*CrossSec_Weight,
 				}
 			)
 
@@ -2316,7 +1807,7 @@ class FourTauPlotting(processor.ProcessorABC):
 		#	print("radion_pt being stored:")
 		#	print(radionPT_Arr)
 		#	print("weight being stored:")
-		#	print(event_level.event_weight*weight_Val)
+		#	print(event_level.event_weight*CrossSec_Weight)
 
 		if not(self.isData):
 			file_name = (dataset + ".parquet")
@@ -2330,6 +1821,7 @@ class FourTauPlotting(processor.ProcessorABC):
 			ak.to_parquet(var_nn,file_name)
 			print("Creating Parquet file (MC)")
 		else:
+			#event_level.event_weight = event_level.event_weight ** 0 #Force data to have weight 1/ no weighting
 			file_name = (dataset + ".parquet")
 			if (mass == "2000"):
 				if (os.path.isfile(file_name)): #Append to existing parquet file
@@ -2341,11 +1833,14 @@ class FourTauPlotting(processor.ProcessorABC):
 					ak.to_parquet(var_nn,file_name) #Create parquet file
 					print("Creating Parquet file (Data)")
 
-		#print(weight_Val)
+		#print(CrossSec_Weight)
 		#print(event_level.event_weight)
 		print("===================!!!=Weight Debugging!!!====================")
-		print(event_level.event_weight*weight_Val)
+		print(event_level.event_weight*CrossSec_Weight)
 		print("===================!!!=Weight Debugging!!!====================")
+		#print("===================!!!=Raw Event Count!!!====================")
+		#print(ak.num(event_level.event_weight,axis=0))
+		#print("===================!!!=Raw Event Count!!!====================")
 			
 		#Histogram bining
 		if (self.trigger_bit == 39): #Use reduced binning for JetHT trigger
@@ -2361,8 +1856,8 @@ class FourTauPlotting(processor.ProcessorABC):
 		h_HiggsDeltaR = hist.Hist.new.Regular(N1,0,5, label = r"Higgs $\Delta$R").Double()
 		h_LeadDiTauDeltaR = hist.Hist.new.Regular(N1,0,5, label = r"Leading di-$\tau$ $\Delta$R").Double()
 		h_SubLeadingDiTauDeltaR = hist.Hist.new.Regular(N1,0,5, label = r"Sub-leading di-$\tau$ $\Delta$R").Double()
-		h_LeadHiggsMass = hist.Hist.new.Regular(N2,0,120, label=r"Leading Higgs Mass (GeV)").Double()
-		h_SubleadingHiggsMass = hist.Hist.new.Regular(N2,0,120, label=r"Sub-Leading Higgs Mass (GeV)").Double()
+		h_LeadHiggsMass = hist.Hist.new.Regular(N2,0,200, label=r"Leading Higgs Mass (GeV)").Double()
+		h_SubleadingHiggsMass = hist.Hist.new.Regular(N2,0,200, label=r"Sub-Leading Higgs Mass (GeV)").Double()
 		h_RadionpT = hist.Hist.new.Regular(N1,0,200, label=r"Radion $p_T$ (GeV)").Double()
 		h_taupT = hist.Hist.new.Regular(N1,0,400, label=r"$\tau$ $p_T$ (GeV)").Double()
 		h_tauEta = hist.Hist.new.Regular(N1,-5,5, label = r"$\tau \ \eta$").Double()
@@ -2392,58 +1887,55 @@ class FourTauPlotting(processor.ProcessorABC):
 		h_MinTauMuonDeltaR = hist.Hist.new.Regular(N1,0,1,label = r"Minimized tau to muon $\Delta$R").Double()
 		h_NEleTauID = hist.Hist.new.Regular(5,0,5,label=r"Number of electrons identified as taus").Double()
 		h_NMuonTauID= hist.Hist.new.Regular(5,0,5,label=r"Number of muon identified as taus").Double()
+		h_weight = hist.Hist.new.Regular(10,-2,2,label=r"Applied Event Weight").Double()
 
 		#Fill histograms
-		#if (): #See what the weights and weight_Val is for the background
-		h_FourTauMass.fill(ak.ravel(FourTau_Mass_Arr),weight = event_level.event_weight*weight_Val)
-		h_HiggsDeltaPhi.fill(ak.ravel(Higgs_DeltaPhi_Arr),weight = event_level.event_weight*weight_Val)
-		h_LeadHiggsMass.fill(ak.ravel(LeadingHiggs_mass_Arr),weight = event_level.event_weight*weight_Val)
-		h_SubleadingHiggsMass.fill(ak.ravel(SubLeadingHiggs_mass_Arr),weight = event_level.event_weight*weight_Val)
-		h_HiggsDeltaR.fill(ak.ravel(diHiggs_dR_Arr),weight = event_level.event_weight*weight_Val)
-		h_LeadDiTauDeltaR.fill(ak.ravel(leading_dR_Arr),weight = event_level.event_weight*weight_Val)
-		h_SubLeadingDiTauDeltaR.fill(ak.ravel(subleading_dR_Arr),weight = event_level.event_weight*weight_Val)
-		h_LeadHiggsCharge.fill(ak.ravel(event_level.LeadingHiggs_Charge),weight = event_level.event_weight*weight_Val)
-		h_SubleadHiggsCharge.fill(ak.ravel(event_level.SubleadingHiggs_Charge),weight = event_level.event_weight*weight_Val)
+		#if (): #See what the weights and CrossSec_Weight is for the background
+		h_FourTauMass.fill(ak.ravel(FourTau_Mass_Arr),weight = event_level.event_weight*CrossSec_Weight)
+		h_HiggsDeltaPhi.fill(ak.ravel(Higgs_DeltaPhi_Arr),weight = event_level.event_weight*CrossSec_Weight)
+		h_LeadHiggsMass.fill(ak.ravel(LeadingHiggs_mass_Arr),weight = event_level.event_weight*CrossSec_Weight)
+		h_SubleadingHiggsMass.fill(ak.ravel(SubLeadingHiggs_mass_Arr),weight = event_level.event_weight*CrossSec_Weight)
+		h_HiggsDeltaR.fill(ak.ravel(diHiggs_dR_Arr),weight = event_level.event_weight*CrossSec_Weight)
+		h_LeadDiTauDeltaR.fill(ak.ravel(leading_dR_Arr),weight = event_level.event_weight*CrossSec_Weight)
+		h_SubLeadingDiTauDeltaR.fill(ak.ravel(subleading_dR_Arr),weight = event_level.event_weight*CrossSec_Weight)
+		h_LeadHiggsCharge.fill(ak.ravel(event_level.LeadingHiggs_Charge),weight = event_level.event_weight*CrossSec_Weight)
+		h_SubleadHiggsCharge.fill(ak.ravel(event_level.SubleadingHiggs_Charge),weight = event_level.event_weight*CrossSec_Weight)
 		
-		h_LeadDiTauPhi.fill(ak.ravel(leading_dPhi_Arr),weight = event_level.event_weight*weight_Val)
-		h_SubleadDiTauPhi.fill(ak.ravel(subleading_dPhi_Arr),weight = event_level.event_weight*weight_Val)
-		h_RadMETPhi.fill(ak.ravel(radionMET_dPhi),weight = event_level.event_weight*weight_Val)
-		h_RadLeadHiggsDeltaR.fill(ak.ravel(leadingHiggs_Rad_dR),weight = event_level.event_weight*weight_Val)
-		h_RadSubleadingHiggsDeltaR.fill(ak.ravel(subleadingHiggs_Rad_dR),weight = event_level.event_weight*weight_Val)
-		h_METLeadHiggsDeltaPhi.fill(ak.ravel(leadingHiggs_MET_dPhi_Arr),weight = event_level.event_weight*weight_Val)
-		h_METSubleadHiggsDeltaPhi.fill(ak.ravel(subleadingHiggs_MET_dPhi_Arr),weight = event_level.event_weight*weight_Val)
-		h_RadionEta.fill(ak.ravel(Radion_Reco.eta),weight = event_level.event_weight*weight_Val)
-		h_RadionCharge.fill(ak.ravel(event_level.Radion_Charge),weight = event_level.event_weight*weight_Val)
+		h_LeadDiTauPhi.fill(ak.ravel(leading_dPhi_Arr),weight = event_level.event_weight*CrossSec_Weight)
+		h_SubleadDiTauPhi.fill(ak.ravel(subleading_dPhi_Arr),weight = event_level.event_weight*CrossSec_Weight)
+		h_RadMETPhi.fill(ak.ravel(radionMET_dPhi),weight = event_level.event_weight*CrossSec_Weight)
+		h_RadLeadHiggsDeltaR.fill(ak.ravel(leadingHiggs_Rad_dR),weight = event_level.event_weight*CrossSec_Weight)
+		h_RadSubleadingHiggsDeltaR.fill(ak.ravel(subleadingHiggs_Rad_dR),weight = event_level.event_weight*CrossSec_Weight)
+		h_METLeadHiggsDeltaPhi.fill(ak.ravel(leadingHiggs_MET_dPhi_Arr),weight = event_level.event_weight*CrossSec_Weight)
+		h_METSubleadHiggsDeltaPhi.fill(ak.ravel(subleadingHiggs_MET_dPhi_Arr),weight = event_level.event_weight*CrossSec_Weight)
+		h_RadionEta.fill(ak.ravel(Radion_Reco.eta),weight = event_level.event_weight*CrossSec_Weight)
+		h_RadionCharge.fill(ak.ravel(event_level.Radion_Charge),weight = event_level.event_weight*CrossSec_Weight)
 
-		h_RadionpT.fill(ak.ravel(radionPT_Arr),weight = event_level.event_weight*weight_Val)
-		#h_taupT.fill(ak.ravel(tau.pt),weight = event_level.event_weight*weight_Val)
-		h_LeadTaupT.fill(ak.ravel(tau[ak.argsort(tau.pt,axis=-1)][:,3].pt),weight = event_level.event_weight*weight_Val)
-		h_SubleadTaupT.fill(ak.ravel(tau[ak.argsort(tau.pt,axis=-1)][:,2].pt),weight = event_level.event_weight*weight_Val)
-		h_3TaupT.fill(ak.ravel(tau[ak.argsort(tau.pt,axis=-1)][:,1].pt),weight = event_level.event_weight*weight_Val)
-		h_4TaupT.fill(ak.ravel(tau[ak.argsort(tau.pt,axis=-1)][:,0].pt),weight = event_level.event_weight*weight_Val)
+		h_RadionpT.fill(ak.ravel(radionPT_Arr),weight = event_level.event_weight*CrossSec_Weight)
+		#h_taupT.fill(ak.ravel(tau.pt),weight = event_level.event_weight*CrossSec_Weight)
+		h_LeadTaupT.fill(ak.ravel(tau[ak.argsort(tau.pt,axis=-1)][:,3].pt),weight = event_level.event_weight*CrossSec_Weight)
+		h_SubleadTaupT.fill(ak.ravel(tau[ak.argsort(tau.pt,axis=-1)][:,2].pt),weight = event_level.event_weight*CrossSec_Weight)
+		h_3TaupT.fill(ak.ravel(tau[ak.argsort(tau.pt,axis=-1)][:,1].pt),weight = event_level.event_weight*CrossSec_Weight)
+		h_4TaupT.fill(ak.ravel(tau[ak.argsort(tau.pt,axis=-1)][:,0].pt),weight = event_level.event_weight*CrossSec_Weight)
 		#h_taupT = h_LeadTaupT + h_SubleadTaupT + h_3TaupT + h_4TaupT
-		#h_tauEta.fill(ak.ravel(tau.eta),weight = event_level.event_weight*weight_Val)
-		h_ZMult.fill(ak.ravel(event_level.ZMult),weight = event_level.event_weight*weight_Val)
-		h_ZMultEle.fill(ak.ravel(event_level.ZMult_e),weight = event_level.event_weight*weight_Val)
-		h_ZMultMu.fill(ak.ravel(event_level.ZMult_mu),weight = event_level.event_weight*weight_Val)
-		h_BJetMult.fill(ak.ravel(event_level.nBJets),weight = event_level.event_weight*weight_Val)
-		h_NElec.fill(ak.ravel(event_level.n_electrons),weight = event_level.event_weight*weight_Val)
-		h_NMuon.fill(ak.ravel(event_level.n_muons),weight = event_level.event_weight*weight_Val)
-		#h_MinTauEleDeltaR.fill(ak.ravel(ak.where(ak.num(electron.tau_min_dR,axis=1)!= 0, electron.tau_min_dR, ak.singletons(np.ones(ak.num(electron.tau_min_dR,axis=0))*999))),weight = event_level.event_weight*weight_Val)
-		#h_MinTauMuonDeltaR.fill(ak.ravel(ak.where(ak.num(muon.tau_min_dR,axis=1) != 0, muon.tau_min_dR, ak.singletons(np.ones(ak.num(muon.tau_min_dR,axis=0))*999))),weight = event_level.event_weight*weight_Val)
-		h_NEleTauID.fill(ak.ravel(event_level.n_tau_electrons),weight = event_level.event_weight*weight_Val)
-		h_NMuonTauID.fill(ak.ravel(event_level.n_tau_muons),weight = event_level.event_weight*weight_Val)
-		#h_.fill(ak.ravel(),weight = event_level.event_weight*weight_Val)
-		#h_.fill(ak.ravel(),weight = event_level.event_weight*weight_Val)
-		#h_.fill(ak.ravel(),weight = event_level.event_weight*weight_Val)
-		#h_.fill(ak.ravel(),weight = event_level.event_weight*weight_Val)
-		#h_.fill(ak.ravel(),weight = event_level.event_weight*weight_Val)
+		#h_tauEta.fill(ak.ravel(tau.eta),weight = event_level.event_weight*CrossSec_Weight)
+		h_ZMult.fill(ak.ravel(event_level.ZMult),weight = event_level.event_weight*CrossSec_Weight)
+		h_ZMultEle.fill(ak.ravel(event_level.ZMult_e),weight = event_level.event_weight*CrossSec_Weight)
+		h_ZMultMu.fill(ak.ravel(event_level.ZMult_mu),weight = event_level.event_weight*CrossSec_Weight)
+		h_BJetMult.fill(ak.ravel(event_level.nBJets),weight = event_level.event_weight*CrossSec_Weight)
+		h_NElec.fill(ak.ravel(event_level.n_electrons),weight = event_level.event_weight*CrossSec_Weight)
+		h_NMuon.fill(ak.ravel(event_level.n_muons),weight = event_level.event_weight*CrossSec_Weight)
+		#h_MinTauEleDeltaR.fill(ak.ravel(ak.where(ak.num(electron.tau_min_dR,axis=1)!= 0, electron.tau_min_dR, ak.singletons(np.ones(ak.num(electron.tau_min_dR,axis=0))*999))),weight = event_level.event_weight*CrossSec_Weight)
+		#h_MinTauMuonDeltaR.fill(ak.ravel(ak.where(ak.num(muon.tau_min_dR,axis=1) != 0, muon.tau_min_dR, ak.singletons(np.ones(ak.num(muon.tau_min_dR,axis=0))*999))),weight = event_level.event_weight*CrossSec_Weight)
+		h_NEleTauID.fill(ak.ravel(event_level.n_tau_electrons),weight = event_level.event_weight*CrossSec_Weight)
+		h_NMuonTauID.fill(ak.ravel(event_level.n_tau_muons),weight = event_level.event_weight*CrossSec_Weight)
+		h_weight.fill(ak.ravel(event_level.event_weight*CrossSec_Weight))
 
 		return{
 			dataset: {
-				#"Weight": weight_Val,
-				"Weight_Val": weight_Val,
-				"Weight": ak.to_list(event_level.event_weight*weight_Val), 
+				#"Weight": CrossSec_Weight,
+				"Weight_Val": CrossSec_Weight,
+				"Weight": ak.to_list(event_level.event_weight*CrossSec_Weight), 
 				"FourTau_Mass_Arr": h_FourTauMass,
 				"HiggsDeltaPhi_Arr": h_HiggsDeltaPhi,
 				"LeadingHiggs_mass": h_LeadHiggsMass,
@@ -2484,6 +1976,9 @@ class FourTauPlotting(processor.ProcessorABC):
 				#"Muon_tau_dR_Arr": h_MinTauMuonDeltaR, #muon.tau_min_dR
                 "num_electron_tau_Arr": h_NEleTauID,
                 "num_muon_tau_Arr": h_NMuonTauID,
+				"cutflow_table": cutflow_table,
+				"num_events": ak.num(event_level.event_weight,axis=0),
+				"weight_Hist": h_weight
 			}
 		}
 	
@@ -2526,8 +2021,8 @@ if __name__ == "__main__":
 	#Trigger dictionaries
 	#trigger_dict = {"Mu50": (21,False), "PFMET120_PFMHT120_IDTight": (27,False), "EitherOr_Trigger": (41,True)}
 	#trigger_dict = {"Mu50": (21,False), "PFMET120_PFMHT120_IDTight": (27,False), "EitherOr_Trigger": (41,True)}
-	#trigger_dict = {"EitherOr_Trigger": (41,True)}
-	trigger_dict = {"Mu50": (21,False)}
+	trigger_dict = {"EitherOr_Trigger": (41,True)}
+	#trigger_dict = {"Mu50": (21,False)}
 	#trigger_dict = {"PFHT500_PFMET100_PFMHT100_IDTight": (39,False)} #,"EitherOr_Trigger": (41,True)}
 	#trigger_dict = {"Mu50": (21,False), "EitherOr_Trigger": (41,True)}
 	#trigger_dict = {"Mu50": (21,False), "PFHT500_PFMET100_PFMHT100_IDTight": (39,False), "EitherOr_Trigger": (41,True)}
@@ -2563,37 +2058,39 @@ if __name__ == "__main__":
 	os.environ["CONDOR_CONFIG"] = "/etc/condor/condor_config"
 	#htc_log_err_dir = "/scratch/twnelson/ControlPlot_HTC/Run_" + str(time.localtime()[0]) + "_" + str(time.localtime()[1]) + "_" + str(time.localtime()[2]) + "_" + str(time.localtime()[3]) + f".{time.localtime()[4]:02d}"
 	#os.makedirs(htc_log_err_dir)
-	
-	cluster = HTCondorCluster(
-            cores=1,
-			memory="6 GB",
-            disk="3 GB",
-            death_timeout = '60',
-            job_extra_directives={
-                "+JobFlavour": '"tomorrow"',
-                "log": "dask_job_output.$(PROCESS).$(CLUSTER).log",
-                "output": "dask_job_output.$(PROCESS).$(CLUSTER).out",
-                "error": "dask_job_output.$(PROCESS).$(CLUSTER).err",
-                "should_transfer_files": "yes",
-                "when_to_transfer_ouput": "ON_EXIT_OR_EVICT",
-                #"transfer_output_remaps": working_dir,
-				#"transfer_output_files": os.getcwd(), #Dump parquet files in current directory
-                "transfer_executable": "false",
-                "+SingularityImage": '"/cvmfs/unpacked.cern.ch/registry.hub.docker.com/coffeateam/coffea-dask-cc7:latest-py3.10"',
-                #"+SingularityImage": '"/cvmfs/unpacked.cern.ch/registry.hub.docker.com/coffeateam/coffea-base-almalinux9:0.7.25-py3.10"',
-                "Requirements": "HasSingularityJobStart",
-                "InitialDir": f'/scratch/{os.environ["USER"]}',
-                'transfer_input_files': f"{_x509_path}",
 
-            },
-            job_script_prologue = [
-                "export XRD_RUNFORKHANDLER=1",
-                f"export X509_USER_PROXY={_x509_path}"
-            ]
-    )
-	cluster.adapt(minimum=1, maximum=500)
+    #DO NOT DELETE THESE LINES CONDOR BROKEN???
+	cluster = ""
+#	cluster = HTCondorCluster(
+#            cores=1,
+#			 memory="6 GB",
+#            disk="3 GB",
+#            death_timeout = '60',
+#            job_extra_directives={
+#                "+JobFlavour": '"tomorrow"',
+#                "log": "dask_job_output.$(PROCESS).$(CLUSTER).log",
+#                "output": "dask_job_output.$(PROCESS).$(CLUSTER).out",
+#                "error": "dask_job_output.$(PROCESS).$(CLUSTER).err",
+#                "should_transfer_files": "yes",
+#                "when_to_transfer_ouput": "ON_EXIT_OR_EVICT",
+#                #"transfer_output_remaps": working_dir,
+#				#"transfer_output_files": os.getcwd(), #Dump parquet files in current directory
+#                "transfer_executable": "false",
+#                "+SingularityImage": '"/cvmfs/unpacked.cern.ch/registry.hub.docker.com/coffeateam/coffea-dask-cc7:latest-py3.10"',
+#                #"+SingularityImage": '"/cvmfs/unpacked.cern.ch/registry.hub.docker.com/coffeateam/coffea-base-almalinux9:0.7.25-py3.10"',
+#                "Requirements": "HasSingularityJobStart",
+#                "InitialDir": f'/scratch/{os.environ["USER"]}',
+#                'transfer_input_files': f"{_x509_path}",
+#
+#            },
+#            job_script_prologue = [
+#                "export XRD_RUNFORKHANDLER=1",
+#                f"export X509_USER_PROXY={_x509_path}"
+#            ]
+#    )
+#	cluster.adapt(minimum=1, maximum=500)
 
-	run_on_condor = True
+	run_on_condor = False
 	
 	if (run_on_condor):
 		print("Run on Condor")
@@ -2616,9 +2113,9 @@ if __name__ == "__main__":
 	four_tau_hist_list = ["FourTau_Mass_Arr","HiggsDeltaPhi_Arr", "Higgs_DeltaR_Arr","leading_dR_Arr","subleading_dR_Arr","LeadingHiggs_mass","SubLeadingHiggs_mass", "radionPT_Arr", 
 			"ZMult_Arr", "BJet_Arr", "tau_lead_pt_Arr", "tau_sublead_pt_Arr", "tau_3rdlead_pt_Arr", "tau_4thlead_pt_Arr", "leading_dPhi_Arr", "subleading_dPhi_Arr", 
 			"radionMET_dPhi_Arr","leadingHiggs_Rad_dR_Arr","subleadingHiggs_Rad_dR_Arr","leadingHiggs_MET_dPhi_Arr","subleadingHiggs_MET_dPhi_Arr","Radion_eta_Arr", "Radion_Charge_Arr",
-			"LeadingHiggsSgn_Arr", "SubleadingHiggsSgn_Arr","Num_Electrons_Arr","Num_Muons_Arr"] #,"num_electron_tau_Arr","num_muon_tau_Arr"] #,"Electron_tau_dR_Arr","Muon_tau_dR_Arr"] (Removed num_electron_tau and num_muon_tau for now)
+			"LeadingHiggsSgn_Arr", "SubleadingHiggsSgn_Arr","Num_Electrons_Arr","Num_Muons_Arr","cutflow_table"] #,"num_electron_tau_Arr","num_muon_tau_Arr"] #,"Electron_tau_dR_Arr","Muon_tau_dR_Arr"] (Removed num_electron_tau and num_muon_tau for now)
 	#four_tau_hist_list = ["Num_Electrons_Arr","Num_Muons_Arr","Electron_tau_dR_Arr","Muon_tau_dR_Arr"]
-	#four_tau_hist_list = ["ZMult_Arr","ZMult_ele_Arr","ZMult_mu_Arr", "ZMult_tau_Arr"]
+	#four_tau_hist_list = ["ZMult_Arr"] #,"ZMult_ele_Arr","ZMult_mu_Arr", "ZMult_tau_Arr"]
 	#four_tau_hist_list = ["leading_dR_Arr"] #Only make 1 histogram for brevity/debugging purposes
 	hist_name_dict = {"FourTau_Mass_Arr": r"Reconstructed 4-$\tau$ invariant mass", "HiggsDeltaPhi_Arr": r"Reconstructed Higgs $\Delta \phi$", "Higgs_DeltaR_Arr": r"Reconstructed Higgs $\Delta R$",
 					"leading_dR_Arr": r"$\Delta R$ of leading di-$\tau$ pair", "subleading_dR_Arr": r"$\Delta R$ of subleading di-$\tau$ pair", 
@@ -2655,13 +2152,14 @@ if __name__ == "__main__":
 		print("====================Radion Mass = " + mass[0] + "." + mass[1] + " TeV====================")
 		#print(np.char.replace(np.array( os.listdir(background_loc + "ZZTo4L_25February25_0413_skim__skim_Feb25/")), "", background_loc + "ZZTo4L_25February25_0413_skim__skim_Feb25/",1).tolist())
 		file_dict_test = { #Reduced files to run over
-			"ZZ4l": [background_base + "ZZTo4L_26August25_0757_skim_Newskim/ZZTo4L.root"], 
-			"Data_SingleMuon": [data_base + "SingleMu_Run2018A_27August25_0551_skim_Newskim/SingleMu_Run2018A.root", data_base + "SingleMu_Run2018B_27August25_0529_skim_Newskim/SingleMu_Run2018B.root", 
-                                data_base + "SingleMu_Run2018C_27August25_0540_skim_Newskim/SingleMu_Run2018C.root", data_base + "SingleMu_Run2018D_27August25_0613_skim_Newskim/SingleMu_Run2018D.root"],
-			#"Data_SingleMuon": [data_base + "SingleMu_Run2018A_27August25_0551_skim_Newskim/singleFileSkimForSubmission-NANO_NANO_227.root", data_base + "SingleMu_Run2018B_27August25_0529_skim_Newskim/singleFileSkimForSubmission-NANO_NANO_227.root", 
-                                #data_base + "SingleMu_Run2018C_27August25_0540_skim_Newskim/singleFileSkimForSubmission-NANO_NANO_227.root", data_base + "SingleMu_Run2018D_27August25_0613_skim_Newskim/singleFileSkimForSubmission-NANO_NANO_227.root"],#Single skimmed nanoAOD for increased speed for testing
-			"Data_JetHT": [data_base + "JetHT_2018_27August25_0655_skim_Newskim/JetHT_2018.root", data_base + "JetHT_Other_2018_27August25_0522_skim_Newskim/JetHT_Other_2018.root"]
-			#"Data_JetHT": [data_base + "JetHT_2018_27August25_0655_skim_Newskim/singleFileSkimForSubmission-NANO_NANO_227.root", data_base + "JetHT_Other_2018_27August25_0522_skim_Newskim/singleFileSkimForSubmission-NANO_NANO_227.root"] #Single skimmed nanoAOD for increased speed for testing^=
+			#"ZZ4l": [background_base + "ZZTo4L_26August25_0757_skim_Newskim/ZZTo4L.root"], 
+			"TTToSemiLeptonic": [background_base + "TTToSemiLeptonic_35August25_0448_skim_Newskim/TTToSemiLeptonic" + str(j) + ".root" for j in range(10)], 
+			"TTTo2L2Nu": [background_base + "TTTo2L2Nu_26August25_0719_skim_Newskim/TTTo2L2Nu.root"], 
+			"TTToHadronic": [background_base + "TTToHadronic_35August25_0419_skim_Newskim/TTToHadronic" + str(j) + ".root" for j in range(10)],
+			"Data_SingleMuon": [data_base + "SingleMu_Run2018A_27August25_0551_skim_Newskim/SingleMu_Run2018A.root"], 
+				#data_base + "SingleMu_Run2018B_27August25_0529_skim_Newskim/SingleMu_Run2018B.root", data_base + "SingleMu_Run2018C_27August25_0540_skim_Newskim/SingleMu_Run2018C.root", 
+				#data_base + "SingleMu_Run2018D_27August25_0613_skim_Newskim/SingleMu_Run2018D.root"],
+			"Data_JetHT": [data_base + "JetHT_2018_27August25_0655_skim_Newskim/JetHT_2018.root"]#, data_base + "JetHT_Other_2018_27August25_0522_skim_Newskim/JetHT_Other_2018.root"]
         }
 
 		#file_dict["ZZ4l"].remove("root://cms-xrd-global.cern.ch//store/user/twnelson/HH4Tau_EtAl/Skimmed_Files/2018/MC/Hadd_ZZTo4L/ZZTo4L_Hadd_9.root") #Remove file 9 to fix errors (maybe?)
@@ -2706,42 +2204,24 @@ if __name__ == "__main__":
 			#"Data_JetHT": [data_loc + "JetHT_Run2018A-17Sep2018-v1.root", data_loc + "JetHT_Run2018B-17Sep2018-v1.root", data_loc + "JetHT_Run2018C-17Sep2018-v1.root",data_loc + "JetHT_Run2018D-PromptReco-v2.root"]
 		}
 
-	#	
-	#file_dict_data = {
-	#		"Data_SingleMuon": np.concatenate((np.char.replace(np.array(os.listdir(data_loc + "SingleMu_Run2018A_22May25_1117_skim__skim_Feb25/")), "", data_base + "SingleMu_Run2018A_22May25_1117_skim__skim_Feb25/",1).tolist(),
-	#		np.char.replace(np.array(os.listdir(data_loc + "SingleMu_Run2018B_22May25_0822_skim__skim_Feb25/")), "", data_base + "SingleMu_Run2018B_22May25_0822_skim__skim_Feb25/").tolist(),
-	#		np.char.replace(np.array(os.listdir(data_loc + "SingleMu_Run2018B_22May25_1054_skim__skim_Feb25/")), "", data_base + "SingleMu_Run2018B_22May25_1054_skim__skim_Feb25/").tolist(),
-	#		np.char.replace(np.array(os.listdir(data_loc + "SingleMu_Run2018C_22May25_1102_skim__skim_Feb25/")), "", data_base + "SingleMu_Run2018C_22May25_1102_skim__skim_Feb25/").tolist(),
-	#		np.char.replace(np.array(os.listdir(data_loc + "SingleMu_Run2018D_23May25_0510_skim__skim_Feb25/")), "", data_base + "SingleMu_Run2018D_23May25_0510_skim__skim_Feb25/").tolist())).tolist() 
-	#	}
-		
 		#Generate dictionary of number of processed events This logic needs fixing
 		#print("About to obtain number of events being proscessed")
+		sumEvents_Dict = {}
 		for key_name, file_array in file_dict.items(): 
 			print(key_name)
 			if (key_name != "Data_JetHT" and key_name != "Data_SingleMuon"): #This logic needs to be fixed
 				numEvents_Dict[key_name] = 0 #Initialize the number of events dictionary
+				sumEvents_Dict[key_name] = 0 #Initialize the number of events dictionary
 				#print("Background:")
 				#print(key_name)
 				#print(file_array)
 				for file in file_array:
-					#print(file)
-					#if (key_name == ""):
-						#tempFile = uproot.open(file)
-						#numEvents_Dict[key_name] =+ tempFile['Runs/genEventCount'].array()[0] #Fixed for nanoAOD (!!This line may cause issues!!)
-					#	print("!!!======================Problem Files==========================!!!")
-					#	print(key_name)
-					#	print(file)
-					#	print("!!!======================Problem Files==========================!!!")
-					#print(file)
-					#tempFile = uproot.open(file[0]) #Get file
-					#tempFile = uproot.open(file) #Get file
 					with uproot.open(file) as tempFile:
 						print(file)
 						#print("Current number of events: " + str(numEvents_Dict[key_name]))
 						#print("Number of events being added: " + str(tempFile['Runs/genEventCount'].array()[0]))
-						#numEvents_Dict[key_name] += tempFile['Runs/genEventCount'].array()[0] #Fixed for nanoAOD (!!This line may cause issues!!)
-						numEvents_Dict[key_name] += np.sum(tempFile['Runs/genEventCount'].array()) #Fixed for nanoAOD (!!This line may cause issues!!)
+						#numEvents_Dict[key_name] += np.sum(tempFile['Runs/genEventCount'].array()) #Fixed for nanoAOD (!!This line may cause issues!!)
+						numEvents_Dict[key_name] += np.sum(tempFile['Runs/genEventSumw'].array()) #Fixed for nanoAOD (!!This line may cause issues!!)
 					#numEvents_Dict[key_name] = tempFile['hEvents'].member('fEntries')/2
 					#numEvents_Dict[key_name] = tempFile['hcount'].member('fEntries')/2 #This is only good for miniAOD
 
@@ -2751,13 +2231,8 @@ if __name__ == "__main__":
 		#break	
 		background_list = [r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"]
 		#background_list = [r"$ZZ \rightarrow 4l$"]
-		#background_list = ["Di-Bosons", r"$ZZ \rightarrow 4l$"]
-		#background_list = ["Di-Bosons", "Single Top", r"Drell-Yan+Jets", r"$ZZ \rightarrow 4l$"]
-		#background_list = [r"Drell-Yan+Jets"]
-		#background_list = [r"Di-Bosons"]
-		#background_list = ["W+Jets"]
 		#background_list = [r"$t\bar{t}$"]
-		#background_list = [r"$t\bar{t}$",r"$ZZ \rightarrow 4l$"]
+		#background_list = [r"$t\bar{t}$", r"$ZZ \rightarrow 4l$"]
 		signal_list = [r"MC Sample $m_\phi$ = %s TeV"%mass[0]]
 		background_plot_names = {r"$t\bar{t}$" : "_ttbar_", r"Drell-Yan+Jets": "_DYJets_", "Di-Bosons" : "_DiBosons_", "Single Top": "_SingleTop_", "QCD" : "_QCD_", "W+Jets" : "_WJets_", r"$ZZ \rightarrow 4l$" : "_ZZ4l_"} #For file names
 		
@@ -2797,116 +2272,129 @@ if __name__ == "__main__":
 				"Num_Muons_Arr" : "NumberOf_Muons_Mass" + mass + "-" + trigger_name, "Electron_tau_dR_Arr": "min_dR_Tau_Electron_Mass" + mass + "-" + trigger_name,
 				"Muon_tau_dR_Arr": "min_dR_Tau_Muon_Mass" + mass + "-" + trigger_name,
 				"num_electron_tau_Arr": "Num_electrons_as_tau_Mass" + mass + "-" + trigger_name,
-				"num_muon_tau_Arr": "Num_muons_as_tau_Mass" + mass + "-" + trigger_name 
-
+				"num_muon_tau_Arr": "Num_muons_as_tau_Mass" + mass + "-" + trigger_name,
+				"cutflow_table": "Cutflow_Table_Mass" + mass + "-" + trigger_name
 			}
 			
 			#fourtau_out = iterative_runner(file_dict, treename="Events", processor_instance=FourTauPlotting(trigger_bit=trigger_pair[0], or_trigger=trigger_pair[1],PUWeights = PUWeight, PU_weight_bool =True, signal_mass = mass)) #Modified for NanoAOD (changd treename)
 			print("About to run iterative runner")
-			fourtau_out = iterative_runner(file_dict, treename="Events", processor_instance=FourTauPlotting(trigger_bit=trigger_pair[0], or_trigger=trigger_pair[1],PUWeights = PUWeight, PU_weight_bool =True, signal_mass = mass)) #Modified for NanoAOD (changd treename)
+			fourtau_out = iterative_runner(file_dict, treename="Events", processor_instance=FourTauPlotting(trigger_bit=trigger_pair[0], or_trigger=trigger_pair[1],PUWeights = PUWeight, PU_weight_bool = False, signal_mass = mass)) #Modified for NanoAOD (changd treename)
 			print("Ran iterative runner")
 			for hist_name in four_tau_hist_list: #Loop over all histograms
-				#fig,ax = plt.subplots()
-				#fig0,ax0 = plt.subplots()
-					#if (hist_name == "Electron_tau_dR_Arr" or hist_name == "Muon_tau_dR_Arr"):
-						#print(fourtau_out["Signal"][hist_name])
-						#Drop events with no leptons
-					#	fill_Arr = ak.from_iter(fourtau_out["Signal"][hist_name])
-					#	fill_Arr = fill_Arr[fill_Arr != 999]
-						#hist_dict_only_signal[hist_name].fill(ak.ravel(fourtau_out["Signal"][hist_name]))
-					#	hist_dict_only_signal[hist_name].fill(fill_Arr)
-					#	hist_dict_only_signal[hist_name].plot1d(ax=ax0)
-					#	ax0.set_yscale('log')
-					#else:
-					#	hist_dict_only_signal[hist_name].fill(fourtau_out["Signal"][hist_name],weight = fourtau_out["Signal"]["Weight"])
-					#	hist_dict_only_signal[hist_name].plot1d(ax=ax0)
-					#plt.title("Signal Mass: " + mass[0] + "TeV")
-					#plt.savefig("SignalSingle" + four_tau_names[hist_name])
-					#plt.close()
 
 				#back_hist_dict = {} #Dictionary of all histogram backgrounds for 
-				if (hist_name != "Pair_DeltaPhi_Hist" and hist_name != "RadionPTComp_Hist"):
-					temp_hist_dict = dict.fromkeys(background_list) # create dictionary of histograms for each background type
-					for background_type in background_list:
-						print("Background type %s"%background_type)
-						background_array = []
-						#background_dict = {r"$ZZ \rightarrow 4l$" : ["ZZ4l"]}
-						backgrounds = background_dict[background_type]
+				#if (hist_name != "Pair_DeltaPhi_Hist" and hist_name != "RadionPTComp_Hist"):
+				temp_hist_dict = dict.fromkeys(background_list) # create dictionary of histograms for each background type
 						
-						#Loop over all backgrounds
-						for background in backgrounds:
-							print("%s"%background)
-							if (mass == "2000"): #Only need to generate single background once
-								if (hist_name == "Radion_Charge_Arr"):
-									lumi_table_data["MC Sample"].append(background)
-									lumi_table_data["Luminosity"].append(fourtau_out[background]["Lumi_Val"])
-									lumi_table_data["Cross Section (pb)"].append(fourtau_out[background]["CrossSec_Val"])
-									lumi_table_data["Number of Events"].append(fourtau_out[background]["NEvent_Val"])
-									lumi_table_data["Calculated Weight"].append(fourtau_out[background]["Weight_Val"])
-								
-								fig2, ax2 = plt.subplots()
-								if (hist_name != "Electron_tau_dR_Arr" and hist_name != "Muon_tau_dR_Arr"):
-									#hist_dict_single_background[hist_name].fill(fourtau_out[background][hist_name],weight = fourtau_out[background]["Weight"]) #Obtain background distributions 
-
-									#print(hist_dict_single_background[hist_name].values())
-									fourtau_out[background][hist_name].plot1d(ax=ax2)
-									plt.title(background_type)
-									plt.savefig("SingleBackground" + background_plot_names[background_type] + four_tau_names[hist_name])
-									plt.close()
-									#print("Bin information for " + hist_name)
-									#center_arr = hist_dict_single_background[hist_name].axes.centers[0]
-									#count_arr = hist_dict_single_background[hist_name].counts()
-									#for n in range(hist_dict_single_background[hist_name].axes.size[0]):
-									#	print(f"Bin #{n}, center at {center_arr[n]}: {count_arr[n]}")
-
-								else: #lepton-tau delta R 
-									#hist_dict_single_background[hist_name].fill(fourtau_out[background][hist_name]) #Obtain background distributions 
-									#fill_Arr = ak.from_iter(fourtau_out[background][hist_name])
-									#fill_Arr = fill_Arr[fill_Arr != 999]
-									#hist_dict_single_background[hist_name].fill(fill_Arr) #Obtain background distributions 
-									#hist_dict_single_background[hist_name].plot1d(ax=ax2)
-									fourtau_out[background][hist_name].plot1d(ax=ax2)
-									ax2.set_yscale('log')
-									plt.title(background_type)
-									plt.savefig("SingleBackground" + background_plot_names[background_type] + four_tau_names[hist_name])
-									plt.close()
-								#if ((background_type == r"$t\bar{t}$" or background_type == "Drell-Yan+Jets" or background_type == r"$ZZ \rightarrow 4l$") and hist_name == "LeadingHiggs_mass"):
-									#print("!!!====================Debugging di-tau masses of %s====================!!!"%background_type)
-									#zeroMassCounter = 0
-									#firstbin_count = 0
-									#for ditau_mass in fourtau_out[background][hist_name]:
-									#	if (ditau_mass == 0):
-									#		zeroMassCounter += 1
-									#	if (ditau_mass >= 0 and ditau_mass <= 10):
-									#		firstbin_count += 1
-									#		print(ditau_mass)
-									#print("# of entries with 0 mass: %d"%zeroMassCounter)
-									#print("# of entries in first bin: %d"%firstbin_count)
+				if (hist_name == "cutflow_table"): #Get the weight distributions from data
+					fig_data, ax_data = plt.subplots()
+					data_hist = fourtau_out["Data_SingleMuon"]["cutflow_table"]
+					data_hist += fourtau_out["Data_JetHT"]["cutflow_table"]
+					data_hist.plot1d(ax = ax_data)
+					plt.title("Data Weights")
+					plt.savefig("SingleBackground_Data_WeightTable")
+					plt.close()
+				
+				for background_type in background_list:
+					print("Background type %s"%background_type)
+					background_array = []
+					backgrounds = background_dict[background_type]
+						
+					#Loop over all backgrounds
+					for background in backgrounds:
+						print("%s"%background)
+						if (mass == "2000"): #Only need to generate single background once
 							
-							#Could there be issues here in terms of how the backgrounds are being combined???
-							if (hist_name != "Electron_tau_dR_Arr"): # and hist_name != "Muon_tau_dR_Arr"): #Skip the lepton-tau delta R
-								#print(fourtau_out[background]["Weight"])
-								if (temp_hist_dict[background_type] == None): #Combine distirbutions of like background types together
-									temp_hist_dict[background_type] = fourtau_out[background][hist_name]
-									print("First histogram added")
+							#Plot the cutflow for each background
+							if (hist_name == "cutflow_table"):
+								#print(fourtau_out[background]["cutflow_table"].axes)
+								if (background == backgrounds[0]):
+									cutflow_hist = fourtau_out[background]["cutflow_table"]
 								else:
-									temp_hist_dict[background_type] += fourtau_out[background][hist_name]
-									print("Additional Histogram added")
+									cutflow_hist += fourtau_out[background]["cutflow_table"]
+								
+								if (background == backgrounds[-1]):
+									fig2p5, ax2p5 = plt.subplots()
+									cutflow_hist.plot1d(ax=ax2p5)
+									plt.title(background_type + " Cutflow Table")
+									ax2p5.set_yscale('log')
+									plt.savefig("SingleBackground" + background_plot_names[background_type] + "CutFlowTable")
+									plt.close()
+							
+								#Plot the weights for each background
+								if (background == backgrounds[0]):
+									weight_hist = fourtau_out[background]["weight_Hist"]
+								else:
+									weight_hist += fourtau_out[background]["weight_Hist"]
+								if (background == backgrounds[-1]):
+									figweight, axweight = plt.subplots()
+									weight_hist.plot1d(ax=axweight)
+									plt.title(background_type + " Weight Histogram")
+									plt.savefig("SingleBackground" + background_plot_names[background_type] + "Weight")
+									plt.close()
+							
+							if (hist_name == "Radion_Charge_Arr"):
+								lumi_table_data["MC Sample"].append(background)
+								lumi_table_data["Luminosity"].append(fourtau_out[background]["Lumi_Val"])
+								lumi_table_data["Cross Section (pb)"].append(fourtau_out[background]["CrossSec_Val"])
+								lumi_table_data["Number of Events"].append(fourtau_out[background]["NEvent_Val"])
+								lumi_table_data["Calculated Weight"].append(fourtau_out[background]["Weight_Val"])
+							
 
-								#hist_dict_background[hist_name].fill(background_type,fourtau_out[background][hist_name],weight = fourtau_out[background]["Weight"]) #Obtain background distributions
-								print("Background %s added"%background)
-								print("Showing histogram:" + hist_name)
-								#hist_dict_background[hist_name].show(background_type)
-                                #print()
-								#center_arr = hist_dict_background[hist_name].axes.centers[0]
-								#count_arr = hist_dict_background[hist_name].counts()
-								#for n in range(hist_dict_background[hist_name].axes.size[0]):
-								#	print(f"Bin #{n}, center at {center_arr[n]}: {count_arr[n]}")
-							if (hist_name == "num_electron_tau_Arr"): # and np.pi == np.exp(1)): #Count final states
-								background_state_array += fin_state_vec(fourtau_out[background]["num_electron_tau_Arr"],fourtau_out[background]["num_muon_tau_Arr"]).tolist()
+							if (hist_name != "Electron_tau_dR_Arr" and hist_name != "Muon_tau_dR_Arr"):
+								if (background == backgrounds[0]):
+									crnt_hist = fourtau_out[background][hist_name]
+									print("Background: " + background)
+									print("Sum of entries: %f"%fourtau_out[background][hist_name].sum())
+								else:
+									crnt_hist += fourtau_out[background][hist_name]
+									print("Background: " + background)
+									print("Sum of entries: %f"%fourtau_out[background][hist_name].sum())
+								if (background == backgrounds[-1]):
+									fig2, ax2 = plt.subplots()
+									temp_hist_dict[background_type] = crnt_hist #Try to fix stacking bug
+									crnt_hist.plot1d(ax=ax2)
+									#if (hist_name == "FourTau_Mass_Arr"):
+									print("Background: " + background_type)
+									print("Sum of entries: %f"%crnt_hist.sum())
+									#print("Number of Entries: %d"%fourtau_out[background]["num_events"])
+									plt.title(background_type)
+									plt.savefig("SingleBackground" + background_plot_names[background_type] + four_tau_names[hist_name])
+									plt.close()
 
-					#Combine the backgrounds together
-					hist_dict_background[hist_name] = hist.Stack.from_dict(temp_hist_dict) #This line won't work with 
+							else: #lepton-tau delta R 
+								fig2, ax2 = plt.subplots()
+								fourtau_out[background][hist_name].plot1d(ax=ax2)
+								ax2.set_yscale('log')
+								plt.title(background_type)
+								plt.savefig("SingleBackground" + background_plot_names[background_type] + four_tau_names[hist_name])
+								plt.close()
+						
+						#Could there be issues here in terms of how the backgrounds are being combined???
+					#	if (hist_name != "Electron_tau_dR_Arr"): # and hist_name != "Muon_tau_dR_Arr"): #Skip the lepton-tau delta R
+					#		#print(fourtau_out[background]["Weight"])
+					#		if (temp_hist_dict[background_type] == None): #Combine distirbutions of like background types together
+					#			#temp_hist_dict[background_type] = fourtau_out[background][hist_name]
+					#			print("First histogram added")
+					#		else:
+					#			#temp_hist_dict[background_type] += fourtau_out[background][hist_name]
+					#			print("Additional Histogram added")
+
+					#		#hist_dict_background[hist_name].fill(background_type,fourtau_out[background][hist_name],weight = fourtau_out[background]["Weight"]) #Obtain background distributions
+					#		print("Background %s added"%background)
+					#		print("Showing histogram:" + hist_name)
+					#		#hist_dict_background[hist_name].show(background_type)
+					#		#print()
+					#		#center_arr = hist_dict_background[hist_name].axes.centers[0]
+					#		#count_arr = hist_dict_background[hist_name].counts()
+					#		#for n in range(hist_dict_background[hist_name].axes.size[0]):
+					#		#	print(f"Bin #{n}, center at {center_arr[n]}: {count_arr[n]}")
+					#	if (hist_name == "num_electron_tau_Arr"): # and np.pi == np.exp(1)): #Count final states
+					#		background_state_array += fin_state_vec(fourtau_out[background]["num_electron_tau_Arr"],fourtau_out[background]["num_muon_tau_Arr"]).tolist()
+
+
+				#Combine the backgrounds together
+				hist_dict_background[hist_name] = hist.Stack.from_dict(temp_hist_dict) #This could be causing the problems 
 
 
 
@@ -2928,21 +2416,21 @@ if __name__ == "__main__":
                         
 
 					
-					#Obtain data distributions
-					print("==================Hist %s================"%hist_name)
-					#print("Total amount of data = %d"%(len(fourtau_out["Data_SingleMuon"][hist_name]) + len(fourtau_out["Data_JetHT"][hist_name])))
-					#print("Total amount of data = %d"%(len(fourtau_out["Data_SingleMuon"][hist_name])))
-					#print("Total amount of data = %d"%(len(fourtau_out["Data_JetHT"][hist_name])))
-					if (trigger_name == "Mu50"):
-						print("Mu50 Only")
-						hist_dict_data[hist_name] = fourtau_out["Data_SingleMuon"][hist_name] #.fill("Data",fourtau_out["Data_SingleMuon"][hist_name]) 
-					if (trigger_name == "PFHT500_PFMET100_PFMHT100_IDTight"):
-						print("JetHTMHTMET Only")
-						hist_dict_data[hist_name] = fourtau_out["Data_JetHT"][hist_name]#.fill("Data",fourtau_out["Data_JetHT"][hist_name]) 
-					if (trigger_name == "EitherOr_Trigger"):
-						print("Both Triggers")
-						hist_dict_data[hist_name] = fourtau_out["Data_SingleMuon"][hist_name]
-						hist_dict_data[hist_name] += fourtau_out["Data_JetHT"][hist_name]
+				#Obtain data distributions
+				print("==================Hist %s================"%hist_name)
+				#print("Total amount of data = %d"%(len(fourtau_out["Data_SingleMuon"][hist_name]) + len(fourtau_out["Data_JetHT"][hist_name])))
+				#print("Total amount of data = %d"%(len(fourtau_out["Data_SingleMuon"][hist_name])))
+				#print("Total amount of data = %d"%(len(fourtau_out["Data_JetHT"][hist_name])))
+				if (trigger_name == "Mu50"):
+					print("Mu50 Only")
+					hist_dict_data[hist_name] = fourtau_out["Data_SingleMuon"][hist_name] #.fill("Data",fourtau_out["Data_SingleMuon"][hist_name]) 
+				if (trigger_name == "PFHT500_PFMET100_PFMHT100_IDTight"):
+					print("JetHTMHTMET Only")
+					hist_dict_data[hist_name] = fourtau_out["Data_JetHT"][hist_name]#.fill("Data",fourtau_out["Data_JetHT"][hist_name]) 
+				if (trigger_name == "EitherOr_Trigger"):
+					print("Both Triggers")
+					hist_dict_data[hist_name] = fourtau_out["Data_SingleMuon"][hist_name]
+					hist_dict_data[hist_name] += fourtau_out["Data_JetHT"][hist_name]
 						
 #							if (hist_name == "num_electron_tau_Arr"):  #and np.pi == np.exp(1)):
 #							    print("Getting final states for data")
@@ -2959,34 +2447,51 @@ if __name__ == "__main__":
 #								    final_state_dict_data_error[state] /= (len(fourtau_out["Data_SingleMuon"]["num_electron_tau_Arr"]) + len(fourtau_out["Data_JetHT"]["num_electron_tau_Arr"]))
 
 					#print("Number of Jet HT entries: %d"%len(fourtau_out["Data_JetHT"][hist_name]))
-				
-					#Put histograms into stacks and arrays for plotting purposes (is the issue arising here??) (This logic may be outdated the .stack(name) may not be needed anymore)
-					background_stack = hist_dict_background[hist_name] #hist_dict_background[hist_name].stack("background")
-					#signal_stack = hist_dict_signal[hist_name].stack("signal")
-					data_stack = hist_dict_data[hist_name] #.stack("data")    
-					#signal_array = [signal_stack["Signal"]]
-					data_array = [data_stack] #["Data"]]
-					#data_array = []
-					for background in background_list:
-						background_array.append(background_stack[background])
+								
+				#Plot the weights for the data
+				figweight_data, axweight_data = plt.subplots()
+				weight_hist_data = fourtau_out["Data_SingleMuon"]["weight_Hist"]
+				weight_hist_data += fourtau_out["Data_JetHT"]["weight_Hist"]
 
-					#if (hist_name == "Radion_Charge_Arr"): #These lines are broken with the way that I now handle output
-					#	print("Background Histogram Sum: %f"%hist_dict_background[hist_name].sum())	
-					#	print("Data Histogram Sum: %f"%hist_dict_data[hist_name].sum())
+				weight_hist_data.plot1d(ax=axweight_data)
+				plt.title("Data Weight Histogram")
+				plt.savefig("SingleBackground_Data_Weight")
+				plt.close()
+			
+				#Put histograms into stacks and arrays for plotting purposes (is the issue arising here??) (This logic may be outdated the .stack(name) may not be needed anymore)
+				background_stack = hist_dict_background[hist_name] #hist_dict_background[hist_name].stack("background")
+				#signal_stack = hist_dict_signal[hist_name].stack("signal")
+				data_stack = hist_dict_data[hist_name] #.stack("data")    
+				#signal_array = [signal_stack["Signal"]]
+				data_array = [data_stack] #["Data"]]
 				
-					#Stack background distributions and plot signal + data distribution
-					fig,ax = plt.subplots()
-					hep.histplot(background_array,ax=ax,stack=True,histtype="fill",label=background_list,facecolor=TABLEAU_COLORS[:len(background_list)],edgecolor=TABLEAU_COLORS[:len(background_list)])
-					#hep.histplot(signal_array,ax=ax,stack=True,histtype="step",label=signal_list,edgecolor=TABLEAU_COLORS[len(background_list)+1],linewidth=2.95)
-					hep.histplot(data_array,ax=ax,stack=False,histtype="errorbar", yerr=True,label=["Data"],marker="o",color = "k") #,facecolor='black',edgecolor='black') #,mec='k')
-					hep.cms.text("Preliminary",loc=0,fontsize=13)
-					#ax.set_title(hist_name_dict[hist_name],loc = "right")
-					ax.set_title("2018 Data",loc = "right")
-					ax.legend(fontsize=10, loc='upper right')
-					plt.savefig(four_tau_names[hist_name])
-					plt.close()
+				for background in background_list:
+					background_array.append(background_stack[background]) #Is this line fucking up your scaling??
+					#if (hist_name == "FourTau_Mass_Arr"):
+					print("Background: " + background)
+					print("Sum of stacked histogram: %f"%background_stack[background].sum())
+			
+				#Stack background distributions and plot signal + data distribution
+				fig,ax = plt.subplots()
+				hep.histplot(background_array,ax=ax,stack=True,histtype="fill",label=background_list,facecolor=TABLEAU_COLORS[:len(background_list)],edgecolor=TABLEAU_COLORS[:len(background_list)])
+				#hep.histplot(signal_array,ax=ax,stack=True,histtype="step",label=signal_list,edgecolor=TABLEAU_COLORS[len(background_list)+1],linewidth=2.95)
+				hep.histplot(data_array,ax=ax,stack=False,histtype="errorbar", yerr=True,label=["Data"],marker="o",color = "k") #,facecolor='black',edgecolor='black') #,mec='k')
+				hep.cms.text("Preliminary",loc=0,fontsize=13)
+				#ax.set_title(hist_name_dict[hist_name],loc = "right")
+				ax.set_title("2018 Data",loc = "right")
+				ax.legend(fontsize=10, loc='upper right')
+				plt.savefig(four_tau_names[hist_name])
+				plt.close()
 	
-	#Store final states in tables (Commented out on 2 September 2025, do not delete yet)
+
+
+
+
+
+
+
+
+#Store final states in tables (Commented out on 2 September 2025, do not delete yet)
 #	for state in background_state_array:
 #		final_state_dict_background[state] += 1/len(background_state_array)
 #
