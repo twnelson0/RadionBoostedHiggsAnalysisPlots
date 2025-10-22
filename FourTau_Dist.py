@@ -18,6 +18,7 @@ import time
 from distributed import Client
 from dask_jobqueue import HTCondorCluster
 from cutflow_producer import cutflow_producer
+import csv
 #import glob
 
 
@@ -419,6 +420,9 @@ class FourTauPlotting(processor.ProcessorABC):
 		print(dataset)
 
 
+		cutflow_dict = dict.fromkeys(["Sample","Initial","Trigger","Tau_pT","Tau_eta","decay","deepboosted","Mass_Cut","Higgs_dR"])
+		cutflow_dict["Sample"] = dataset
+		cutflow_dict["Initial"] = ak.num(tau,axis=0)
 		print("Number of events before selection + Trigger: %d"%ak.num(tau,axis=0))
 
 		#Look at the problem events before anything is applied
@@ -842,12 +846,11 @@ class FourTauPlotting(processor.ProcessorABC):
 		muon["tau_min_dR"] = mu_dR_collection
 		
 		#Set up cutflow dictionary
-		cutflow_dict = dict.fromkeys(["No_Selec","Tau_pT","Tau_eta","decay","deepboosted"])
 		cutflow_table = hist.Hist.new.Reg(6,0,6,label="Cut flow",underflow = True, overflow = True).Double()
-		cutflow_dict["No_Selec"] = ak.num(tau,axis=0) #Initial number of events
+		cutflow_dict["Trigger"] = ak.num(tau,axis=0) #Initial number of events
 		cutflow_table.fill(0,weight = ak.num(tau,axis=0))
-		print("Number of events (no selections): %d"%cutflow_dict["No_Selec"])
-		print("Should also be Number of events (no selections): %d"%len(np.zeros(ak.num(tau,axis=0))))
+		print("Number of events (no selections post trigger): %d"%cutflow_dict["Trigger"])
+		print("Should also be Number of events (no selections post trigger): %d"%len(np.zeros(ak.num(tau,axis=0))))
 		
 		#Apply selections
 		tau = tau[tau.pt > 30] #pT selection
@@ -1527,10 +1530,6 @@ class FourTauPlotting(processor.ProcessorABC):
 				)
 				#nextleading_higgs["phi"] = ak.from_iter(np.arctan2(nextleading_higgs.Py,nextleading_higgs.Px))
 				#nextleading_higgs["eta"] = ak.from_iter(np.arcsinh(nextleading_higgs.Pz)/np.sqrt(nextleading_higgs.Px**2 + nextleading_higgs.Py**2 + nextleading_higgs.Pz**2))
-
-				#Why has the delta R thing broken now that I have stopped checking charge??
-				#print(leading_higgs.phi)
-				#print(nextleading_higgs.eta)
 		
 				#Visiable Mass selection
 				if (ak.num(event_level.MHT,axis=0) > 0):
@@ -1558,6 +1557,7 @@ class FourTauPlotting(processor.ProcessorABC):
 					event_level = event_level[vis_cond]
 
 					cutflow_table.fill(5,weight = ak.num(tau,axis=0))
+					cutflow_dict["Mass_Cut"] = ak.num(tau,axis=0)
 					if (self.isData or not(self.isData)):
 						print("# of events after visible mass cut (dropping empty arrays): %d"%ak.num(tau[ak.num(tau,axis=1) > 0],axis=0))
 
@@ -1580,6 +1580,7 @@ class FourTauPlotting(processor.ProcessorABC):
 				leading_higgs = leading_higgs[higgs_cond]
 				nextleading_higgs = nextleading_higgs[higgs_cond]
 				cutflow_table.fill(6,weight = ak.num(tau,axis=0))
+				cutflow_dict["Higgs_dR"] = ak.num(tau,axis=0)
 				#tau_cond = tau_cond[higgs_cond]
 				if (self.isData or not(self.isData)):
 					print("# of events after Higgs cut (dropping empty arrays): %d"%ak.num(tau[ak.num(tau,axis=1) > 0],axis=0))
@@ -1978,7 +1979,8 @@ class FourTauPlotting(processor.ProcessorABC):
                 "num_muon_tau_Arr": h_NMuonTauID,
 				"cutflow_table": cutflow_table,
 				"num_events": ak.num(event_level.event_weight,axis=0),
-				"weight_Hist": h_weight
+				"weight_Hist": h_weight,
+				"cutflow_dict": cutflow_dict
 			}
 		}
 	
@@ -1988,6 +1990,8 @@ class FourTauPlotting(processor.ProcessorABC):
 if __name__ == "__main__":
 	#mass_str_arr = ["1000","2000","3000"]
 	mass_str_arr = ["2000"]
+	cutflow_table_array = [] #Array to be converted into cutflow table
+	cutflow_fields = ["Sample","Initial","Trigger","Tau_pT","Tau_eta","decay","deepboosted","Mass_Cut","Higgs_dR"]
 	
 	#Functions and variables for Luminosity weights
 	lumi_table_data = {"MC Sample":[], "Luminosity":[], "Cross Section (pb)":[], "Number of Events":[], "Calculated Weight":[]}
@@ -2150,7 +2154,6 @@ if __name__ == "__main__":
 	#Loop over all mass points
 	for mass in mass_str_arr:
 		print("====================Radion Mass = " + mass[0] + "." + mass[1] + " TeV====================")
-		#print(np.char.replace(np.array( os.listdir(background_loc + "ZZTo4L_25February25_0413_skim__skim_Feb25/")), "", background_loc + "ZZTo4L_25February25_0413_skim__skim_Feb25/",1).tolist())
 		file_dict_test = { #Reduced files to run over
 			#"ZZ4l": [background_base + "ZZTo4L_26August25_0757_skim_Newskim/ZZTo4L.root"], 
 			"TTToSemiLeptonic": [background_base + "TTToSemiLeptonic_35August25_0448_skim_Newskim/TTToSemiLeptonic" + str(j) + ".root" for j in range(10)], 
@@ -2162,10 +2165,8 @@ if __name__ == "__main__":
 			"Data_JetHT": [data_base + "JetHT_2018_27August25_0655_skim_Newskim/JetHT_2018.root"]#, data_base + "JetHT_Other_2018_27August25_0522_skim_Newskim/JetHT_Other_2018.root"]
         }
 
-		#file_dict["ZZ4l"].remove("root://cms-xrd-global.cern.ch//store/user/twnelson/HH4Tau_EtAl/Skimmed_Files/2018/MC/Hadd_ZZTo4L/ZZTo4L_Hadd_9.root") #Remove file 9 to fix errors (maybe?)
 		file_dict_debug = {"WJetsToLNu_HT-1200To2500":[background_base + "WJetsToLNu_HT-1200To2500_OtherPart_28February25_1012_skim__skim_Feb25/singleFileSkimForSubmission-NANO_NANO_80.root"]}
 		file_dict_signal_only = {
-		#file_dict = {
 			"Signal": [signal_base + mass + ".root"]
 		}
 		
@@ -2222,6 +2223,7 @@ if __name__ == "__main__":
 						#print("Number of events being added: " + str(tempFile['Runs/genEventCount'].array()[0]))
 						#numEvents_Dict[key_name] += np.sum(tempFile['Runs/genEventCount'].array()) #Fixed for nanoAOD (!!This line may cause issues!!)
 						numEvents_Dict[key_name] += np.sum(tempFile['Runs/genEventSumw'].array()) #Fixed for nanoAOD (!!This line may cause issues!!)
+						print(key_name + "sum: %f"%numEvents_Dict[key_name])
 					#numEvents_Dict[key_name] = tempFile['hEvents'].member('fEntries')/2
 					#numEvents_Dict[key_name] = tempFile['hcount'].member('fEntries')/2 #This is only good for miniAOD
 
@@ -2278,8 +2280,17 @@ if __name__ == "__main__":
 			
 			#fourtau_out = iterative_runner(file_dict, treename="Events", processor_instance=FourTauPlotting(trigger_bit=trigger_pair[0], or_trigger=trigger_pair[1],PUWeights = PUWeight, PU_weight_bool =True, signal_mass = mass)) #Modified for NanoAOD (changd treename)
 			print("About to run iterative runner")
-			fourtau_out = iterative_runner(file_dict, treename="Events", processor_instance=FourTauPlotting(trigger_bit=trigger_pair[0], or_trigger=trigger_pair[1],PUWeights = PUWeight, PU_weight_bool = False, signal_mass = mass)) #Modified for NanoAOD (changd treename)
+			fourtau_out = iterative_runner(file_dict, treename="Events", processor_instance=FourTauPlotting(trigger_bit=trigger_pair[0], or_trigger=trigger_pair[1],PUWeights = PUWeight, PU_weight_bool = True, signal_mass = mass)) #Modified for NanoAOD (changd treename)
 			print("Ran iterative runner")
+
+			#Produce cutflow csv table
+			for file in file_dict.keys():
+				cutflow_table_array.append(fourtau_out[file]["cutflow_dict"])
+			with open("Cutflow_Table_Mass_" + mass[0] + "TeV.csv", mode = "w", newline = '') as cutflow_file:	
+				writer = csv.DictWriter(cutflow_file,fieldnames=cutflow_fields)
+				writer.writeheader()
+				writer.writerows(cutflow_table_array)
+
 			for hist_name in four_tau_hist_list: #Loop over all histograms
 
 				#back_hist_dict = {} #Dictionary of all histogram backgrounds for 
