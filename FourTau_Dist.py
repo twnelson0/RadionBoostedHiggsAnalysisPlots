@@ -8,6 +8,7 @@ import mplhep as hep
 from coffea import processor, nanoevents
 from coffea.nanoevents import NanoEventsFactory, NanoAODSchema, BaseSchema
 from coffea.nanoevents.methods import candidate, vector
+from coffea import util
 from math import pi
 import numba 
 import pandas as pd
@@ -15,6 +16,7 @@ from matplotlib.backends.backend_pdf import PdfPages
 import vector
 import os
 import time
+import datetime
 from distributed import Client
 from dask_jobqueue import HTCondorCluster
 from cutflow_producer import cutflow_producer
@@ -769,30 +771,6 @@ class FourTauPlotting(processor.ProcessorABC):
 				electron = electron[event_level.MHT > 110]
 				event_level = event_level[event_level.MHT > 110]
 				
-				#print("Jet HT Trigger")
-				#tau = tau[np.bitwise_and(event_level.jet_trigger,bit_mask([27])) == bit_mask([27])]	
-				#AK8Jet = AK8Jet[np.bitwise_and(event_level.jet_trigger,bit_mask([27])) == bit_mask([27])]	
-				#Jet = Jet[np.bitwise_and(event_level.jet_trigger,bit_mask([27])) == bit_mask([27])]	
-				#muon = muon[np.bitwise_and(event_level.jet_trigger,bit_mask([27])) == bit_mask([27])]	
-				#event_level = event_level[np.bitwise_and(event_level.jet_trigger,bit_mask([27])) == bit_mask([27])]
-
-				#Offline Cuts
-				#pfMET	
-				#tau = tau[event_level.pfMET > 130]	
-				#AK8Jet = AK8Jet[event_level.pfMET > 130]	
-				#Jet = Jet[event_level.pfMET > 130]
-				#event_level = event_level[event_level.pfMET > 130]
-			
-				#MHT
-				#tau = tau[event_level.MHT > 130]	
-				#AK8Jet = AK8Jet[event_level.MHT > 130]	
-				#Jet = Jet[event_level.MHT > 130]
-				#event_level = event_level[event_level.MHT > 130]
-				
-				#PFLoose ID
-				#tau = tau[ak.any(Jet.PFLooseId, axis=1)]	
-				#AK8Jet = AK8Jet[ak.any(Jet.PFLooseId, axis=1)]	
-				#Jet = Jet[ak.any(Jet.PFLooseId, axis=1)]
 			
 			print("# of events after Trigger + Selection: %d"%ak.num(tau,axis=0))
 			print("# of events after Trigger + Selection (dropping empty arrays): %d"%ak.num(tau[ak.num(tau,axis=1) > 0],axis=0))
@@ -1461,52 +1439,19 @@ class FourTauPlotting(processor.ProcessorABC):
 				tau4 = tau[np.bitwise_and(tau.E == tau[:,3].E,np.bitwise_and(np.bitwise_and(tau.Px == tau[:,3].Px, tau.Py == tau[:,3].Py), tau.Pz == tau[:,3].Pz))]
 	
 				#Check on the number of taus
-				tau_num_arr = ak.num(tau.pt,axis=1)
-				
-				#Drop the goddman events with anomolous numbers of taus
-				#tau = tau[tau_num_arr != 4]
-				#Jet = Jet[tau_num_arr != 4]
-				#AK8Jet = AK8Jet[tau_num_arr != 4]
-				#event_level = event_level[tau_num_arr != 4]
-				#electron = electron[tau_num_arr != 4]
-				#muon = muon[tau_num_arr != 4]
-
-
-				#Print statements for debugging events with anomolous numbers of taus
-				tau_notFour = tau_num_arr[tau_num_arr != 4]
-				print("Number of events with unexpected number of taus: %d"%ak.num(tau_notFour,axis=0))
-				print("Number of events with 4 taus: %d"%ak.num(tau_num_arr[tau_num_arr == 4],axis=0))
-				print("Number of events with 3 taus: %d"%ak.num(tau_num_arr[tau_num_arr == 3],axis=0))
-				print("Number of events with 2 taus: %d"%ak.num(tau_num_arr[tau_num_arr == 2],axis=0))
-				print("Number of events with 5 taus: %d"%ak.num(tau_num_arr[tau_num_arr == 5],axis=0))
-				print("Number of events with 6 taus: %d"%ak.num(tau_num_arr[tau_num_arr == 6],axis=0))
-
-				#Look at the event with 5 taus to see what's going wrong
-				print("=================================Inspection of event with 5 taus===========================================")
-				print("Tau Energies: " + str(tau[tau_num_arr == 5].E))
-				print("Tau Pt: " + str(tau[tau_num_arr == 5].pt))
-				print("Tau Px: " + str(tau[tau_num_arr == 5].Px))
-				print("Tau Py: " + str(tau[tau_num_arr == 5].Py))
-				print("Tau Pz: " + str(tau[tau_num_arr == 5].Pz))
-				print("Tau phi: " + str(tau[tau_num_arr == 5].eta))
-				print("Tau eta: " + str(tau[tau_num_arr == 5].phi))
-				print("Number of boosted taus " + str(tau[tau_num_arr == 5].nBoostedTau))
-				print("Event number:" + str(event_level[tau_num_arr == 5].event_num))
-				print("Run:" + str(event_level[tau_num_arr == 5].run))
-				print("LumiBlock:" + str(event_level[tau_num_arr == 5].Lumi))
-				print("============================================================================")
-				
-				test_arr3 = ak.num(tau3.eta,axis=1) 
-				num_3 = ak.num(test_arr3,axis=0)
-				test_arr4 = ak.num(tau4.eta,axis=1)
-				num_4 = ak.num(test_arr4,axis=0)
-				
-				test_sizes = test_arr3 == test_arr4
-				test_sizes[test_sizes]
-				if (num_3 != num_4):
-					print("Different numbers of next leading and paired taus (this is a problem)")
-				if (ak.num(test_sizes,axis=0) == num_3):
-					print("Issue with dimensions of the taus")
+			#	tau_num_arr = ak.num(tau.pt,axis=1)
+			#	
+			#	test_arr3 = ak.num(tau3.eta,axis=1) 
+			#	num_3 = ak.num(test_arr3,axis=0)
+			#	test_arr4 = ak.num(tau4.eta,axis=1)
+			#	num_4 = ak.num(test_arr4,axis=0)
+			#	
+			#	test_sizes = test_arr3 == test_arr4
+			#	test_sizes[test_sizes]
+			#	if (num_3 != num_4):
+			#		print("Different numbers of next leading and paired taus (this is a problem)")
+			#	if (ak.num(test_sizes,axis=0) == num_3):
+			#		print("Issue with dimensions of the taus")
 				#End print statments for debugging events with anomolous number of taus
 
 
@@ -1584,24 +1529,6 @@ class FourTauPlotting(processor.ProcessorABC):
 				#tau_cond = tau_cond[higgs_cond]
 				if (self.isData or not(self.isData)):
 					print("# of events after Higgs cut (dropping empty arrays): %d"%ak.num(tau[ak.num(tau,axis=1) > 0],axis=0))
-	
-			#Apply Tau topological condition	
-			#tau = tau[tau_cond]
-			#Jet = Jet[tau_cond]
-			#AK8Jet = AK8Jet[tau_cond]
-			#event_level = event_level[tau_cond]
-			#leading_higgs = leading_higgs[tau_cond]
-			#nextleading_higgs = nextleading_higgs[tau_cond]
-			#if (self.isData or not(self.isData)):
-			#	print("# of events after di-tau delta R cut (dropping empty arrays): %d"%ak.num(tau[ak.num(tau,axis=1) > 0],axis=0))
-			
-			#Also apply selection to higgs events to add a visable mass cut
-			#leading_higgs = leading_higgs[topo_cond]
-			#nextleading_higgs = nextleading_higgs[topo_cond]
-			#higgs_11 = higgs_11[topo_cond]
-			#higgs_22 = higgs_22[topo_cond]
-			#higgs_12 = higgs_12[topo_cond]
-			#higgs_21 = higgs_21[topo_cond]
 		
 			if (self.isData or not(self.isData)):
 				print("# of events after topology cut (dropping empty arrays): %d"%ak.num(tau[ak.num(tau,axis=1) > 0],axis=0))
@@ -1637,7 +1564,7 @@ class FourTauPlotting(processor.ProcessorABC):
 				good_lepton_cond = np.bitwise_or(cond1,np.bitwise_or(cond2,cond3))
 				good_lepton = lepton[good_lepton_cond]
 			
-			print("Number of lepton filled events before Z-multiplicty building: %d"%ak.num(good_lepton,axis=0))
+			#print("Number of lepton filled events before Z-multiplicty building: %d"%ak.num(good_lepton,axis=0))
 			Z_Mult = find_Z_Candidates(good_lepton,ak.ArrayBuilder()).snapshot()
 
 			return Z_Mult
@@ -1757,12 +1684,12 @@ class FourTauPlotting(processor.ProcessorABC):
 			CrossSec_Weight = 1 
 		else:
 			CrossSec_Weight = weight_calc(dataset,numEvents_Dict[dataset])
-			print("=========!!!Weight Debugging!!!=========")
-			print(dataset)
-			print("Luminosity Weight = %f"%CrossSec_Weight)
-			print("Luminosity = %f"%Lumi_2018)
-			print("Cross section = %f"%xSection_Dictionary[dataset])
-			print("Number of events Processed: %d"%numEvents_Dict[dataset])
+		#	print("=========!!!Weight Debugging!!!=========")
+		#	print(dataset)
+		#	print("Luminosity Weight = %f"%CrossSec_Weight)
+		#	print("Luminosity = %f"%Lumi_2018)
+		#	print("Cross section = %f"%xSection_Dictionary[dataset])
+		#	print("Number of events Processed: %d"%numEvents_Dict[dataset])
 		
 		#Efficiency Histograms
 		if (self.isData):
@@ -1776,8 +1703,10 @@ class FourTauPlotting(processor.ProcessorABC):
 			ind_event_weight = ak.prod(event_level.event_weight,axis=0)
 		
 		#Store data for NN as parquet file
-		print(event_level.ZMult)
-		print(radionPT_Arr)
+		#print(event_level.ZMult)
+		#print(radionPT_Arr)
+		print("Sum of Weights for " + dataset + ":")
+		print(ak.sum(event_level.event_weight*CrossSec_Weight))
 		var_nn = ak.zip( #Variables to be exported to .parquet file
 			{
 				"radion_pt": radionPT_Arr,
@@ -1804,21 +1733,32 @@ class FourTauPlotting(processor.ProcessorABC):
 				}
 			)
 
-		#if (dataset == "ZZ4l"):
-		#	print("radion_pt being stored:")
-		#	print(radionPT_Arr)
-		#	print("weight being stored:")
-		#	print(event_level.event_weight*CrossSec_Weight)
-
+		#Store parquet files
 		if not(self.isData):
 			file_name = (dataset + ".parquet")
 			if (dataset != "Signal"):
 				if (mass == "2000"):
 					file_name = dataset  + ".parquet"
-					print("Background")
+					if (os.path.isfile(file_name)): #Append to existing parquet file
+						file_data = ak.from_parquet(file_name)
+						var_nn = ak.concatenate([file_data,var_nn])
+						ak.to_parquet(var_nn,file_name)
+						print("Appending parquet file (Background)")
+					else:
+						ak.to_parquet(var_nn,file_name) #Create parquet file
+						print("Creating Parquet file (Background)")
+					#print("Background")
 			else:
 				file_name = dataset + "_mass_" + self.massVal + "GeV.parquet"
-				print("Signal")
+				if (os.path.isfile(file_name)): #Append to existing parquet file
+					file_data = ak.from_parquet(file_name)
+					var_nn = ak.concatenate([file_data,var_nn])
+					ak.to_parquet(var_nn,file_name)
+					print("Appending parquet file (Signal)")
+				else:
+					ak.to_parquet(var_nn,file_name) #Create parquet file
+					print("Creating Parquet file (Signal)")
+				#print("Signal")
 			ak.to_parquet(var_nn,file_name)
 			print("Creating Parquet file (MC)")
 		else:
@@ -1836,9 +1776,9 @@ class FourTauPlotting(processor.ProcessorABC):
 
 		#print(CrossSec_Weight)
 		#print(event_level.event_weight)
-		print("===================!!!=Weight Debugging!!!====================")
-		print(event_level.event_weight*CrossSec_Weight)
-		print("===================!!!=Weight Debugging!!!====================")
+		#print("===================!!!=Weight Debugging!!!====================")
+		#print(event_level.event_weight*CrossSec_Weight)
+		#print("===================!!!=Weight Debugging!!!====================")
 		#print("===================!!!=Raw Event Count!!!====================")
 		#print(ak.num(event_level.event_weight,axis=0))
 		#print("===================!!!=Raw Event Count!!!====================")
@@ -2036,22 +1976,8 @@ if __name__ == "__main__":
 	
 	#Locations of files
 	signal_base = "root://cmseos.fnal.gov//store/user/abdollah/SkimBoostedHH4t/2018/4t/v2_Hadd/GluGluToRadionToHHTo4T_M-"
-	#background_base = "root://cmseos.fnal.gov//store/user/abdollah/SkimBoostedHH4t/2018/4t/v2_Hadd/"	
-	#background_base = "/hdfs/store/user/twnelson/HH4Tau_EtAl/Skimmed_Files/2018/MC/" #ZZTo4L_25February25_0413_skim__skim_Feb25/ #NanoAOD files
-	#background_base = "/hdfs/store/user/twnelson/HH4Tau_EtAl/Skimmed_Files/2018/MC/"
-	#background_base = "root://cmsxrootd.hep.wisc.edu:1094//store/user/twnelson/HH4Tau_EtAl/Skimmed_Files/2018/MC/" #ZZTo4L_25February25_0413_skim__skim_Feb25/ #NanoAOD files
 	background_base = "root://cmsxrootd.hep.wisc.edu//store/user/twnelson/HH4Tau_EtAl/Skimmed_Files/2018/MC/" #ZZTo4L_25February25_0413_skim__skim_Feb25/ #NanoAOD files
 	background_loc = "/hdfs/store/user/twnelson/HH4Tau_EtAl/Skimmed_Files/2018/MC/" #ZZTo4L_25February25_0413_skim__skim_Feb25/ #NanoAOD files
-	#background_base = "" #For testing nanoAOD just dumped one ZZ4l root file into here, not scalable though 
-	#data_loc = "root://cmseos.fnal.gov//store/user/abdollah/SkimBoostedHH4t/2018/4t/v2_Hadd/"
-	
-	#signal_base = "hdfs/store/user/abdollah/SkimBoostedHH4t/2018/4t/v2_Hadd/GluGluToRadionToHHTo4T_M-"
-	#background_base = "hdfs/store/user/abdollah/SkimBoostedHH4t/2018/4t/v2_Hadd/"	
-	#data_loc = "hdfs/store/user/abdollah/SkimBoostedHH4t/2018/4t/v2_Hadd/"
-	
-	#signal_base = "root://cmseos.fnal.gov//store/user/abdollah/SkimBoostedHH4t/2018/4t/v2/GluGluToRadionToHHTo4T_M-"
-	#background_base = "root://cmseos.fnal.gov//store/user/abdollah/SkimBoostedHH4t/2018/4t/v2/"	
-	#data_loc = "root://cmseos.fnal.gov//store/user/abdollah/SkimBoostedHH4t/2018/4t/v2/" (miniAOD)
 	data_loc = "/hdfs/store/user/twnelson/HH4Tau_EtAl/Skimmed_Files/2018/Data/"
 	data_base = "root://cmsxrootd.hep.wisc.edu//store/user/twnelson/HH4Tau_EtAl/Skimmed_Files/2018/Data/" 
 
@@ -2158,7 +2084,7 @@ if __name__ == "__main__":
 			#"ZZ4l": [background_base + "ZZTo4L_26August25_0757_skim_Newskim/ZZTo4L.root"], 
 			"TTToSemiLeptonic": [background_base + "TTToSemiLeptonic_35August25_0448_skim_Newskim/TTToSemiLeptonic" + str(j) + ".root" for j in range(10)], 
 			"TTTo2L2Nu": [background_base + "TTTo2L2Nu_26August25_0719_skim_Newskim/TTTo2L2Nu.root"], 
-			"TTToHadronic": [background_base + "TTToHadronic_35August25_0419_skim_Newskim/TTToHadronic" + str(j) + ".root" for j in range(10)],
+			"TTToHadronic": [background_base + "TTToHadronic_25October25_0813_skim_Newskim/TTToHadronic" + str(j) + ".root" for j in range(10)],
 			"Data_SingleMuon": [data_base + "SingleMu_Run2018A_27August25_0551_skim_Newskim/SingleMu_Run2018A.root"], 
 				#data_base + "SingleMu_Run2018B_27August25_0529_skim_Newskim/SingleMu_Run2018B.root", data_base + "SingleMu_Run2018C_27August25_0540_skim_Newskim/SingleMu_Run2018C.root", 
 				#data_base + "SingleMu_Run2018D_27August25_0613_skim_Newskim/SingleMu_Run2018D.root"],
@@ -2174,7 +2100,7 @@ if __name__ == "__main__":
 		file_dict = {
 			"TTToSemiLeptonic": [background_base + "TTToSemiLeptonic_35August25_0448_skim_Newskim/TTToSemiLeptonic" + str(j) + ".root" for j in range(10)], 
 			"TTTo2L2Nu": [background_base + "TTTo2L2Nu_26August25_0719_skim_Newskim/TTTo2L2Nu.root"], 
-			"TTToHadronic": [background_base + "TTToHadronic_35August25_0419_skim_Newskim/TTToHadronic" + str(j) + ".root" for j in range(10)],
+			"TTToHadronic": [background_base + "TTToHadronic_25October25_0813_skim_Newskim/TTToHadronic" + str(j) + ".root" for j in range(10)],
 			"ZZ4l": [background_base + "ZZTo4L_26August25_0757_skim_Newskim/ZZTo4L.root"], 
 			"VV2l2nu": [background_base + "WWTo2L2Nu_26August25_1040_skim_Newskim/WWTo2L2Nu.root"], 
 			"WZ1l3nu": [background_base + "WZTo1L3Nu_4f_26August25_1016_skim_Newskim/WZTo1L3Nu_4f.root"], 
@@ -2282,6 +2208,10 @@ if __name__ == "__main__":
 			print("About to run iterative runner")
 			fourtau_out = iterative_runner(file_dict, treename="Events", processor_instance=FourTauPlotting(trigger_bit=trigger_pair[0], or_trigger=trigger_pair[1],PUWeights = PUWeight, PU_weight_bool = True, signal_mass = mass)) #Modified for NanoAOD (changd treename)
 			print("Ran iterative runner")
+			timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+			outfile = os.path.join(os.getcwd(), f"output_2018_run{timestamp}.coffea")
+			util.save(fourtau_out, outfile)
+			print(f"Saved output to {outfile}")
 
 			#Produce cutflow csv table
 			for file in file_dict.keys():
