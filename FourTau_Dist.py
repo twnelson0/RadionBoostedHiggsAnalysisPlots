@@ -14,6 +14,7 @@ import pandas as pd
 from matplotlib.backends.backend_pdf import PdfPages
 import vector
 import os
+import csv
 vector.register_awkward()
 
 hep.style.use(hep.style.CMS)
@@ -206,6 +207,7 @@ class FourTauPlotting(processor.ProcessorABC):
 			with_name="EventArray",
 			behavior=candidate.behavior,
 		)
+
 		tau = ak.zip( 
 			{
 				"pt": events.boostedTauPt,
@@ -218,12 +220,14 @@ class FourTauPlotting(processor.ProcessorABC):
 				"phi": events.boostedTauPhi,
 				"nBoostedTau": events.nBoostedTau,
 				"charge": events.boostedTauCharge,
-				"iso": events.boostedTauByIsolationMVArun2v1DBoldDMwLTrawNew,
+				"iso": events.boostedTauByIsolationMVArun2v1DBoldDMwLTrawNew, #WHY IS THIS EMPTY THE SINGLE FILE???
+				#"iso": ak.ones_like(events.boostedTaupfTausDiscriminationByDecayModeFinding), #WHY IS THIS EMPTY THE SINGLE FILE???
 				"decay": events.boostedTaupfTausDiscriminationByDecayModeFinding,
 			},
 			with_name="TauArray",
 			behavior=candidate.behavior,
 		)
+		tau = tau[ak.argsort(tau.pt,axis=1,ascending=False)]
 		electron = ak.zip(
 			{
 				"pt": events.elePt,
@@ -263,7 +267,7 @@ class FourTauPlotting(processor.ProcessorABC):
 			
 		)
 
-		AK8Jet = ak.zip(
+		AK8Jet = ak.zip( #Note commenting this out since there's no AK8Jet inforamtion in the single file
 			{
 				"AK8JetDropMass": events.AK8JetSoftDropMass,
 				"AK8JetPt": events.AK8JetPt,
@@ -274,7 +278,7 @@ class FourTauPlotting(processor.ProcessorABC):
 			behavior=candidate.behavior,
 		)
 		
-		Jet = ak.zip(
+		Jet = ak.zip( #For some Reason there's no JETHT information....
 			{
 				"Pt": events.jetPt,
 				"PFLooseId": events.jetPFLooseId,
@@ -311,7 +315,7 @@ class FourTauPlotting(processor.ProcessorABC):
 				behavior=candidate.behavior,
 			)
             
-			#GenTau_Num = ak.num(np.bitwise_and(np.abs(Gen_Info.MCId) == 15, np.abs(Gen_Info.MotherId) != 15),axis=1) #Get the number of Generated taus that decayed from something
+			GenTau_Num = ak.num(np.bitwise_and(np.abs(Gen_Info.MCId) == 15, np.abs(Gen_Info.MotherId) != 15),axis=1) #Get the number of Generated taus that decayed from something
 			GenTau_Num = ak.num(Gen_Info[np.abs(Gen_Info.MCId) == 15],axis=1)
 			print("=============================================================================")
 			print(event_level.event_weight)
@@ -374,16 +378,49 @@ class FourTauPlotting(processor.ProcessorABC):
 		#	.StrCat(["Leading pair","Subleading pair"], name = "delta_phi")
 		#	.Reg(50, -pi, pi, name="delta_phD")
 	        #Force taus to be ordered via transverse momenta (if they are not already)
-		tau = tau[ak.argsort(tau.pt,axis=1)]
+		#tau = tau[ak.argsort(tau.pt,axis=1)]
 
 		print("!!!=====Dataset=====!!!!")	
 		print(type(dataset))
 		print(dataset)
 
+        #Basic histograms
+		h_tau1_pT_NoTrigger = hist.Hist.new.Regular(50,0,1000,label = r"Leading $\tau$ $p_T$ [GeV]").Double()
+		h_tau2_pT_NoTrigger = hist.Hist.new.Regular(50,0,1000,label = r"Sub-leading $\tau$ $p_T$ [GeV]").Double()
+		h_tau3_pT_NoTrigger = hist.Hist.new.Regular(50,0,1000,label = r"Third-leading $\tau$ $p_T$ [GeV]").Double()
+		h_tau4_pT_NoTrigger = hist.Hist.new.Regular(50,0,1000,label = r"Fourth-leading $\tau$ $p_T$ [GeV]").Double()
+		
+		h_tau1_eta_NoTrigger = hist.Hist.new.Regular(20,-4,4,label = r"Leading $\tau$ $\eta$").Double()
+		h_tau2_eta_NoTrigger = hist.Hist.new.Regular(20,-4,4,label = r"Sub-leading $\tau$ $\eta$").Double()
+		h_tau3_eta_NoTrigger = hist.Hist.new.Regular(20,-4,4,label = r"Third-leading $\tau$ $\eta$").Double()
+		h_tau4_eta_NoTrigger = hist.Hist.new.Regular(20,-4,4,label = r"Fourth-leading $\tau$ $\eta$").Double()
+		
+		h_tau1_iso_NoTrigger = hist.Hist.new.Regular(20,-1,1,label=r"Leading Raw MVA Score").Double() 
+		h_tau2_iso_NoTrigger = hist.Hist.new.Regular(20,-1,1,label=r"Sub-leading Raw MVA Score").Double() 
+		h_tau3_iso_NoTrigger = hist.Hist.new.Regular(20,-1,1,label=r"Third-leading Raw MVA Score").Double() 
+		h_tau4_iso_NoTrigger = hist.Hist.new.Regular(20,-1,1,label=r"Fourth-leading Raw MVA Score").Double() 
 
+		cutflow_dict = dict.fromkeys(["Sample","PreSkimming","Skimming","Trigger","Tau_pT","Tau_eta","decay","MVA","Mass_Cut","Higgs_dR"])
+		cutflow_dict["Sample"] = dataset
+		cutflow_dict["PreSkimming"] = numEvents_Dict[dataset] 
 		print("Number of events before selection + Trigger: %d"%ak.num(tau,axis=0))
+		cutflow_dict["Skimming"] = ak.num(tau,axis=0)
+        
+		#Fill Kinematics
+		h_tau1_pT_NoTrigger.fill(ak.ravel(tau[:,0].pt),weight=ak.num(tau[:,0].pt,axis=0)**-1)
+		h_tau2_pT_NoTrigger.fill(ak.ravel(tau[:,1].pt),weight=ak.num(tau[:,1].pt,axis=0)**-1)
+		h_tau3_pT_NoTrigger.fill(ak.ravel(tau[:,2].pt),weight=ak.num(tau[:,2].pt,axis=0)**-1)
+		h_tau4_pT_NoTrigger.fill(ak.ravel(tau[:,3].pt),weight=ak.num(tau[:,3].pt,axis=0)**-1)
+		h_tau1_eta_NoTrigger.fill(ak.ravel(tau[:,0].eta),weight=ak.num(tau[:,0].eta,axis=0)**-1)
+		h_tau2_eta_NoTrigger.fill(ak.ravel(tau[:,1].eta),weight=ak.num(tau[:,1].eta,axis=0)**-1)
+		h_tau3_eta_NoTrigger.fill(ak.ravel(tau[:,2].eta),weight=ak.num(tau[:,2].eta,axis=0)**-1)
+		h_tau4_eta_NoTrigger.fill(ak.ravel(tau[:,3].eta),weight=ak.num(tau[:,3].eta,axis=0)**-1)
+		h_tau1_iso_NoTrigger.fill(ak.ravel(tau[:,0].iso),weight=ak.num(tau[:,0].iso,axis=0)**-1)
+		h_tau2_iso_NoTrigger.fill(ak.ravel(tau[:,1].iso),weight=ak.num(tau[:,1].iso,axis=0)**-1)
+		h_tau3_iso_NoTrigger.fill(ak.ravel(tau[:,2].iso),weight=ak.num(tau[:,2].iso,axis=0)**-1)
+		h_tau4_iso_NoTrigger.fill(ak.ravel(tau[:,3].iso),weight=ak.num(tau[:,3].iso,axis=0)**-1)
 
-		#Construct HT and MHT variables (and give them their own object)
+		#Construct HT and MHT variables (and give them their own object) (This had to be commented out for the single file sample)
 		Jet_MHT = Jet[Jet.Pt > 30]
 		Jet_MHT = Jet_MHT[np.abs(Jet_MHT.eta) < 5]
 		Jet_MHT = Jet_MHT[Jet_MHT.PFLooseId > 0.5]
@@ -443,7 +480,6 @@ class FourTauPlotting(processor.ProcessorABC):
 					Gen_Info_21 = Gen_Info[np.bitwise_and(event_level.mu_trigger,bit_mask([21])) == bit_mask([21])]
 					Gen_Info_fail = Gen_Info[np.bitwise_and(event_level.mu_trigger,bit_mask([21])) != bit_mask([21])]
 					
-				
 
 				#Apply offline Single Muon Cut
 				tau_21 = tau_21[ak.any(muon_21.nMu > 0, axis = 1)]
@@ -805,6 +841,14 @@ class FourTauPlotting(processor.ProcessorABC):
 
 		ele_dR_collection = electron_fourVec.delta_r(min_tau_ele)
 		mu_dR_collection = muon_fourVec.delta_r(min_tau_mu)
+		cutflow_dict["Trigger"] = ak.num(tau,axis=0) #Initial number of events
+		
+		#Kinematic distrubtions
+		#h_tau_pT_Trigger.fill(ak.ravel(tau.pt))
+		#h_tau_eta_Trigger.fill(ak.ravel(tau.eta))
+		#h_tau_phi_Trigger.fill(ak.ravel(tau.phi))
+		#h_tau_raw_iso_Trigger.fill(ak.ravel(tau.iso))
+		
 		#if (self.isData):
 		electron["tau_min_dR"] = ele_dR_collection 
 		muon["tau_min_dR"] = mu_dR_collection
@@ -827,49 +871,51 @@ class FourTauPlotting(processor.ProcessorABC):
 		tau = tau[ak.num(tau) >= 4] #4 tau events
 		if (self.isData or not(self.isData)):
 			print("# of events after pT cut (dropping empty arrays): %d"%ak.num(tau[ak.num(tau,axis=1) > 0],axis=0))
-		#tau = tau[np.abs(tau.eta) < 2.3] #eta selection
-		
-		#Remove events with fewer than 4 taus	
-		#AK8Jet = AK8Jet[ak.num(tau) >= 4]
-		#event_level = event_level[ak.num(tau) >= 4]
-		#Jet = Jet[ak.num(tau) >= 4]
-		#electron = electron[ak.num(tau) >= 4] 
-		#muon = muon[ak.num(tau) >= 4] 
-		#if (not(self.isData)): # and self.isData):
-		#	Gen_Info = Gen_Info[ak.num(tau) >= 4] 
-		#tau = tau[ak.num(tau) >= 4] #4 tau events
-		#if (self.isData or not(self.isData)):
-		#	print("# of events after eta cut (dropping empty arrays): %d"%ak.num(tau[ak.num(tau,axis=1) > 0],axis=0))
-		
+		cutflow_dict["Tau_pT"] = ak.num(tau,axis=0) 
+
+		#Remove events with fewer than 4 taus
+		tau = tau[np.abs(tau.eta) < 2.3] #eta selection	
+		AK8Jet = AK8Jet[ak.num(tau) >= 4]
+		event_level = event_level[ak.num(tau) >= 4]
+		Jet = Jet[ak.num(tau) >= 4]
+		electron = electron[ak.num(tau) >= 4] 
+		muon = muon[ak.num(tau) >= 4] 
+		if (not(self.isData)): # and self.isData):
+			Gen_Info = Gen_Info[ak.num(tau) >= 4] 
+		tau = tau[ak.num(tau) >= 4] #4 tau events
+		if (self.isData or not(self.isData)):
+			print("# of events after eta cut (dropping empty arrays): %d"%ak.num(tau[ak.num(tau,axis=1) > 0],axis=0))
+		cutflow_dict["Tau_eta"] = ak.num(tau,axis=0) #Number of events after eta selection
 		
 		#Isolation and decay selections
-		#tau = tau[tau.decay >= 0.5]
+		tau = tau[tau.decay >= 0.5]
 		
 		#Remove events with fewer than 4 taus	
-		#AK8Jet = AK8Jet[ak.num(tau) >= 4]
-		#event_level = event_level[ak.num(tau) >= 4]
-		#Jet = Jet[ak.num(tau) >= 4]
-		#electron = electron[ak.num(tau) >= 4] 
-		#muon = muon[ak.num(tau) >= 4] 
-		#if (not(self.isData)): # and self.isData):
-		#	Gen_Info = Gen_Info[ak.num(tau) >= 4] 
-		#tau = tau[ak.num(tau) >= 4] #4 tau events
-		#if (self.isData or not(self.isData)):
-		#	print("# of events after decay cut (dropping empty arrays): %d"%ak.num(tau[ak.num(tau,axis=1) > 0],axis=0))
-		
-		#tau = tau[tau.iso >= 0.0] #Make loose to ensure high number of statistics
-		#Remove events with fewer than 4 taus	
-		#AK8Jet = AK8Jet[ak.num(tau) >= 4]
-		#event_level = event_level[ak.num(tau) >= 4]
-		#Jet = Jet[ak.num(tau) >= 4]
-		#electron = electron[ak.num(tau) >= 4] 
-		#muon = muon[ak.num(tau) >= 4] 
-		#if (not(self.isData)): # and self.isData):
-		#	Gen_Info = Gen_Info[ak.num(tau) >= 4] 
-		#tau = tau[ak.num(tau) >= 4] #4 tau events
-		#if (self.isData or not(self.isData)):
-		#	print("# of events after isolation cut (dropping empty arrays): %d"%ak.num(tau[ak.num(tau,axis=1) > 0],axis=0))
+		AK8Jet = AK8Jet[ak.num(tau) >= 4]
+		event_level = event_level[ak.num(tau) >= 4]
+		Jet = Jet[ak.num(tau) >= 4]
+		electron = electron[ak.num(tau) >= 4] 
+		muon = muon[ak.num(tau) >= 4] 
+		if (not(self.isData)): # and self.isData):
+			Gen_Info = Gen_Info[ak.num(tau) >= 4] 
+		tau = tau[ak.num(tau) >= 4] #4 tau events
+		if (self.isData or not(self.isData)):
+			print("# of events after decay cut (dropping empty arrays): %d"%ak.num(tau[ak.num(tau,axis=1) > 0],axis=0))
+		cutflow_dict["decay"] = ak.num(tau,axis=0) #Number of events after deay mode
 
+		tau = tau[tau.iso >= 0.0] #Make loose to ensure high number of statistics
+		#Remove events with fewer than 4 taus	
+		AK8Jet = AK8Jet[ak.num(tau) >= 4]
+		event_level = event_level[ak.num(tau) >= 4]
+		Jet = Jet[ak.num(tau) >= 4]
+		electron = electron[ak.num(tau) >= 4] 
+		muon = muon[ak.num(tau) >= 4] 
+		if (not(self.isData)): # and self.isData):
+			Gen_Info = Gen_Info[ak.num(tau) >= 4] 
+		tau = tau[ak.num(tau) >= 4] #4 tau events
+		if (self.isData or not(self.isData)):
+			print("# of events after isolation cut (dropping empty arrays): %d"%ak.num(tau[ak.num(tau,axis=1) > 0],axis=0))
+		cutflow_dict["MVA"] = ak.num(tau,axis=0) #Number of events after isolation		
 
 		#Delta R Cut on taus (identifiy and remove jets incorrectly reconstructed as taus)
 		a,b = ak.unzip(ak.cartesian([tau,tau], axis = 1, nested = True)) #Create all di-tau pairs
@@ -1171,15 +1217,15 @@ class FourTauPlotting(processor.ProcessorABC):
 
 				Good_GenTau = Gen_Info[np.abs(Gen_Info.MotherId) == 15] #Ensure mother particles are Taus
 				Good_GenTau = Good_GenTau[Good_GenTau.GMotherId == 25] #Ensure Taus come from Higgs
-				print(len(Good_GenTau))
+				#print(len(Good_GenTau))
 
 				#Count muons, electrons and hadrons
 				gen_elec_arr = ak.sum(np.abs(Good_GenTau.MCId) == 11,axis = 1)
 				gen_muon_arr = ak.sum(np.abs(Good_GenTau.MCId) == 13,axis = 1)
 				gen_had_arr = ak.sum(np.bitwise_and(np.abs(Good_GenTau.MCId) != 11,np.abs(Good_GenTau.MCId) != 13),axis=1)
-				#gen_elec_arr = ak.where(np.abs(Good_GenTau.MCId) == 11, gen_elec_arr + 1, gen_elec_arr)
-				#gen_muon_arr = ak.where(np.abs(Good_GenTau.MCId) == 13, gen_muon_arr + 1, gen_muon_arr)
-				#gen_had_arr = ak.where(np.bitwise_and(np.abs(Good_GenTau.MCId) != 13, np.abs(Good_GenTau.MCId) != 11), gen_had_arr + 1, gen_had_arr)
+			#	gen_elec_arr = ak.where(np.abs(Good_GenTau.MCId) == 11, gen_elec_arr + 1, gen_elec_arr)
+			#	gen_muon_arr = ak.where(np.abs(Good_GenTau.MCId) == 13, gen_muon_arr + 1, gen_muon_arr)
+			#	gen_had_arr = ak.where(np.bitwise_and(np.abs(Good_GenTau.MCId) != 13, np.abs(Good_GenTau.MCId) != 11), gen_had_arr + 1, gen_had_arr)
 
 				n_4had_gen = 0
 				n_3had_1e_gen = 0
@@ -1187,16 +1233,16 @@ class FourTauPlotting(processor.ProcessorABC):
 
 				for evnt in range(len(Good_GenTau)):
 					print(gen_had_arr[evnt])
-					if (gen_had_arr[evnt] + gen_muon_arr[evnt] + gen_elec_arr[evnt] > 4):
-						print("!!!Too many gen level particles!!!!!")
-						print("Electrons from tau: %d"%gen_elec_arr[evnt])
-						print("Muons from tau: %d"%gen_muon_arr[evnt])
-						print("Hardonic taus: %d"%gen_had_arr[evnt])
-					if (gen_had_arr[evnt] + gen_muon_arr[evnt] + gen_elec_arr[evnt] < 4):
-						print("!!!Too few gen level particles!!!!!!")
-						print("Electrons from tau: %d"%gen_elec_arr[evnt])
-						print("Muons from tau: %d"%gen_muon_arr[evnt])
-						print("Hardonic taus: %d"%gen_had_arr[evnt])
+				#	if (gen_had_arr[evnt] + gen_muon_arr[evnt] + gen_elec_arr[evnt] > 4):
+				#		print("!!!Too many gen level particles!!!!!")
+				#		print("Electrons from tau: %d"%gen_elec_arr[evnt])
+				#		print("Muons from tau: %d"%gen_muon_arr[evnt])
+				#		print("Hardonic taus: %d"%gen_had_arr[evnt])
+				#	if (gen_had_arr[evnt] + gen_muon_arr[evnt] + gen_elec_arr[evnt] < 4):
+				#		print("!!!Too few gen level particles!!!!!!")
+				#		print("Electrons from tau: %d"%gen_elec_arr[evnt])
+				#		print("Muons from tau: %d"%gen_muon_arr[evnt])
+				#		print("Hardonic taus: %d"%gen_had_arr[evnt])
 					if (gen_had_arr[evnt] == 4):
 						n_4had_gen += 1
 					if (gen_had_arr[evnt] == 3 and gen_muon_arr[evnt] == 1):
@@ -1605,7 +1651,7 @@ class FourTauPlotting(processor.ProcessorABC):
 					event_level = event_level[vis_cond]
 					if (self.isData or not(self.isData)):
 						print("# of events after visible mass cut (dropping empty arrays): %d"%ak.num(tau[ak.num(tau,axis=1) > 0],axis=0))
-
+					cutflow_dict["Mass_Cut"] = ak.num(tau,axis=0)
 
 				#higgs_dR = deltaR(leading_higgs, nextleading_higgs) 
 				higgs_dR = leading_higgs.deltaR(nextleading_higgs) #Use vector library for delta R calculations
@@ -1628,7 +1674,8 @@ class FourTauPlotting(processor.ProcessorABC):
 				#tau_cond = tau_cond[higgs_cond]
 				if (self.isData or not(self.isData)):
 					print("# of events after Higgs cut (dropping empty arrays): %d"%ak.num(tau[ak.num(tau,axis=1) > 0],axis=0))
-	
+				cutflow_dict["Higgs_dR"] = ak.num(tau,axis=0)
+
 			#Apply Tau topolotical condition	
 			#tau = tau[tau_cond]
 			#Jet = Jet[tau_cond]
@@ -1923,10 +1970,10 @@ class FourTauPlotting(processor.ProcessorABC):
 				
 				"radionPT_Arr" : ak.to_list(radionPT_Arr),
 				"tau_pt_Arr": ak.to_list(ak.ravel(tau.pt)),
-				"tau_lead_pt_Arr": ak.to_list(ak.ravel(tau[ak.argsort(tau.pt,axis=-1)][:,3].pt)),
-				"tau_sublead_pt_Arr": ak.to_list(ak.ravel(tau[ak.argsort(tau.pt,axis=-1)][:,2].pt)),
-				"tau_3rdlead_pt_Arr": ak.to_list(ak.ravel(tau[ak.argsort(tau.pt,axis=-1)][:,1].pt)),
-				"tau_4thlead_pt_Arr": ak.to_list(ak.ravel(tau[ak.argsort(tau.pt,axis=-1)][:,0].pt)),
+				"tau_lead_pt_Arr": ak.to_list(ak.ravel(tau[ak.argsort(tau.pt,axis=1,ascending=False)][:,3].pt)),
+				"tau_sublead_pt_Arr": ak.to_list(ak.ravel(tau[ak.argsort(tau.pt,axis=1,ascending=False)][:,2].pt)),
+				"tau_3rdlead_pt_Arr": ak.to_list(ak.ravel(tau[ak.argsort(tau.pt,axis=1,ascending=False)][:,1].pt)),
+				"tau_4thlead_pt_Arr": ak.to_list(ak.ravel(tau[ak.argsort(tau.pt,axis=1,ascending=False)][:,0].pt)),
 				"tau_eta_Arr": ak.to_list(ak.ravel(tau.eta)),
 				"ZMult_Arr": ak.to_list(ak.ravel(event_level.ZMult)),
 				"ZMult_ele_Arr": ak.to_list(ak.ravel(event_level.ZMult_e)),
@@ -1942,6 +1989,21 @@ class FourTauPlotting(processor.ProcessorABC):
 				"Muon_tau_dR_Arr": ak.to_list(ak.ravel(ak.where(ak.num(muon.tau_min_dR,axis=1) != 0, muon.tau_min_dR, ak.singletons(np.ones(ak.num(muon.tau_min_dR,axis=0))*999)))), #muon.tau_min_dR
                 "num_electron_tau_Arr": ak.to_list(ak.ravel(event_level.n_tau_electrons)),
                 "num_muon_tau_Arr": ak.to_list(ak.ravel(event_level.n_tau_muons)),
+                "cutflow_dict": cutflow_dict,
+				#Simple kinematic Histograms
+				"tau1_pt_NoTrigg": h_tau1_pT_NoTrigger,
+				"tau2_pt_NoTrigg": h_tau2_pT_NoTrigger,
+				"tau3_pt_NoTrigg": h_tau3_pT_NoTrigger,
+				"tau4_pt_NoTrigg": h_tau4_pT_NoTrigger,
+                "tau1_eta_NoTrigg": h_tau1_eta_NoTrigger,
+				"tau2_eta_NoTrigg": h_tau2_eta_NoTrigger,
+				"tau3_eta_NoTrigg": h_tau3_eta_NoTrigger,
+				"tau4_eta_NoTrigg": h_tau4_eta_NoTrigger,
+                "tau1_iso_NoTrigg": h_tau1_iso_NoTrigger,
+				"tau2_iso_NoTrigg": h_tau2_iso_NoTrigger,
+				"tau3_iso_NoTrigg": h_tau3_iso_NoTrigger,
+				"tau4_iso_NoTrigg": h_tau4_iso_NoTrigger,
+
 				#"LeadTau_h": ak.to_list(ak.ravel(event_level.LeadingTau_h)),	
 				#"PairLeadTau_h": ak.to_list(ak.ravel(event_level.PairedLeadingTau_h)),	
 				#"NextLeadTau_h": ak.to_list(ak.ravel(event_level.NextLeadingTau_h)),	
@@ -1965,6 +2027,8 @@ class FourTauPlotting(processor.ProcessorABC):
 if __name__ == "__main__":
 	#mass_str_arr = ["1000","2000","3000"]
 	mass_str_arr = ["2000"]
+	cutflow_table_array = [] #Array to be converted into cutflow table
+	cutflow_fields = ["Sample","PreSkimming","Skimming","Trigger","Tau_pT","Tau_eta","decay","MVA","Mass_Cut","Higgs_dR"]
 	
 	#Functions and variables for Luminosity weights
 	lumi_table_data = {"MC Sample":[], "Luminosity":[], "Cross Section (pb)":[], "Number of Events":[], "Calculated Weight":[]}
@@ -2031,7 +2095,7 @@ if __name__ == "__main__":
 	four_tau_hist_list = ["FourTau_Mass_Arr","HiggsDeltaPhi_Arr", "Higgs_DeltaR_Arr","leading_dR_Arr","subleading_dR_Arr","LeadingHiggs_mass","SubLeadingHiggs_mass", "radionPT_Arr", 
 			"ZMult_Arr", "BJet_Arr", "tau_lead_pt_Arr", "tau_sublead_pt_Arr", "tau_3rdlead_pt_Arr", "tau_4thlead_pt_Arr", "leading_dPhi_Arr", "subleading_dPhi_Arr", 
 			"radionMET_dPhi_Arr","leadingHiggs_Rad_dR_Arr","subleadingHiggs_Rad_dR_Arr","leadingHiggs_MET_dPhi_Arr","subleadingHiggs_MET_dPhi_Arr","Radion_eta_Arr", "Radion_Charge_Arr",
-			"LeadingHiggsSgn_Arr", "SubleadingHiggsSgn_Arr","Num_Electrons_Arr","Num_Muons_Arr","num_electron_tau_Arr","num_muon_tau_Arr"] #,"Electron_tau_dR_Arr","Muon_tau_dR_Arr"]
+			"LeadingHiggsSgn_Arr", "SubleadingHiggsSgn_Arr","Num_Electrons_Arr","Num_Muons_Arr"] #,"num_electron_tau_Arr","num_muon_tau_Arr"] #,"Electron_tau_dR_Arr","Muon_tau_dR_Arr"]
 	#four_tau_hist_list = ["Num_Electrons_Arr","Num_Muons_Arr","Electron_tau_dR_Arr","Muon_tau_dR_Arr"]
 	#four_tau_hist_list = ["ZMult_Arr","ZMult_ele_Arr","ZMult_mu_Arr", "ZMult_tau_Arr"]
 	#four_tau_hist_list = ["leading_dR_Arr"] #Only make 1 histogram for brevity/debugging purposes
@@ -2064,15 +2128,18 @@ if __name__ == "__main__":
 	for mass in mass_str_arr:
 		print("====================Radion Mass = " + mass[0] + "." + mass[1] + " TeV====================")
 		file_dict = { #Reduced files to run over
-			#"ZZ4l": [background_base + "ZZ4l.root"],
-			"DYJetsToLL_Pt-50To100": [background_base + "DYJetsToLL_Pt-50To100.root"] ,
-			"DYJetsToLL_Pt-100To250": [ background_base + "DYJetsToLL_Pt-100To250.root"], 
-			"DYJetsToLL_Pt-250To400": [ background_base + "DYJetsToLL_Pt-250To400.root"], 
-			"DYJetsToLL_Pt-400To650": [ background_base + "DYJetsToLL_Pt-400To650.root"], 
-			"DYJetsToLL_Pt-650ToInf": [background_base + "DYJetsToLL_Pt-650ToInf.root"],
-			"Signal": [signal_base + mass + ".root"],
-			"Data_SingleMuon": [data_loc + "SingleMu_Run2018A.root"], #, data_loc + "SingleMu_Run2018B.root", data_loc + "SingleMu_Run2018C.root", data_loc + "SingleMu_Run2018D.root"],
-			"Data_JetHT": [data_loc + "JetHT_Run2018A-17Sep2018-v1.root"] #, data_loc + "JetHT_Run2018B-17Sep2018-v1.root", data_loc + "JetHT_Run2018C-17Sep2018-v1.root",data_loc + "JetHT_Run2018D-PromptReco-v2.root"]
+			"ZZ4l": [background_base + "ZZ4l.root"],
+			#"ZZ4l": ["root://cmsxrootd.hep.wisc.edu//store/user/twnelson/HH4Tau_EtAl/SingleZZ4L_MiniAOD/Ntuple_ZZTo4L_TuneCP5_13TeV_powheg_pythia8_A9E1797D6AE0.root"],
+			#"ZZ4l": ["root://cmsxrootd.hep.wisc.edu//store/user/abdollah/Ntuple_ZZTo4L_TuneCP5_13TeV_powheg_pythia8_A9E1797D6AE0.root"],
+			#"ZZ4l": ["/hdfs/store/user/abdollah/Ntuple_ZZTo4L_TuneCP5_13TeV_powheg_pythia8_A9E1797D6AE0.root"],
+			#"DYJetsToLL_Pt-50To100": [background_base + "DYJetsToLL_Pt-50To100.root"] ,
+			#"DYJetsToLL_Pt-100To250": [ background_base + "DYJetsToLL_Pt-100To250.root"], 
+			#"DYJetsToLL_Pt-250To400": [ background_base + "DYJetsToLL_Pt-250To400.root"], 
+			#"DYJetsToLL_Pt-400To650": [ background_base + "DYJetsToLL_Pt-400To650.root"], 
+			#"DYJetsToLL_Pt-650ToInf": [background_base + "DYJetsToLL_Pt-650ToInf.root"],
+			#"Signal": [signal_base + mass + ".root"],
+			#"Data_SingleMuon": [data_loc + "SingleMu_Run2018A.root"], #, data_loc + "SingleMu_Run2018B.root", data_loc + "SingleMu_Run2018C.root", data_loc + "SingleMu_Run2018D.root"],
+			#"Data_JetHT": [data_loc + "JetHT_Run2018A-17Sep2018-v1.root"] #, data_loc + "JetHT_Run2018B-17Sep2018-v1.root", data_loc + "JetHT_Run2018C-17Sep2018-v1.root",data_loc + "JetHT_Run2018D-PromptReco-v2.root"]
 			#"Data_SingleMuon": [data_loc + "SingleMu_Run2018A.root", data_loc + "SingleMu_Run2018B.root", data_loc + "SingleMu_Run2018C.root", data_loc + "SingleMu_Run2018D.root"],
 			#"Data_JetHT": [data_loc + "JetHT_Run2018A-17Sep2018-v1.root", data_loc + "JetHT_Run2018B-17Sep2018-v1.root", data_loc + "JetHT_Run2018C-17Sep2018-v1.root",data_loc + "JetHT_Run2018D-PromptReco-v2.root"]
   
@@ -2116,18 +2183,20 @@ if __name__ == "__main__":
 		
 		#Generate dictionary of number of processed events
 		for key_name, file_name in file_dict.items(): 
-			if (file_name != "Data_JetHT" or file_name != "Data_SingleMuon"):
+			#if (not("Data_JetHT" in file_name) and not("Data_SingleMu" in file_name)):
+			if (key_name != "Data_JetHT" and key_name != "Data_SingleMuon"):
 				tempFile = uproot.open(file_name[0]) #Get file
-				#numEvents_Dict[key_name] = tempFile['hEvents'].member('fEntries')/2
+				print(file_name)
+				#numEvents_Dict[key_name] = tempFile['ggNtuplizer/hEvents'].member('fEntries')/2 #Needed for single UL file for some reason
 				numEvents_Dict[key_name] = tempFile['hcount'].member('fEntries')/2
 			else: #Ignore data files
 				continue
 
 		
-		#background_list = [r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"]
+		background_list = [r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"]
 		#background_list = ["Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"]
 		#background_list = [r"$ZZ \rightarrow 4l$"]
-		background_list = [r"Drell-Yan+Jets"]
+		#background_list = [r"Drell-Yan+Jets"]
 		signal_list = [r"MC Sample $m_\phi$ = %s TeV"%mass[0]]
 		background_plot_names = {r"$t\bar{t}$" : "_ttbar_", r"Drell-Yan+Jets": "_DYJets_", "Di-Bosons" : "_DiBosons_", "Single Top": "_SingleTop+", "QCD" : "_QCD_", "W+Jets" : "_WJets_", r"$ZZ \rightarrow 4l$" : "_ZZ4l_"} #For file names
 		background_dict = {r"$t\bar{t}$" : ["TTToSemiLeptonic","TTTo2L2Nu","TTToHadronic"], 
@@ -2296,6 +2365,26 @@ if __name__ == "__main__":
 			}
 			
 			fourtau_out = iterative_runner(file_dict, treename="4tau_tree", processor_instance=FourTauPlotting(trigger_bit=trigger_pair[0], or_trigger=trigger_pair[1],PUWeights = PUWeight, PU_weight_bool =True, signal_mass = mass))
+			#fourtau_out = iterative_runner(file_dict, treename="ggNtuplizer/EventTree", processor_instance=FourTauPlotting(trigger_bit=trigger_pair[0], or_trigger=trigger_pair[1],PUWeights = PUWeight, PU_weight_bool =True, signal_mass = mass)) #I don't know why the single UL file structure is different
+			#Produce cutflow csv table
+			for file in file_dict.keys():
+				cutflow_table_array.append(fourtau_out[file]["cutflow_dict"])
+			with open("Cutflow_Table_Mass_" + mass[0] + "TeV_ZZ4l_fromMiniAOD.csv", mode = "w", newline = '') as cutflow_file:	
+				writer = csv.DictWriter(cutflow_file,fieldnames=cutflow_fields)
+				writer.writeheader()
+				writer.writerows(cutflow_table_array)
+			
+			#Save Basic Kienematics Plots
+			basic_kinematics_array = ["tau1_pt_NoTrigg","tau1_eta_NoTrigg","tau1_iso_NoTrigg",
+                    "tau2_pt_NoTrigg","tau2_eta_NoTrigg","tau2_iso_NoTrigg",
+                    "tau3_pt_NoTrigg","tau3_eta_NoTrigg","tau3_iso_NoTrigg",
+                    "tau4_pt_NoTrigg","tau4_eta_NoTrigg","tau4_iso_NoTrigg"]
+			for plot_name in basic_kinematics_array:
+				fig1,ax1 = plt.subplots()
+				fourtau_out["ZZ4l"][plot_name].plot1d(ax=ax1)
+				plt.savefig("BasicKinematics_ZZ4l_PreLegacy_" + plot_name)
+				plt.close()
+
 			for hist_name in four_tau_hist_list: #Loop over all histograms
 				#fig,ax = plt.subplots()
 				fig0,ax0 = plt.subplots()
