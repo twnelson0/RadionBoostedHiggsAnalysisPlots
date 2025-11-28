@@ -254,8 +254,8 @@ class FourTauPlotting(processor.ProcessorABC):
 				"phi": events.boostedTau_phi,
 				"nBoostedTau": events.nboostedTau,
 				"charge": events.boostedTau_charge,
-				#"iso": events.boostedTau_rawMVAoldDM2017v2,
-				"iso": events.boostedTau_idDeepTau2018v2p7VSjet,
+				"iso": events.boostedTau_rawMVAoldDM2017v2,
+				#"iso": events.boostedTau_idDeepTau2018v2p7VSjet,
 				"DBT": events.boostedTau_rawDeepTau2018v2p7VSjet,
 				#"decay": events.boostedTaupfTausDiscriminationByDecayModeFinding,
 				"decay": events.boostedTau_idDecayModeOldDMs,
@@ -263,6 +263,7 @@ class FourTauPlotting(processor.ProcessorABC):
 			with_name="TauArray",
 			behavior=candidate.behavior,
 		)
+		tau = tau[ak.argsort(tau.pt,axis=1,ascending=False)]
 		electron = ak.zip(
 			{
 				"pt": events.Electron_pt,
@@ -423,25 +424,53 @@ class FourTauPlotting(processor.ProcessorABC):
 		print(dataset)
 
 		#Basic Kinematic histograms
-		h_tau_pT_NoTrigger = hist.Hist.new.Regular(50,0,1000,label = r"$\tau$ $p_T$ [GeV]").Double()
-		h_tau_pT_Trigger = hist.Hist.new.Regular(50,0,1000,label = r"$\tau$ $p_T$ [GeV]").Double()
-		h_tau_eta_NoTrigger = hist.Hist.new.Regular(20,-4,4,label = r"$\tau$ $\eta$").Double()
-		h_tau_eta_Trigger = hist.Hist.new.Regular(20,-4,4,label = r"$\tau$ $\eta$").Double()
-		h_tau_phi_NoTrigger = hist.Hist.new.Regular(20,-pi,pi,label = r"$\tau$ $\phi$").Double()
-		h_tau_phi_Trigger = hist.Hist.new.Regular(20,-pi,pi,label = r"$\tau$ $\phi$").Double()
-		h_tau_raw_iso_NoTrigger = hist.Hist.new.Regular(20,-1,1,label=r"Raw MVA Score").Double() 
-		h_tau_raw_iso_Trigger = hist.Hist.new.Regular(20,-1,1,label=r"Raw MVA Score").Double()
+		h_tau1_pT_NoTrigger = hist.Hist.new.Regular(50,0,1000,label = r"Leading $\tau$ $p_T$ [GeV]").Double()
+		h_tau2_pT_NoTrigger = hist.Hist.new.Regular(50,0,1000,label = r"Subleading $\tau$ $p_T$ [GeV]").Double()
+		h_tau3_pT_NoTrigger = hist.Hist.new.Regular(50,0,1000,label = r"Third-leading $\tau$ $p_T$ [GeV]").Double()
+		h_tau4_pT_NoTrigger = hist.Hist.new.Regular(50,0,1000,label = r"Fourth-leading $\tau$ $p_T$ [GeV]").Double()
+		
+		h_tau1_eta_NoTrigger = hist.Hist.new.Regular(20,-4,4,label = r"Leading $\tau$ $\eta$").Double()
+		h_tau2_eta_NoTrigger = hist.Hist.new.Regular(20,-4,4,label = r"Subleading $\tau$ $\eta$").Double()
+		h_tau3_eta_NoTrigger = hist.Hist.new.Regular(20,-4,4,label = r"Third-leading $\tau$ $\eta$").Double()
+		h_tau4_eta_NoTrigger = hist.Hist.new.Regular(20,-4,4,label = r"Fourth-leading $\tau$ $\eta$").Double()
+		
+		h_tau1_iso_NoTrigger = hist.Hist.new.Regular(20,-1,1,label=r"Leading Raw MVA Score").Double() 
+		h_tau2_iso_NoTrigger = hist.Hist.new.Regular(20,-1,1,label=r"Subleading Raw MVA Score").Double() 
+		h_tau3_iso_NoTrigger = hist.Hist.new.Regular(20,-1,1,label=r"Third-leading Raw MVA Score").Double() 
+		h_tau4_iso_NoTrigger = hist.Hist.new.Regular(20,-1,1,label=r"Fourth-leading Raw MVA Score").Double() 
+        
+        #h_tau_pT_Trigger = hist.Hist.new.Regular(50,0,1000,label = r"$\tau$ $p_T$ [GeV]").Double()
+
+		#h_tau_eta_Trigger = hist.Hist.new.Regular(20,-4,4,label = r"$\tau$ $\eta$").Double()
+		#h_tau_phi_NoTrigger = hist.Hist.new.Regular(20,-pi,pi,label = r"$\tau$ $\phi$").Double()
+		#h_tau_phi_Trigger = hist.Hist.new.Regular(20,-pi,pi,label = r"$\tau$ $\phi$").Double()
+		#h_tau_raw_iso_NoTrigger = hist.Hist.new.Regular(20,-1,1,label=r"Raw MVA Score").Double() 
+		#h_tau_raw_iso_Trigger = hist.Hist.new.Regular(20,-1,1,label=r"Raw MVA Score").Double()
 
 
-		cutflow_dict = dict.fromkeys(["Sample","PreSkimming","Skimming","Trigger","Tau_pT","Tau_eta","decay","deepboosted","Mass_Cut","Higgs_dR"])
-		#cutflow_dict = dict.fromkeys(["Sample","PreSkimming","Skimming","Trigger","Tau_pT","Tau_eta","decay","mva","Mass_Cut","Higgs_dR"])
+		#cutflow_dict = dict.fromkeys(["Sample","PreSkimming","Skimming","Trigger","Tau_pT","Tau_eta","decay","deepboosted","Mass_Cut","Higgs_dR"])
+		cutflow_dict = dict.fromkeys(["Sample","PreSkimming","Skimming","Trigger","Tau_pT","Tau_eta","decay","mva","Mass_Cut","Higgs_dR"])
 		cutflow_dict["Sample"] = dataset
 		cutflow_dict["PreSkimming"] = numEvents_Dict[dataset] 
 		cutflow_dict["Skimming"] = ak.num(tau,axis=0)
-		h_tau_pT_NoTrigger.fill(ak.ravel(tau.pt))
-		h_tau_eta_NoTrigger.fill(ak.ravel(tau.eta))
-		h_tau_phi_NoTrigger.fill(ak.ravel(tau.phi))
-		h_tau_raw_iso_NoTrigger.fill(ak.ravel(tau.iso))
+		#Fill Kinematics
+		h_tau1_pT_NoTrigger.fill(ak.ravel(tau[:,0].pt),weight = ak.num(tau[:,0].pt,axis=0)**-1)
+		h_tau2_pT_NoTrigger.fill(ak.ravel(tau[:,1].pt),weight = ak.num(tau[:,1].pt,axis=0)**-1)
+		h_tau3_pT_NoTrigger.fill(ak.ravel(tau[:,2].pt),weight = ak.num(tau[:,2].pt,axis=0)**-1)
+		h_tau4_pT_NoTrigger.fill(ak.ravel(tau[:,3].pt),weight = ak.num(tau[:,3].pt,axis=0)**-1)
+		h_tau1_eta_NoTrigger.fill(ak.ravel(tau[:,0].eta),weight = ak.num(tau[:,0].eta,axis=0)**-1)
+		h_tau2_eta_NoTrigger.fill(ak.ravel(tau[:,1].eta),weight = ak.num(tau[:,1].eta,axis=0)**-1)
+		h_tau3_eta_NoTrigger.fill(ak.ravel(tau[:,2].eta),weight = ak.num(tau[:,2].eta,axis=0)**-1)
+		h_tau4_eta_NoTrigger.fill(ak.ravel(tau[:,3].eta),weight = ak.num(tau[:,3].eta,axis=0)**-1)
+		h_tau1_iso_NoTrigger.fill(ak.ravel(tau[:,0].iso),weight = ak.num(tau[:,0].iso,axis=0)**-1)
+		h_tau2_iso_NoTrigger.fill(ak.ravel(tau[:,1].iso),weight = ak.num(tau[:,1].iso,axis=0)**-1)
+		h_tau3_iso_NoTrigger.fill(ak.ravel(tau[:,2].iso),weight = ak.num(tau[:,2].iso,axis=0)**-1)
+		h_tau4_iso_NoTrigger.fill(ak.ravel(tau[:,3].iso),weight = ak.num(tau[:,3].iso,axis=0)**-1)
+
+		#h_tau_pT_NoTrigger.fill(ak.ravel(tau.pt))
+		#h_tau_eta_NoTrigger.fill(ak.ravel(tau.eta))
+		#h_tau_phi_NoTrigger.fill(ak.ravel(tau.phi))
+		#h_tau_raw_iso_NoTrigger.fill(ak.ravel(tau.iso))
 		print("Number of events before selection + Trigger: %d"%ak.num(tau,axis=0))
 
 		#Look at the problem events before anything is applied
@@ -845,10 +874,10 @@ class FourTauPlotting(processor.ProcessorABC):
 		cutflow_dict["Trigger"] = ak.num(tau,axis=0) #Initial number of events
 		cutflow_table.fill(0,weight = ak.num(tau,axis=0))
 		#Fill Kinematics distributions
-		h_tau_pT_Trigger.fill(ak.ravel(tau.pt))
-		h_tau_eta_Trigger.fill(ak.ravel(tau.eta))
-		h_tau_phi_Trigger.fill(ak.ravel(tau.phi))
-		h_tau_raw_iso_Trigger.fill(ak.ravel(tau.iso))
+	#	h_tau_pT_Trigger.fill(ak.ravel(tau.pt))
+	#	h_tau_eta_Trigger.fill(ak.ravel(tau.eta))
+	#	h_tau_phi_Trigger.fill(ak.ravel(tau.phi))
+	#	h_tau_raw_iso_Trigger.fill(ak.ravel(tau.iso))
 		
 		print("Number of events (no selections post trigger): %d"%cutflow_dict["Trigger"])
 		print("Should also be Number of events (no selections post trigger): %d"%len(np.zeros(ak.num(tau,axis=0))))
@@ -906,8 +935,8 @@ class FourTauPlotting(processor.ProcessorABC):
 		#if (self.isData or not(self.isData)):
 		#	print("# of events after decay cut (dropping empty arrays): %d"%ak.num(tau[ak.num(tau,axis=1) > 0],axis=0))
 		
-		tau = tau[tau.iso >= 0.85] #Make loose to ensure high number of statistics
-		#tau = tau[tau.iso >= 0.0] #MVA selection
+		#tau = tau[tau.iso >= 0.85] #Make loose to ensure high number of statistics
+		tau = tau[tau.iso >= 0.0] #MVA selection
 		#Remove events with fewer than 4 taus	
 		AK8Jet = AK8Jet[ak.num(tau) >= 4]
 		event_level = event_level[ak.num(tau) >= 4]
@@ -917,8 +946,8 @@ class FourTauPlotting(processor.ProcessorABC):
 		if (not(self.isData)): # and self.isData):
 			Gen_Info = Gen_Info[ak.num(tau) >= 4] 
 		tau = tau[ak.num(tau) >= 4] #4 tau events
-		cutflow_dict["deepboosted"] = ak.num(tau,axis=0) #Number of events after isolation
-		#cutflow_dict["mva"] = ak.num(tau,axis=0) #Number of events after isolation
+		#cutflow_dict["deepboosted"] = ak.num(tau,axis=0) #Number of events after isolation
+		cutflow_dict["mva"] = ak.num(tau,axis=0) #Number of events after isolation
 		cutflow_table.fill(4,weight= ak.num(tau,axis=0))
 		#if (self.isData or not(self.isData)):
 		if (not(self.isData)):
@@ -1968,14 +1997,21 @@ class FourTauPlotting(processor.ProcessorABC):
 				"num_events": ak.num(event_level.event_weight,axis=0),
 				"weight_Hist": h_weight,
 				"cutflow_dict": cutflow_dict,
-				"tau_pt_NoTrigg": h_tau_pT_NoTrigger,
-				"tau_pt_Trigg": h_tau_pT_Trigger,
-				"tau_eta_NoTrigg": h_tau_eta_NoTrigger,
-				"tau_eta_Trigg": h_tau_eta_Trigger,
-				"tau_phi_NoTrigg": h_tau_phi_NoTrigger,
-				"tau_phi_Trigg": h_tau_phi_Trigger,
-				"tau_iso_NoTrigg": h_tau_raw_iso_NoTrigger,
-				"tau_iso_Trigg": h_tau_raw_iso_Trigger,
+                #Kinematic distributions
+				"tau1_pt_NoTrigg": h_tau1_pT_NoTrigger,
+				"tau2_pt_NoTrigg": h_tau2_pT_NoTrigger,
+				"tau3_pt_NoTrigg": h_tau3_pT_NoTrigger,
+				"tau4_pt_NoTrigg": h_tau4_pT_NoTrigger,
+                "tau1_eta_NoTrigg": h_tau1_eta_NoTrigger,
+				"tau2_eta_NoTrigg": h_tau2_eta_NoTrigger,
+				"tau3_eta_NoTrigg": h_tau3_eta_NoTrigger,
+				"tau4_eta_NoTrigg": h_tau4_eta_NoTrigger,
+                "tau1_iso_NoTrigg": h_tau1_iso_NoTrigger,
+				"tau2_iso_NoTrigg": h_tau2_iso_NoTrigger,
+				"tau3_iso_NoTrigg": h_tau3_iso_NoTrigger,
+				"tau4_iso_NoTrigg": h_tau4_iso_NoTrigger,
+				#"tau_eta_NoTrigg": h_tau_eta_NoTrigger,
+				#"tau_iso_NoTrigg": h_tau_raw_iso_NoTrigger,
 			}
 		}
 	
@@ -1986,8 +2022,8 @@ if __name__ == "__main__":
 	#mass_str_arr = ["1000","2000","3000"]
 	mass_str_arr = ["2000"]
 	cutflow_table_array = [] #Array to be converted into cutflow table
-	cutflow_fields = ["Sample","PreSkimming","Skimming","Trigger","Tau_pT","Tau_eta","decay","deepboosted","Mass_Cut","Higgs_dR"]
-	#cutflow_fields = ["Sample","PreSkimming","Skimming","Trigger","Tau_pT","Tau_eta","decay","mva","Mass_Cut","Higgs_dR"]
+	#cutflow_fields = ["Sample","PreSkimming","Skimming","Trigger","Tau_pT","Tau_eta","decay","deepboosted","Mass_Cut","Higgs_dR"]
+	cutflow_fields = ["Sample","PreSkimming","Skimming","Trigger","Tau_pT","Tau_eta","decay","mva","Mass_Cut","Higgs_dR"]
 	
 	#Functions and variables for Luminosity weights
 	lumi_table_data = {"MC Sample":[], "Luminosity":[], "Cross Section (pb)":[], "Gen SumW":[], "Calculated Weight":[]}
@@ -2100,8 +2136,9 @@ if __name__ == "__main__":
 	four_tau_hist_list = ["FourTau_Mass_Arr","HiggsDeltaPhi_Arr", "Higgs_DeltaR_Arr","leading_dR_Arr","subleading_dR_Arr","LeadingHiggs_mass","SubLeadingHiggs_mass", "radionPT_Arr", 
 			"ZMult_Arr", "BJet_Arr", "tau_lead_pt_Arr", "tau_sublead_pt_Arr", "tau_3rdlead_pt_Arr", "tau_4thlead_pt_Arr", "leading_dPhi_Arr", "subleading_dPhi_Arr", 
 			"radionMET_dPhi_Arr","leadingHiggs_Rad_dR_Arr","subleadingHiggs_Rad_dR_Arr","leadingHiggs_MET_dPhi_Arr","subleadingHiggs_MET_dPhi_Arr","Radion_eta_Arr", "Radion_Charge_Arr",
-			"LeadingHiggsSgn_Arr", "SubleadingHiggsSgn_Arr","Num_Electrons_Arr","Num_Muons_Arr","cutflow_table","tau_pt_NoTrigg","tau_pt_NoTrigg","tau_eta_NoTrigg","tau_eta_Trigg",
-			"tau_phi_NoTrigg","tau_phi_Trigg","tau_pt_NoTrigg","tau_pt_Trigg","tau_eta_NoTrigg","tau_eta_Trigg","tau_phi_NoTrigg","tau_phi_Trigg"] #,"num_electron_tau_Arr","num_muon_tau_Arr"] #,"Electron_tau_dR_Arr","Muon_tau_dR_Arr"] (Removed num_electron_tau and num_muon_tau for now)
+			"LeadingHiggsSgn_Arr", "SubleadingHiggsSgn_Arr","Num_Electrons_Arr","Num_Muons_Arr","cutflow_table","tau1_pt_NoTrigg","tau1_eta_NoTrigg","tau1_iso_NoTrigg",
+			"tau2_pt_NoTrigg","tau2_eta_NoTrigg","tau2_iso_NoTrigg","tau3_pt_NoTrigg","tau3_eta_NoTrigg","tau3_iso_NoTrigg",
+			"tau4_pt_NoTrigg","tau4_eta_NoTrigg","tau4_iso_NoTrigg"] #,"num_electron_tau_Arr","num_muon_tau_Arr"] #,"Electron_tau_dR_Arr","Muon_tau_dR_Arr"] (Removed num_electron_tau and num_muon_tau for now)
 	#four_tau_hist_list = ["Num_Electrons_Arr","Num_Muons_Arr","Electron_tau_dR_Arr","Muon_tau_dR_Arr"]
 	#four_tau_hist_list = ["ZMult_Arr"] #,"ZMult_ele_Arr","ZMult_mu_Arr", "ZMult_tau_Arr"]
 	#four_tau_hist_list = ["leading_dR_Arr"] #Only make 1 histogram for brevity/debugging purposes
@@ -2117,8 +2154,10 @@ if __name__ == "__main__":
 					"subleadingHiggs_MET_dPhi_Arr": r"Subleading Higgs MET $\Delta \phi$", "Radion_eta_Arr": r"Radion $\eta$", "Radion_Charge_Arr": r"Radion Charge",
 					"Num_Electrons_Arr": r"Number of $e$","Num_Muons_Arr": r"Number of $\mu$","Electron_tau_dR_Arr" : r"Electron $\tau$ minimized $\Delta$R",
 					"Muon_tau_dR_Arr": r"$\mu$ $\tau$ minimized $\Delta$R","num_electron_tau_Arr": r"Number of e reconstructed as $\tau$","num_muon_tau_Arr": r"Number of $\mu$ reconstructed as $\tau$",
-					"tau_pt_NoTrigg": r"$\tau$ $p_T$ after skimming","tau_pt_NoTrigg": r"$\tau$ $p_T$ after Trigger","tau_eta_NoTrigg": r"$\tau$ $\eta$ after skimming",
-					"tau_eta_Trigg": r"$\tau$ $\eta$ after Trigger","tau_phi_NoTrigg": r"$\tau$ $\phi$ after skimming","tau_phi_Trigg": r"$\tau$ $\phi$ after Trigger", "tau_iso_Trigg": "Raw Isolation Score after Trigger", "tau_iso_NoTrigg": "Raw Isolation Score after Skimming"}
+					"tau1_pt_NoTrigg": r"Leading $\tau$ $p_T$ after skimming","tau1_eta_NoTrigg": r"Leading $\tau$ $\eta$ after skimming","tau1_iso_NoTrigg": r"Leading $\tau$ MVA after skimming",
+					"tau2_pt_NoTrigg": r"Sub-leading $\tau$ $p_T$ after skimming","tau2_eta_NoTrigg": r"Sub-leading $\tau$ $\eta$ after skimming","tau2_iso_NoTrigg": r"Sub-leading $\tau$ MVA after skimming",
+				"tau3_pt_NoTrigg": r"Third leading $\tau$ $p_T$ after skimming","tau3_eta_NoTrigg": r"Third leading $\tau$ $\eta$ after skimming","tau3_iso_NoTrigg": r"Third leading $\tau$ MVA after skimming",
+				"tau4_pt_NoTrigg": r"Fourth leading $\tau$ $p_T$ after skimming","tau4_eta_NoTrigg": r"Fourth leading $\tau$ $\eta$ after skimming","tau4_iso_NoTrigg": r"Fourth leading $\tau$ MVA after skimming",}
     #four_tau_hist_list = ["HiggsDeltaPhi_Arr","Pair_DeltaPhi_Hist"]
 
 	#Get PU Weighting information
@@ -2143,14 +2182,14 @@ if __name__ == "__main__":
 		file_dict = { #Reduced files to run over
 			#"ZZ4l": ["/hdfs/store/user/twnelson/HH4Tau_EtAl/Skimmed_Files/2018/ZZTo4L_p65_14November25_0817_skim_NewSkim_BTDp65/ZZTo4L.root"], # ZZ4L DBT cut of 0.65
 			#"ZZ4l": [background_base + "ZZTo4L_26August25_0757_skim_Newskim/ZZTo4L.root"], # ZZ4L DBT
-			#"ZZ4l": [MVA_base + "ZZTo4L_MVA_07November25_0943_skim_Newskim_Debugging/ZZTo4L_MVA.root"], # ZZ4L MVA
-			#"ZZ4l": [MVA_base + "ZZTo4L_p68_16November25_0916_skim_NewSkim_BTDp68/ZZTo4L.root"], # ZZ4L p68 
-			"ZZ4l": [MVA_base + "ZZTo4L_p70_17November25_0740_skim_NewSkim_BTDp70/ZZTo4L.root"], # ZZ4L p70
+			"ZZ4l": [MVA_base + "ZZTo4L_MVA_07November25_0943_skim_Newskim_Debugging/ZZTo4L_MVA.root"], # ZZ4L MVA
 			#"ZZ4l_p6": ["/hdfs/store/user/twnelson/HH4Tau_EtAl/Skimmed_Files/2018/ZZTo4L_SingleMiniAOD_13November25_1101_skim_SingleZZ4lFile_DBT_p6/singleFileSkimForSubmission-NANO_NANO.root"],
 			#"ZZ4l_p7": ["/hdfs/store/user/twnelson/HH4Tau_EtAl/Skimmed_Files/2018/ZZTo4L_SingleMiniAOD_13November25_1116_skim_SingleZZ4lFile_DBT_p7/singleFileSkimForSubmission-NANO_NANO.root"],
 			#"TTToSemiLeptonic": [background_base + "TTToSemiLeptonic_35August25_0448_skim_Newskim/TTToSemiLeptonic" + str(j) + ".root" for j in range(10)], 
 			#"TTTo2L2Nu": [background_base + "TTTo2L2Nu_26August25_0719_skim_Newskim/TTTo2L2Nu.root"], 
 			#"TTToHadronic": [background_base + "TTToHadronic_25October25_0813_skim_Newskim/TTToHadronic" + str(j) + ".root" for j in range(10)],
+			"Data_SingleMuon": [data_base + "SingleMu_Run2018A_27August25_0551_skim_Newskim/SingleMu_Run2018A.root"], 
+			"Data_JetHT": [data_base + "JetHT_2018_27August25_0655_skim_Newskim/JetHT_2018.root"],
 			#"Data_SingleMuon": [data_base + "SingleMu_Run2018A_27August25_0551_skim_Newskim/SingleMu_Run2018A.root", 
 			#	data_base + "SingleMu_Run2018B_27August25_0529_skim_Newskim/SingleMu_Run2018B.root", data_base + "SingleMu_Run2018C_27August25_0540_skim_Newskim/SingleMu_Run2018C.root", 
 			#	data_base + "SingleMu_Run2018D_27August25_0613_skim_Newskim/SingleMu_Run2018D.root"],
@@ -2268,14 +2307,18 @@ if __name__ == "__main__":
 				"num_electron_tau_Arr": "Num_electrons_as_tau_Mass" + mass + "-" + trigger_name,
 				"num_muon_tau_Arr": "Num_muons_as_tau_Mass" + mass + "-" + trigger_name,
 				"cutflow_table": "Cutflow_Table_Mass" + mass + "-" + trigger_name,
-				"tau_pt_NoTrigg": "Tau_pT_NoTrigger" + mass + "-" + trigger_name,
-				"tau_pt_Trigg": "Tau_pT_Trigger" + mass + "-" + trigger_name,
-				"tau_eta_NoTrigg": "Tau_eta_NoTrigger" + mass + "-" + trigger_name,
-				"tau_eta_Trigg": "Tau_eta_Trigger" + mass + "-" + trigger_name,
-				"tau_phi_NoTrigg": "Tau_phi_NoTrigger" + mass + "-" + trigger_name, 
-				"tau_phi_Trigg": "Tau_phi_Trigger" + mass + "-" + trigger_name,
-				"tau_iso_NoTrigg": "Tau_iso_NoTrigger" + mass + "-" + trigger_name, 
-				"tau_iso_Trigg": "Tau_iso_Trigger" + mass + "-" + trigger_name,
+				"tau1_pt_NoTrigg": "BasicKinematics_Tau1_pT_NoTrigger" + mass + "-" + trigger_name,
+				"tau2_pt_NoTrigg": "BasicKinematics_Tau2_pT_NoTrigger" + mass + "-" + trigger_name,
+				"tau3_pt_NoTrigg": "BasicKinematics_Tau3_pT_NoTrigger" + mass + "-" + trigger_name,
+				"tau4_pt_NoTrigg": "BasicKinematics_Tau4_pT_NoTrigger" + mass + "-" + trigger_name,
+				"tau1_eta_NoTrigg": "BasicKinematics_Tau1_eta_NoTrigger" + mass + "-" + trigger_name,
+				"tau2_eta_NoTrigg": "BasicKinematics_Tau2_eta_NoTrigger" + mass + "-" + trigger_name,
+				"tau3_eta_NoTrigg": "BasicKinematics_Tau3_eta_NoTrigger" + mass + "-" + trigger_name,
+				"tau4_eta_NoTrigg": "BasicKinematics_Tau4_eta_NoTrigger" + mass + "-" + trigger_name,
+				"tau1_iso_NoTrigg": "BasicKinematics_Tau1_iso_NoTrigger" + mass + "-" + trigger_name, 
+				"tau2_iso_NoTrigg": "BasicKinematics_Tau2_iso_NoTrigger" + mass + "-" + trigger_name, 
+				"tau3_iso_NoTrigg": "BasicKinematics_Tau3_iso_NoTrigger" + mass + "-" + trigger_name, 
+				"tau4_iso_NoTrigg": "BasicKinematics_Tau4_iso_NoTrigger" + mass + "-" + trigger_name, 
 			}
 			
 			#fourtau_out = iterative_runner(file_dict, treename="Events", processor_instance=FourTauPlotting(trigger_bit=trigger_pair[0], or_trigger=trigger_pair[1],PUWeights = PUWeight, PU_weight_bool =True, signal_mass = mass)) #Modified for NanoAOD (changd treename)
@@ -2290,7 +2333,7 @@ if __name__ == "__main__":
 			#Produce cutflow csv table
 			for file in file_dict.keys():
 				cutflow_table_array.append(fourtau_out[file]["cutflow_dict"])
-			with open("Cutflow_Table_Mass_" + mass[0] + "TeV_ZZ4l_DBTp70.csv", mode = "w", newline = '') as cutflow_file:	
+			with open("Cutflow_Table_Mass_" + mass[0] + "TeV_ZZ4l_MVA.csv", mode = "w", newline = '') as cutflow_file:	
 				writer = csv.DictWriter(cutflow_file,fieldnames=cutflow_fields)
 				writer.writeheader()
 				writer.writerows(cutflow_table_array)
