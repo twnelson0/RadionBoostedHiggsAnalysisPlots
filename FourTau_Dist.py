@@ -269,6 +269,7 @@ class FourTauPlotting(processor.ProcessorABC):
 				"eta": events.Electron_eta,
 				"phi": events.Electron_phi,
 				"charge": events.Electron_charge,
+				"nElectron": events.nElectron,
 				"Px": events.Electron_pt*np.cos(events.Electron_phi),
 				"Py": events.Electron_pt*np.sin(events.Electron_phi),
 				"Pz": events.Electron_pt*np.tan(2*np.arctan(np.exp(-events.Electron_eta)))**-1,
@@ -289,6 +290,7 @@ class FourTauPlotting(processor.ProcessorABC):
 				"eta": events.Muon_eta,
 				"phi": events.Muon_phi,
 				"charge": events.Muon_charge,
+				"nMuon": events.nMuon,
 				"Px": events.Muon_pt*np.cos(events.Muon_phi),
 				"Py": events.Muon_pt*np.sin(events.Muon_phi),
 				"Pz": events.Muon_pt*np.tan(2*np.arctan(np.exp(-events.Muon_eta)))**-1,
@@ -309,9 +311,11 @@ class FourTauPlotting(processor.ProcessorABC):
 		AK8Jet = ak.zip(
 			{
 				"AK8JetDropMass": events.FatJet_msoftdrop,
-				"AK8JetPt": events.FatJet_pt,
+				#"AK8JetPt": events.FatJet_pt,
+				"pt": events.FatJet_pt,
 				"eta": events.FatJet_eta,
 				"phi": events.FatJet_phi,
+				"nAK8Jet": events.nFatJet, 
 			},
 			with_name="AK8JetArray",
 			behavior=candidate.behavior,
@@ -319,11 +323,12 @@ class FourTauPlotting(processor.ProcessorABC):
 		
 		Jet = ak.zip(
 			{
-				"Pt": events.Jet_pt,
+				"pt": events.Jet_pt,
 				#"PFLooseId": events.JetPFLooseId,
 				"PFLooseId": events.Jet_jetId, #Not sure that this is correct
 				"eta": events.Jet_eta,
 				"phi": events.Jet_phi,
+				"nJet": events.nJet,
 				#"DeepCSVTags_b": events.Jet_DeepCSVTags_b
 				"DeepCSVTags_b": events.Jet_btagCSVV2,
 			},
@@ -422,7 +427,7 @@ class FourTauPlotting(processor.ProcessorABC):
 		print(type(dataset))
 		print(dataset)
 
-		#Basic Kinematic histograms
+		#Basic Kinematic histograms Boosted tau
 		h_tau_pT_NoTrigger = hist.Hist.new.Regular(50,0,1000,label = r"$\tau$ $p_T$ [GeV]").Double()
 		h_tau_pT_Trigger = hist.Hist.new.Regular(50,0,1000,label = r"$\tau$ $p_T$ [GeV]").Double()
 		h_tau_eta_NoTrigger = hist.Hist.new.Regular(20,-4,4,label = r"$\tau$ $\eta$").Double()
@@ -432,35 +437,87 @@ class FourTauPlotting(processor.ProcessorABC):
 		h_tau_raw_iso_NoTrigger = hist.Hist.new.Regular(20,-1,1,label=r"Raw MVA Score").Double() 
 		h_tau_raw_iso_Trigger = hist.Hist.new.Regular(20,-1,1,label=r"Raw MVA Score").Double()
 
+		#Basic Kinematic histograms leptons (muons and electrons)
+		h_electron_pT_NoTrigger = hist.Hist.new.Regular(50,0,1000,label = r"e $p_T$ [GeV]").Double()
+		h_electron_pT_Trigger = hist.Hist.new.Regular(50,0,1000,label = r"e $p_T$ [GeV]").Double()
+		h_electron_eta_NoTrigger = hist.Hist.new.Regular(20,-4,4,label = r"e $\eta$").Double()
+		h_electron_eta_Trigger = hist.Hist.new.Regular(20,-4,4,label = r"e $\eta$").Double()
+		h_electron_phi_NoTrigger = hist.Hist.new.Regular(20,-pi,pi,label = r"e $\phi$").Double()
+		h_electron_phi_Trigger = hist.Hist.new.Regular(20,-pi,pi,label = r"e $\phi$").Double()
+		h_muon_pT_NoTrigger = hist.Hist.new.Regular(50,0,1000,label = r"$\mu$ $p_T$ [GeV]").Double()
+		h_muon_pT_Trigger = hist.Hist.new.Regular(50,0,1000,label = r"$\mu$ $p_T$ [GeV]").Double()
+		h_muon_eta_NoTrigger = hist.Hist.new.Regular(20,-4,4,label = r"$\mu$ $\eta$").Double()
+		h_muon_eta_Trigger = hist.Hist.new.Regular(20,-4,4,label = r"$\mu$ $\eta$").Double()
+		h_muon_phi_NoTrigger = hist.Hist.new.Regular(20,-pi,pi,label = r"$\mu$ $\phi$").Double()
+		h_muon_phi_Trigger = hist.Hist.new.Regular(20,-pi,pi,label = r"$\mu$ $\phi$").Double()
+
+		#Basic Kinematic histograms Jets (check which Jets most useful based on 
+		h_Jet_pT_NoTrigger = hist.Hist.new.Regular(50,0,1000,label = r"Jet $p_T$ [GeV]").Double()
+		h_Jet_pT_Trigger = hist.Hist.new.Regular(50,0,1000,label = r"Jet $p_T$ [GeV]").Double()
+		h_Jet_eta_NoTrigger = hist.Hist.new.Regular(20,-4,4,label = r"Jet $\eta$").Double()
+		h_Jet_eta_Trigger = hist.Hist.new.Regular(20,-4,4,label = r"Jet $\eta$").Double()
+		h_Jet_phi_NoTrigger = hist.Hist.new.Regular(20,-pi,pi,label = r"Jet $\phi$").Double()
+		h_Jet_phi_Trigger = hist.Hist.new.Regular(20,-pi,pi,label = r"Jet $\phi$").Double()
+		h_AK8Jet_pT_NoTrigger = hist.Hist.new.Regular(50,0,1000,label = r"AK8Jet $p_T$ [GeV]").Double()
+		h_AK8Jet_pT_Trigger = hist.Hist.new.Regular(50,0,1000,label = r"AK8Jet $p_T$ [GeV]").Double()
+		h_AK8Jet_eta_NoTrigger = hist.Hist.new.Regular(20,-4,4,label = r"AK8Jet $\eta$").Double()
+		h_AK8Jet_eta_Trigger = hist.Hist.new.Regular(20,-4,4,label = r"AK8Jet $\eta$").Double()
+		h_AK8Jet_phi_NoTrigger = hist.Hist.new.Regular(20,-pi,pi,label = r"AK8Jet $\phi$").Double()
+		h_AK8Jet_phi_Trigger = hist.Hist.new.Regular(20,-pi,pi,label = r"AK8Jet $\phi$").Double()
+
 
 		cutflow_dict = dict.fromkeys(["Sample","PreSkimming","Skimming","Trigger","Tau_pT","Tau_eta","decay","deepboosted","Mass_Cut","Higgs_dR"])
 		#cutflow_dict = dict.fromkeys(["Sample","PreSkimming","Skimming","Trigger","Tau_pT","Tau_eta","decay","mva","Mass_Cut","Higgs_dR"])
 		cutflow_dict["Sample"] = dataset
 		cutflow_dict["PreSkimming"] = numEvents_Dict[dataset] 
 		cutflow_dict["Skimming"] = ak.num(tau,axis=0)
+		
+		#Fill histograms prior to trigger and all selections (excluding skimming) 
+		#Taus
 		h_tau_pT_NoTrigger.fill(ak.ravel(tau.pt))
 		h_tau_eta_NoTrigger.fill(ak.ravel(tau.eta))
 		h_tau_phi_NoTrigger.fill(ak.ravel(tau.phi))
 		h_tau_raw_iso_NoTrigger.fill(ak.ravel(tau.iso))
+
+		#Electrons
+		h_electron_pT_NoTrigger.fill(ak.ravel(electron.pt))
+		h_electron_eta_NoTrigger.fill(ak.ravel(electron.eta))
+		h_electron_phi_NoTrigger.fill(ak.ravel(electron.phi))
+
+		#Muons
+		h_muon_pT_NoTrigger.fill(ak.ravel(muon.pt))
+		h_muon_eta_NoTrigger.fill(ak.ravel(muon.eta))
+		h_muon_phi_NoTrigger.fill(ak.ravel(muon.phi))
+
+		#Jets 
+		h_Jet_pT_NoTrigger.fill(ak.ravel(Jet.pt))
+		h_Jet_eta_NoTrigger.fill(ak.ravel(Jet.eta))
+		h_Jet_phi_NoTrigger.fill(ak.ravel(Jet.phi))
+
+		#AK8/Fat Jets
+		h_AK8Jet_pT_NoTrigger.fill(ak.ravel(AK8Jet.pt))
+		h_AK8Jet_eta_NoTrigger.fill(ak.ravel(AK8Jet.eta))
+		h_AK8Jet_phi_NoTrigger.fill(ak.ravel(AK8Jet.phi))
+		
 		print("Number of events before selection + Trigger: %d"%ak.num(tau,axis=0))
 
 		#Look at the problem events before anything is applied
 		#Construct HT and MHT variables (and give them their own object)
-		Jet_MHT = Jet[Jet.Pt > 30]
+		Jet_MHT = Jet[Jet.pt > 30]
 		Jet_MHT = Jet_MHT[np.abs(Jet_MHT.eta) < 5]
 		Jet_MHT = Jet_MHT[Jet_MHT.PFLooseId > 0.5]
-		event_level["MHT_x"] = ak.sum(Jet_MHT.Pt*np.cos(Jet_MHT.phi),axis=1,keepdims=False)
-		#event_level["MHT_y"] = ak.sum(Jet_MHT.Pt*np.sin(Jet_MHT.phi),axis=1,keepdims=False) #Broken/wrong implementation
-		event_level["MHT_y"] = ak.sum(Jet.Pt*np.sin(Jet.phi),axis=1,keepdims=False) #Fixed implementation (I think)
+		event_level["MHT_x"] = ak.sum(Jet_MHT.pt*np.cos(Jet_MHT.phi),axis=1,keepdims=False)
+		event_level["MHT_y"] = ak.sum(Jet_MHT.pt*np.sin(Jet_MHT.phi),axis=1,keepdims=False) #No idea why this was commented out
+		#event_level["MHT_y"] = ak.sum(Jet.pt*np.sin(Jet.phi),axis=1,keepdims=False) #Fixed implementation (I think)
 		#Jet_MHT["MHT"] = np.sqrt(Jet_MHT.MHT_x**2 + Jet_MHT.MHT_y**2)
 		event_level["MHT"] = np.sqrt(event_level.MHT_x**2 + event_level.MHT_y**2) 
 		
 		#HT Seleciton (new)
 		#tau_temp1,HT_Jet_Cand = ak.unzip(ak.cartesian([tau,Jet_MHT], axis = 1, nested = True))
-		Jet_HT = Jet[Jet.Pt > 30]
+		Jet_HT = Jet[Jet.pt > 30]
 		Jet_HT = Jet_HT[np.abs(Jet_HT.eta) < 3]
 		Jet_HT = Jet_HT[Jet_HT.PFLooseId > 0.5]
-		event_level["HT"] = ak.sum(Jet_HT.Pt, axis = 1, keepdims=False)
+		event_level["HT"] = ak.sum(Jet_HT.pt, axis = 1, keepdims=False)
 		
 		#Apply trigger weights
 		#if not(self.isData):
@@ -1562,7 +1619,7 @@ class FourTauPlotting(processor.ProcessorABC):
 		#Apply BJet multiplicity selection
 		#Apply pt, eta, loose ID, and deep csv tag cut
 		Jet_B = Jet[Jet.PFLooseId > 0.5]
-		Jet_B = Jet_B[Jet_B.Pt > 30]
+		Jet_B = Jet_B[Jet_B.pt > 30]
 		Jet_B = Jet_B[np.abs(Jet_B.eta) < 2.4]
 		Jet_B = Jet_B[Jet_B.DeepCSVTags_b > 0.7527]
 		NumBJets = ak.num(Jet_B,axis=1)
@@ -1968,6 +2025,7 @@ class FourTauPlotting(processor.ProcessorABC):
 				"num_events": ak.num(event_level.event_weight,axis=0),
 				"weight_Hist": h_weight,
 				"cutflow_dict": cutflow_dict,
+				#Tau kineamtic distirubtions
 				"tau_pt_NoTrigg": h_tau_pT_NoTrigger,
 				"tau_pt_Trigg": h_tau_pT_Trigger,
 				"tau_eta_NoTrigg": h_tau_eta_NoTrigger,
@@ -1976,6 +2034,34 @@ class FourTauPlotting(processor.ProcessorABC):
 				"tau_phi_Trigg": h_tau_phi_Trigger,
 				"tau_iso_NoTrigg": h_tau_raw_iso_NoTrigger,
 				"tau_iso_Trigg": h_tau_raw_iso_Trigger,
+				#Electron kineamtic distirubtions
+				"electron_pt_NoTrigg": h_electron_pT_NoTrigger,
+				"electron_pt_Trigg": h_electron_pT_Trigger,
+				"electron_eta_NoTrigg": h_electron_eta_NoTrigger,
+				"electron_eta_Trigg": h_electron_eta_Trigger,
+				"electron_phi_NoTrigg": h_electron_phi_NoTrigger,
+				"electron_phi_Trigg": h_electron_phi_Trigger,
+				#Muon kineamtic distirubtions
+				"muon_pt_NoTrigg": h_muon_pT_NoTrigger,
+				"muon_pt_Trigg": h_muon_pT_Trigger,
+				"muon_eta_NoTrigg": h_muon_eta_NoTrigger,
+				"muon_eta_Trigg": h_muon_eta_Trigger,
+				"muon_phi_NoTrigg": h_muon_phi_NoTrigger,
+				"muon_phi_Trigg": h_muon_phi_Trigger,
+				#Jet kineamtic distirubtions
+				"Jet_pt_NoTrigg": h_Jet_pT_NoTrigger,
+				"Jet_pt_Trigg": h_Jet_pT_Trigger,
+				"Jet_eta_NoTrigg": h_Jet_eta_NoTrigger,
+				"Jet_eta_Trigg": h_Jet_eta_Trigger,
+				"Jet_phi_NoTrigg": h_Jet_phi_NoTrigger,
+				"Jet_phi_Trigg": h_Jet_phi_Trigger,
+				#AK8Jet kineamtic distirubtions
+				"AK8Jet_pt_NoTrigg": h_AK8Jet_pT_NoTrigger,
+				"AK8Jet_pt_Trigg": h_AK8Jet_pT_Trigger,
+				"AK8Jet_eta_NoTrigg": h_AK8Jet_eta_NoTrigger,
+				"AK8Jet_eta_Trigg": h_AK8Jet_eta_Trigger,
+				"AK8Jet_phi_NoTrigg": h_AK8Jet_phi_NoTrigger,
+				"AK8Jet_phi_Trigg": h_AK8Jet_phi_Trigger,
 			}
 		}
 	
@@ -2100,8 +2186,13 @@ if __name__ == "__main__":
 	four_tau_hist_list = ["FourTau_Mass_Arr","HiggsDeltaPhi_Arr", "Higgs_DeltaR_Arr","leading_dR_Arr","subleading_dR_Arr","LeadingHiggs_mass","SubLeadingHiggs_mass", "radionPT_Arr", 
 			"ZMult_Arr", "BJet_Arr", "tau_lead_pt_Arr", "tau_sublead_pt_Arr", "tau_3rdlead_pt_Arr", "tau_4thlead_pt_Arr", "leading_dPhi_Arr", "subleading_dPhi_Arr", 
 			"radionMET_dPhi_Arr","leadingHiggs_Rad_dR_Arr","subleadingHiggs_Rad_dR_Arr","leadingHiggs_MET_dPhi_Arr","subleadingHiggs_MET_dPhi_Arr","Radion_eta_Arr", "Radion_Charge_Arr",
-			"LeadingHiggsSgn_Arr", "SubleadingHiggsSgn_Arr","Num_Electrons_Arr","Num_Muons_Arr","cutflow_table","tau_pt_NoTrigg","tau_pt_NoTrigg","tau_eta_NoTrigg","tau_eta_Trigg",
-			"tau_phi_NoTrigg","tau_phi_Trigg","tau_pt_NoTrigg","tau_pt_Trigg","tau_eta_NoTrigg","tau_eta_Trigg","tau_phi_NoTrigg","tau_phi_Trigg"] #,"num_electron_tau_Arr","num_muon_tau_Arr"] #,"Electron_tau_dR_Arr","Muon_tau_dR_Arr"] (Removed num_electron_tau and num_muon_tau for now)
+			"LeadingHiggsSgn_Arr", "SubleadingHiggsSgn_Arr","Num_Electrons_Arr","Num_Muons_Arr","cutflow_table",
+			"tau_pt_NoTrigg","tau_pt_NoTrigg","tau_eta_NoTrigg","tau_eta_Trigg","tau_phi_NoTrigg","tau_phi_Trigg",
+			"electron_pt_NoTrigg","electron_pt_Trigg","electron_eta_NoTrigg","electron_eta_Trigg","electron_phi_NoTrigg","electron_phi_Trigg",
+			"muon_pt_NoTrigg","muon_pt_Trigg","muon_eta_NoTrigg","muon_eta_Trigg","muon_phi_NoTrigg","muon_phi_Trigg",
+			"Jet_pt_NoTrigg","Jet_pt_Trigg","Jet_eta_NoTrigg","Jet_eta_Trigg","Jet_phi_NoTrigg","Jet_phi_Trigg",
+			"AK8Jet_pt_NoTrigg","AK8Jet_pt_Trigg","AK8Jet_eta_NoTrigg","AK8Jet_eta_Trigg","AK8Jet_phi_NoTrigg","AK8Jet_phi_Trigg",
+			] #,"num_electron_tau_Arr","num_muon_tau_Arr"] #,"Electron_tau_dR_Arr","Muon_tau_dR_Arr"] (Removed num_electron_tau and num_muon_tau for now)
 	#four_tau_hist_list = ["Num_Electrons_Arr","Num_Muons_Arr","Electron_tau_dR_Arr","Muon_tau_dR_Arr"]
 	#four_tau_hist_list = ["ZMult_Arr"] #,"ZMult_ele_Arr","ZMult_mu_Arr", "ZMult_tau_Arr"]
 	#four_tau_hist_list = ["leading_dR_Arr"] #Only make 1 histogram for brevity/debugging purposes
@@ -2118,7 +2209,17 @@ if __name__ == "__main__":
 					"Num_Electrons_Arr": r"Number of $e$","Num_Muons_Arr": r"Number of $\mu$","Electron_tau_dR_Arr" : r"Electron $\tau$ minimized $\Delta$R",
 					"Muon_tau_dR_Arr": r"$\mu$ $\tau$ minimized $\Delta$R","num_electron_tau_Arr": r"Number of e reconstructed as $\tau$","num_muon_tau_Arr": r"Number of $\mu$ reconstructed as $\tau$",
 					"tau_pt_NoTrigg": r"$\tau$ $p_T$ after skimming","tau_pt_NoTrigg": r"$\tau$ $p_T$ after Trigger","tau_eta_NoTrigg": r"$\tau$ $\eta$ after skimming",
-					"tau_eta_Trigg": r"$\tau$ $\eta$ after Trigger","tau_phi_NoTrigg": r"$\tau$ $\phi$ after skimming","tau_phi_Trigg": r"$\tau$ $\phi$ after Trigger", "tau_iso_Trigg": "Raw Isolation Score after Trigger", "tau_iso_NoTrigg": "Raw Isolation Score after Skimming"}
+					"tau_eta_Trigg": r"$\tau$ $\eta$ after Trigger","tau_phi_NoTrigg": r"$\tau$ $\phi$ after skimming","tau_phi_Trigg": r"$\tau$ $\phi$ after Trigger", 
+					"tau_iso_Trigg": "Raw Isolation Score after Trigger", "tau_iso_NoTrigg": "Raw Isolation Score after Skimming",
+					"electron_pt_NoTrigg": r"e $p_T$ after skimming","electron_pt_NoTrigg": r"e $p_T$ after Trigger","electron_eta_NoTrigg": r"e $\eta$ after skimming",
+					"electron_eta_Trigg": r"e $\eta$ after Trigger","electron_phi_NoTrigg": r"e $\phi$ after skimming","electron_phi_Trigg": r"e $\phi$ after Trigger", 
+					"muon_pt_NoTrigg": r"$\mu$ $p_T$ after skimming","muon_pt_NoTrigg": r"$\mu$ $p_T$ after Trigger","muon_eta_NoTrigg": r"$\mu$ $\eta$ after skimming",
+					"muon_eta_Trigg": r"$\mu$ $\eta$ after Trigger","muon_phi_NoTrigg": r"$\mu$ $\phi$ after skimming","muon_phi_Trigg": r"$\mu$ $\phi$ after Trigger", 
+					"Jet_pt_NoTrigg": r"Jet $p_T$ after skimming","Jet_pt_NoTrigg": r"Jet $p_T$ after Trigger","Jet_eta_NoTrigg": r"Jet $\eta$ after skimming",
+					"Jet_eta_Trigg": r"Jet $\eta$ after Trigger","Jet_phi_NoTrigg": r"Jet $\phi$ after skimming","Jet_phi_Trigg": r"Jet $\phi$ after Trigger", 
+					"AK8Jet_pt_NoTrigg": r"AK8Jet $p_T$ after skimming","AK8Jet_pt_NoTrigg": r"AK8Jet $p_T$ after Trigger","AK8Jet_eta_NoTrigg": r"AK8Jet $\eta$ after skimming",
+					"AK8Jet_eta_Trigg": r"AK8Jet $\eta$ after Trigger","AK8Jet_phi_NoTrigg": r"AK8Jet $\phi$ after skimming","AK8Jet_phi_Trigg": r"AK8Jet $\phi$ after Trigger", 
+					}
     #four_tau_hist_list = ["HiggsDeltaPhi_Arr","Pair_DeltaPhi_Hist"]
 
 	#Get PU Weighting information
@@ -2140,7 +2241,7 @@ if __name__ == "__main__":
 	#Loop over all mass points
 	for mass in mass_str_arr:
 		print("====================Radion Mass = " + mass[0] + "." + mass[1] + " TeV====================")
-		file_dict = { #Reduced files to run over
+		file_dict_test = { #Reduced files to run over
 			#"ZZ4l": ["/hdfs/store/user/twnelson/HH4Tau_EtAl/Skimmed_Files/2018/ZZTo4L_p65_14November25_0817_skim_NewSkim_BTDp65/ZZTo4L.root"], # ZZ4L DBT cut of 0.65
 			#"ZZ4l": [background_base + "ZZTo4L_26August25_0757_skim_Newskim/ZZTo4L.root"], # ZZ4L DBT
 			#"ZZ4l": [MVA_base + "ZZTo4L_MVA_07November25_0943_skim_Newskim_Debugging/ZZTo4L_MVA.root"], # ZZ4L MVA
@@ -2163,11 +2264,12 @@ if __name__ == "__main__":
 		}
 		
 		#Grand Unified Background + Signal + Data Dictionary links file name to location of root file
-		file_dict_full = {
+		file_dict = {
 			"TTToSemiLeptonic": [background_base + "TTToSemiLeptonic_35August25_0448_skim_Newskim/TTToSemiLeptonic" + str(j) + ".root" for j in range(10)], 
 			"TTTo2L2Nu": [background_base + "TTTo2L2Nu_26August25_0719_skim_Newskim/TTTo2L2Nu.root"], 
 			"TTToHadronic": [background_base + "TTToHadronic_25October25_0813_skim_Newskim/TTToHadronic" + str(j) + ".root" for j in range(10)],
-			"ZZ4l": [background_base + "ZZTo4L_26August25_0757_skim_Newskim/ZZTo4L.root"], 
+			#"ZZ4l": [background_base + "ZZTo4L_26August25_0757_skim_Newskim/ZZTo4L.root"], 
+			"ZZ4l": [MVA_base + "ZZTo4L_p70_17November25_0740_skim_NewSkim_BTDp70/ZZTo4L.root"], 
 			"VV2l2nu": [background_base + "WWTo2L2Nu_26August25_1040_skim_Newskim/WWTo2L2Nu.root"], 
 			"WZ1l3nu": [background_base + "WZTo1L3Nu_4f_26August25_1016_skim_Newskim/WZTo1L3Nu_4f.root"], 
 			"WZ3l1nu": [background_base + "WZTo3L1Nu_4f_26August25_1032_skim_Newskim/WZTo3L1Nu_4f.root"],  
@@ -2276,6 +2378,31 @@ if __name__ == "__main__":
 				"tau_phi_Trigg": "Tau_phi_Trigger" + mass + "-" + trigger_name,
 				"tau_iso_NoTrigg": "Tau_iso_NoTrigger" + mass + "-" + trigger_name, 
 				"tau_iso_Trigg": "Tau_iso_Trigger" + mass + "-" + trigger_name,
+				"electron_pt_NoTrigg": "Electron_pT_NoTrigger" + mass + "-" + trigger_name,
+				"electron_pt_Trigg": "Electron_pT_Trigger" + mass + "-" + trigger_name,
+				"electron_eta_NoTrigg": "Electron_eta_NoTrigger" + mass + "-" + trigger_name,
+				"electron_eta_Trigg": "Electron_eta_Trigger" + mass + "-" + trigger_name,
+				"electron_phi_NoTrigg": "Electron_phi_NoTrigger" + mass + "-" + trigger_name, 
+				"electron_phi_Trigg": "Electron_phi_Trigger" + mass + "-" + trigger_name,
+				"muon_pt_NoTrigg": "Muon_pT_NoTrigger" + mass + "-" + trigger_name,
+				"muon_pt_Trigg": "Muon_pT_Trigger" + mass + "-" + trigger_name,
+				"muon_eta_NoTrigg": "Muon_eta_NoTrigger" + mass + "-" + trigger_name,
+				"muon_eta_Trigg": "Muon_eta_Trigger" + mass + "-" + trigger_name,
+				"muon_phi_NoTrigg": "Muon_phi_NoTrigger" + mass + "-" + trigger_name, 
+				"muon_phi_Trigg": "Muon_phi_Trigger" + mass + "-" + trigger_name,
+				"Jet_pt_NoTrigg": "Jet_pT_NoTrigger" + mass + "-" + trigger_name,
+				"Jet_pt_Trigg": "Jet_pT_Trigger" + mass + "-" + trigger_name,
+				"Jet_eta_NoTrigg": "Jet_eta_NoTrigger" + mass + "-" + trigger_name,
+				"Jet_eta_Trigg": "Jet_eta_Trigger" + mass + "-" + trigger_name,
+				"Jet_phi_NoTrigg": "Jet_phi_NoTrigger" + mass + "-" + trigger_name, 
+				"Jet_phi_Trigg": "Jet_phi_Trigger" + mass + "-" + trigger_name,
+				
+				"AK8Jet_pt_NoTrigg": "AK8Jet_pT_NoTrigger" + mass + "-" + trigger_name,
+				"AK8Jet_pt_Trigg": "AK8Jet_pT_Trigger" + mass + "-" + trigger_name,
+				"AK8Jet_eta_NoTrigg": "AK8Jet_eta_NoTrigger" + mass + "-" + trigger_name,
+				"AK8Jet_eta_Trigg": "AK8Jet_eta_Trigger" + mass + "-" + trigger_name,
+				"AK8Jet_phi_NoTrigg": "AK8Jet_phi_NoTrigger" + mass + "-" + trigger_name, 
+				"AK8Jet_phi_Trigg": "AK8Jet_phi_Trigger" + mass + "-" + trigger_name,
 			}
 			
 			#fourtau_out = iterative_runner(file_dict, treename="Events", processor_instance=FourTauPlotting(trigger_bit=trigger_pair[0], or_trigger=trigger_pair[1],PUWeights = PUWeight, PU_weight_bool =True, signal_mass = mass)) #Modified for NanoAOD (changd treename)
