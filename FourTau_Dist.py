@@ -472,32 +472,38 @@ class FourTauPlotting(processor.ProcessorABC):
 		cutflow_dict["PreSkimming"] = numEvents_Dict[dataset] 
 		cutflow_dict["Skimming"] = ak.num(tau,axis=0)
 		
+		#Obtain the cross section scale factor	
+		if (self.isData):
+			CrossSec_Weight = 1 
+		else:
+			CrossSec_Weight = weight_calc(dataset,sumWEvents_Dict[dataset])
+		
 		#Fill histograms prior to trigger and all selections (excluding skimming) 
 		#Taus
-		h_tau_pT_NoTrigger.fill(ak.ravel(tau.pt))
-		h_tau_eta_NoTrigger.fill(ak.ravel(tau.eta))
-		h_tau_phi_NoTrigger.fill(ak.ravel(tau.phi))
-		h_tau_raw_iso_NoTrigger.fill(ak.ravel(tau.iso))
+		h_tau_pT_NoTrigger.fill(ak.ravel(tau.pt),weight=event_level.event_weight*CrossSec_Weight)
+		h_tau_eta_NoTrigger.fill(ak.ravel(tau.eta),weight=event_level.event_weight*CrossSec_Weight)
+		h_tau_phi_NoTrigger.fill(ak.ravel(tau.phi),weight=event_level.event_weight*CrossSec_Weight)
+		h_tau_raw_iso_NoTrigger.fill(ak.ravel(tau.iso),weight=event_level.event_weight*CrossSec_Weight)
 
 		#Electrons
-		h_electron_pT_NoTrigger.fill(ak.ravel(electron.pt))
-		h_electron_eta_NoTrigger.fill(ak.ravel(electron.eta))
-		h_electron_phi_NoTrigger.fill(ak.ravel(electron.phi))
+		h_electron_pT_NoTrigger.fill(ak.ravel(electron.pt),weight=event_level.event_weight*CrossSec_Weight)
+		h_electron_eta_NoTrigger.fill(ak.ravel(electron.eta),weight=event_level.event_weight*CrossSec_Weight)
+		h_electron_phi_NoTrigger.fill(ak.ravel(electron.phi),weight=event_level.event_weight*CrossSec_Weight)
 
 		#Muons
-		h_muon_pT_NoTrigger.fill(ak.ravel(muon.pt))
-		h_muon_eta_NoTrigger.fill(ak.ravel(muon.eta))
-		h_muon_phi_NoTrigger.fill(ak.ravel(muon.phi))
+		h_muon_pT_NoTrigger.fill(ak.ravel(muon.pt),weight=event_level.event_weight*CrossSec_Weight)
+		h_muon_eta_NoTrigger.fill(ak.ravel(muon.eta),weight=event_level.event_weight*CrossSec_Weight)
+		h_muon_phi_NoTrigger.fill(ak.ravel(muon.phi),weight=event_level.event_weight*CrossSec_Weight)
 
 		#Jets 
-		h_Jet_pT_NoTrigger.fill(ak.ravel(Jet.pt))
-		h_Jet_eta_NoTrigger.fill(ak.ravel(Jet.eta))
-		h_Jet_phi_NoTrigger.fill(ak.ravel(Jet.phi))
+		h_Jet_pT_NoTrigger.fill(ak.ravel(Jet.pt),weight=event_level.event_weight*CrossSec_Weight)
+		h_Jet_eta_NoTrigger.fill(ak.ravel(Jet.eta),weight=event_level.event_weight*CrossSec_Weight)
+		h_Jet_phi_NoTrigger.fill(ak.ravel(Jet.phi),weight=event_level.event_weight*CrossSec_Weight)
 
 		#AK8/Fat Jets
-		h_AK8Jet_pT_NoTrigger.fill(ak.ravel(AK8Jet.pt))
-		h_AK8Jet_eta_NoTrigger.fill(ak.ravel(AK8Jet.eta))
-		h_AK8Jet_phi_NoTrigger.fill(ak.ravel(AK8Jet.phi))
+		h_AK8Jet_pT_NoTrigger.fill(ak.ravel(AK8Jet.pt),weight=event_level.event_weight*CrossSec_Weight)
+		h_AK8Jet_eta_NoTrigger.fill(ak.ravel(AK8Jet.eta),weight=event_level.event_weight*CrossSec_Weight)
+		h_AK8Jet_phi_NoTrigger.fill(ak.ravel(AK8Jet.phi),weight=event_level.event_weight*CrossSec_Weight)
 		
 		print("Number of events before selection + Trigger: %d"%ak.num(tau,axis=0))
 
@@ -901,11 +907,33 @@ class FourTauPlotting(processor.ProcessorABC):
 		cutflow_table = hist.Hist.new.Reg(6,0,6,label="Cut flow",underflow = True, overflow = True).Double()
 		cutflow_dict["Trigger"] = ak.num(tau,axis=0) #Initial number of events
 		cutflow_table.fill(0,weight = ak.num(tau,axis=0))
-		#Fill Kinematics distributions
-		h_tau_pT_Trigger.fill(ak.ravel(tau.pt))
-		h_tau_eta_Trigger.fill(ak.ravel(tau.eta))
-		h_tau_phi_Trigger.fill(ak.ravel(tau.phi))
-		h_tau_raw_iso_Trigger.fill(ak.ravel(tau.iso))
+		
+		#Fill histograms after to trigger and all selections
+		#Taus
+		h_tau_pT_Trigger.fill(ak.ravel(tau.pt),weight=event_level.event_weight*CrossSec_Weight)
+		h_tau_eta_Trigger.fill(ak.ravel(tau.eta),weight=event_level.event_weight*CrossSec_Weight)
+		h_tau_phi_Trigger.fill(ak.ravel(tau.phi),weight=event_level.event_weight*CrossSec_Weight)
+		h_tau_raw_iso_Trigger.fill(ak.ravel(tau.iso),weight=event_level.event_weight*CrossSec_Weight)
+
+		#Electrons
+		h_electron_pT_Trigger.fill(ak.ravel(electron.pt),weight=event_level.event_weight*CrossSec_Weight)
+		h_electron_eta_Trigger.fill(ak.ravel(electron.eta),weight=event_level.event_weight*CrossSec_Weight)
+		h_electron_phi_Trigger.fill(ak.ravel(electron.phi),weight=event_level.event_weight*CrossSec_Weight)
+
+		#Muons
+		h_muon_pT_Trigger.fill(ak.ravel(muon.pt),weight=event_level.event_weight*CrossSec_Weight)
+		h_muon_eta_Trigger.fill(ak.ravel(muon.eta),weight=event_level.event_weight*CrossSec_Weight)
+		h_muon_phi_Trigger.fill(ak.ravel(muon.phi),weight=event_level.event_weight*CrossSec_Weight)
+
+		#Jets 
+		h_Jet_pT_Trigger.fill(ak.ravel(Jet.pt),weight=event_level.event_weight*CrossSec_Weight)
+		h_Jet_eta_Trigger.fill(ak.ravel(Jet.eta),weight=event_level.event_weight*CrossSec_Weight)
+		h_Jet_phi_Trigger.fill(ak.ravel(Jet.phi),weight=event_level.event_weight*CrossSec_Weight)
+
+		#AK8/Fat Jets
+		h_AK8Jet_pT_Trigger.fill(ak.ravel(AK8Jet.pt),weight=event_level.event_weight*CrossSec_Weight)
+		h_AK8Jet_eta_Trigger.fill(ak.ravel(AK8Jet.eta),weight=event_level.event_weight*CrossSec_Weight)
+		h_AK8Jet_phi_Trigger.fill(ak.ravel(AK8Jet.phi),weight=event_level.event_weight*CrossSec_Weight)
 		
 		print("Number of events (no selections post trigger): %d"%cutflow_dict["Trigger"])
 		print("Should also be Number of events (no selections post trigger): %d"%len(np.zeros(ak.num(tau,axis=0))))
@@ -1761,11 +1789,7 @@ class FourTauPlotting(processor.ProcessorABC):
 		#print(len(tau))
 		FourTau_Mass_Arr =four_mass([tau[:,0],tau[:,1],tau[:,2],tau[:,3]]) #ak.ravel(tau.FourMass)
 	
-		#Obtain the weight	
-		if (self.isData):
-			CrossSec_Weight = 1 
-		else:
-			CrossSec_Weight = weight_calc(dataset,sumWEvents_Dict[dataset])
+
 		#	print("=========!!!Weight Debugging!!!=========")
 		#	print(dataset)
 		#	print("Luminosity Weight = %f"%CrossSec_Weight)
@@ -2325,8 +2349,8 @@ if __name__ == "__main__":
 				sumWEvents_Dict[key_name] = 1
 
 		#break	
-		#background_list = [r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"]
-		background_list = [r"$ZZ \rightarrow 4l$"]
+		background_list = [r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"]
+		#background_list = [r"$ZZ \rightarrow 4l$"]
 		#background_list = [r"$t\bar{t}$"]
 		#background_list = [r"$t\bar{t}$", r"$ZZ \rightarrow 4l$"]
 		signal_list = [r"MC Sample $m_\phi$ = %s TeV"%mass[0]]
