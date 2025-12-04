@@ -480,30 +480,30 @@ class FourTauPlotting(processor.ProcessorABC):
 		
 		#Fill histograms prior to trigger and all selections (excluding skimming) 
 		#Taus
-		h_tau_pT_NoTrigger.fill(ak.ravel(tau.pt),weight=event_level.event_weight*CrossSec_Weight)
-		h_tau_eta_NoTrigger.fill(ak.ravel(tau.eta),weight=event_level.event_weight*CrossSec_Weight)
-		h_tau_phi_NoTrigger.fill(ak.ravel(tau.phi),weight=event_level.event_weight*CrossSec_Weight)
-		h_tau_raw_iso_NoTrigger.fill(ak.ravel(tau.iso),weight=event_level.event_weight*CrossSec_Weight)
+		h_tau_pT_NoTrigger.fill(tau.pt,weight=ak.broadcast_arrays(event_level.event_weight*CrossSec_Weight,ak.ones_like(tau.pt)[0]))
+		h_tau_eta_NoTrigger.fill(tau.eta,weight=ak.broadcast_arrays(event_level.event_weight*CrossSec_Weight,ak.ones_like(tau.eta)[0]))
+		h_tau_phi_NoTrigger.fill(tau.phi,weight=ak.broadcast_arrays(event_level.event_weight*CrossSec_Weight,ak.ones_like(tau.phi)[0]))
+		h_tau_raw_iso_NoTrigger.fill(tau.iso,weight=ak.broadcast_arrays(event_level.event_weight*CrossSec_Weight,ak.ones_like(tau.iso)[0]))
 
 		#Electrons
-		h_electron_pT_NoTrigger.fill(ak.ravel(electron.pt),weight=event_level.event_weight*CrossSec_Weight)
-		h_electron_eta_NoTrigger.fill(ak.ravel(electron.eta),weight=event_level.event_weight*CrossSec_Weight)
-		h_electron_phi_NoTrigger.fill(ak.ravel(electron.phi),weight=event_level.event_weight*CrossSec_Weight)
+		h_electron_pT_NoTrigger.fill(electron.pt,weight=ak.broadcast_arrays(event_level.event_weight*CrossSec_Weight,ak.ones_like(electron.pt)[0]))
+		h_electron_eta_NoTrigger.fill(electron.eta,weight=ak.broadcast_arrays(event_level.event_weight*CrossSec_Weight,ak.ones_like(electron.eta)[0]))
+		h_electron_phi_NoTrigger.fill(electron.phi,weight=ak.broadcast_arrays(event_level.event_weight*CrossSec_Weight,ak.ones_like(electron.phi)[0]))
 
 		#Muons
-		h_muon_pT_NoTrigger.fill(ak.ravel(muon.pt),weight=event_level.event_weight*CrossSec_Weight)
-		h_muon_eta_NoTrigger.fill(ak.ravel(muon.eta),weight=event_level.event_weight*CrossSec_Weight)
-		h_muon_phi_NoTrigger.fill(ak.ravel(muon.phi),weight=event_level.event_weight*CrossSec_Weight)
+		h_muon_pT_NoTrigger.fill(muon.pt,weight=ak.broadcast_arrays(event_level.event_weight*CrossSec_Weight,ak.ones_like(muon.pt)[0]))
+		h_muon_eta_NoTrigger.fill(muon.eta,weight=ak.broadcast_arrays(event_level.event_weight*CrossSec_Weight,ak.ones_like(muon.eta)[0]))
+		h_muon_phi_NoTrigger.fill(muon.phi,weight=ak.broadcast_arrays(event_level.event_weight*CrossSec_Weight,ak.ones_like(muon.phi)[0]))
 
 		#Jets 
-		h_Jet_pT_NoTrigger.fill(ak.ravel(Jet.pt),weight=event_level.event_weight*CrossSec_Weight)
-		h_Jet_eta_NoTrigger.fill(ak.ravel(Jet.eta),weight=event_level.event_weight*CrossSec_Weight)
-		h_Jet_phi_NoTrigger.fill(ak.ravel(Jet.phi),weight=event_level.event_weight*CrossSec_Weight)
+		h_Jet_pT_NoTrigger.fill(Jet.pt,weight=ak.broadcast_arrays(event_level.event_weight*CrossSec_Weight,ak.ones_like(Jet.pt)[0]))
+		h_Jet_eta_NoTrigger.fill(Jet.eta,weight=ak.broadcast_arrays(event_level.event_weight*CrossSec_Weight,ak.ones_like(Jet.eta)[0]))
+		h_Jet_phi_NoTrigger.fill(Jet.phi,weight=ak.broadcast_arrays(event_level.event_weight*CrossSec_Weight,ak.ones_like(Jet.phi)[0]))
 
 		#AK8/Fat Jets
-		h_AK8Jet_pT_NoTrigger.fill(ak.ravel(AK8Jet.pt),weight=event_level.event_weight*CrossSec_Weight)
-		h_AK8Jet_eta_NoTrigger.fill(ak.ravel(AK8Jet.eta),weight=event_level.event_weight*CrossSec_Weight)
-		h_AK8Jet_phi_NoTrigger.fill(ak.ravel(AK8Jet.phi),weight=event_level.event_weight*CrossSec_Weight)
+		h_AK8Jet_pT_NoTrigger.fill(AK8Jet.pt,weight=ak.broadcast_arrays(event_level.event_weight*CrossSec_Weight,ak.ones_like(AK8Jet.pt)[0]))
+		h_AK8Jet_eta_NoTrigger.fill(AK8Jet.eta,weight=ak.broadcast_arrays(event_level.event_weight*CrossSec_Weight,ak.ones_like(AK8Jet.eta)[0]))
+		h_AK8Jet_phi_NoTrigger.fill(AK8Jet.phi,weight=ak.broadcast_arrays(event_level.event_weight*CrossSec_Weight,ak.ones_like(AK8Jet.phi)[0]))
 		
 		print("Number of events before selection + Trigger: %d"%ak.num(tau,axis=0))
 
@@ -910,30 +910,30 @@ class FourTauPlotting(processor.ProcessorABC):
 		
 		#Fill histograms after to trigger and all selections
 		#Taus
-		h_tau_pT_Trigger.fill(ak.ravel(tau.pt),weight=event_level.event_weight*CrossSec_Weight)
-		h_tau_eta_Trigger.fill(ak.ravel(tau.eta),weight=event_level.event_weight*CrossSec_Weight)
-		h_tau_phi_Trigger.fill(ak.ravel(tau.phi),weight=event_level.event_weight*CrossSec_Weight)
-		h_tau_raw_iso_Trigger.fill(ak.ravel(tau.iso),weight=event_level.event_weight*CrossSec_Weight)
+		h_tau_pT_Trigger.fill(tau.pt,weight=ak.broadcast_arrays(event_level.event_weight*CrossSec_Weight,ak.ones_like(tau.pt)[0]))
+		h_tau_eta_Trigger.fill(tau.eta,weight=ak.broadcast_arrays(event_level.event_weight*CrossSec_Weight,ak.ones_like(tau.eta)[0]))
+		h_tau_phi_Trigger.fill(tau.phi,weight=ak.broadcast_arrays(event_level.event_weight*CrossSec_Weight,ak.ones_like(tau.phi)[0]))
+		h_tau_raw_iso_Trigger.fill(tau.iso,weight=ak.broadcast_arrays(event_level.event_weight*CrossSec_Weight,ak.ones_like(tau.iso)[0]))
 
 		#Electrons
-		h_electron_pT_Trigger.fill(ak.ravel(electron.pt),weight=event_level.event_weight*CrossSec_Weight)
-		h_electron_eta_Trigger.fill(ak.ravel(electron.eta),weight=event_level.event_weight*CrossSec_Weight)
-		h_electron_phi_Trigger.fill(ak.ravel(electron.phi),weight=event_level.event_weight*CrossSec_Weight)
+		h_electron_pT_Trigger.fill(electron.pt,weight=ak.broadcast_arrays(event_level.event_weight*CrossSec_Weight,ak.ones_like(electron.pt)[0]))
+		h_electron_eta_Trigger.fill(electron.eta,weight=ak.broadcast_arrays(event_level.event_weight*CrossSec_Weight,ak.ones_like(electron.eta)[0]))
+		h_electron_phi_Trigger.fill(electron.phi,weight=ak.broadcast_arrays(event_level.event_weight*CrossSec_Weight,ak.ones_like(electron.phi)[0]))
 
 		#Muons
-		h_muon_pT_Trigger.fill(ak.ravel(muon.pt),weight=event_level.event_weight*CrossSec_Weight)
-		h_muon_eta_Trigger.fill(ak.ravel(muon.eta),weight=event_level.event_weight*CrossSec_Weight)
-		h_muon_phi_Trigger.fill(ak.ravel(muon.phi),weight=event_level.event_weight*CrossSec_Weight)
+		h_muon_pT_Trigger.fill(muon.pt,weight=ak.broadcast_arrays(event_level.event_weight*CrossSec_Weight,ak.ones_like(muon.pt)[0]))
+		h_muon_eta_Trigger.fill(muon.eta,weight=ak.broadcast_arrays(event_level.event_weight*CrossSec_Weight,ak.ones_like(muon.eta)[0]))
+		h_muon_phi_Trigger.fill(muon.phi,weight=ak.broadcast_arrays(event_level.event_weight*CrossSec_Weight,ak.ones_like(muon.phi)[0]))
 
 		#Jets 
-		h_Jet_pT_Trigger.fill(ak.ravel(Jet.pt),weight=event_level.event_weight*CrossSec_Weight)
-		h_Jet_eta_Trigger.fill(ak.ravel(Jet.eta),weight=event_level.event_weight*CrossSec_Weight)
-		h_Jet_phi_Trigger.fill(ak.ravel(Jet.phi),weight=event_level.event_weight*CrossSec_Weight)
+		h_Jet_pT_Trigger.fill(Jet.pt,weight=ak.broadcast_arrays(event_level.event_weight*CrossSec_Weight,ak.ones_like(Jet.pt)[0]))
+		h_Jet_eta_Trigger.fill(Jet.eta,weight=ak.broadcast_arrays(event_level.event_weight*CrossSec_Weight,ak.ones_like(Jet.eta)[0]))
+		h_Jet_phi_Trigger.fill(Jet.phi,weight=ak.broadcast_arrays(event_level.event_weight*CrossSec_Weight,ak.ones_like(Jet.phi)[0]))
 
 		#AK8/Fat Jets
-		h_AK8Jet_pT_Trigger.fill(ak.ravel(AK8Jet.pt),weight=event_level.event_weight*CrossSec_Weight)
-		h_AK8Jet_eta_Trigger.fill(ak.ravel(AK8Jet.eta),weight=event_level.event_weight*CrossSec_Weight)
-		h_AK8Jet_phi_Trigger.fill(ak.ravel(AK8Jet.phi),weight=event_level.event_weight*CrossSec_Weight)
+		h_AK8Jet_pT_Trigger.fill(AK8Jet.pt,weight=ak.broadcast_arrays(event_level.event_weight*CrossSec_Weight,ak.ones_like(AK8Jet.pt)[0]))
+		h_AK8Jet_eta_Trigger.fill(AK8Jet.eta,weight=ak.broadcast_arrays(event_level.event_weight*CrossSec_Weight,ak.ones_like(AK8Jet.eta)[0]))
+		h_AK8Jet_phi_Trigger.fill(AK8Jet.phi,weight=ak.broadcast_arrays(event_level.event_weight*CrossSec_Weight,ak.ones_like(AK8Jet.phi)[0]))
 		
 		print("Number of events (no selections post trigger): %d"%cutflow_dict["Trigger"])
 		print("Should also be Number of events (no selections post trigger): %d"%len(np.zeros(ak.num(tau,axis=0))))
