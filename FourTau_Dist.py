@@ -368,7 +368,8 @@ class FourTauPlotting(processor.ProcessorABC):
 			#GenTau_Num = ak.num(np.bitwise_and(np.abs(Gen_Info.MCId) == 15, np.abs(Gen_Info.MotherId) != 15),axis=1) #Get the number of Generated taus that decayed from something
 			GenTau_Num = ak.num(Gen_Info[np.abs(Gen_Info.MCId) == 15],axis=1)
 			#event_level["event_weight"] = event_level.event_weight**GenTau_Num #GenTau_Num #Apply weightings based on Gen Taus
-			event_level["event_weight"] = np.multiply(events.genWeight, (event_level.event_weight*0.9)**GenTau_Num) #GenTau_Num #Apply weightings based on Gen Taus
+			#event_level["event_weight"] = np.multiply(events.genWeight, (event_level.event_weight*0.9)**GenTau_Num) #GenTau_Num #Apply weightings based on Gen Taus
+			event_level["event_weight"] = events.genWeight #GenTau_Num 
 			#event_level["event_weight"] = events.genWeight #GenTau_Num #Apply weightings based on Gen Taus
 			dummy_weight = event_level["event_weight"]
 			#Debugg/test Gen Tau Weighting
@@ -409,7 +410,7 @@ class FourTauPlotting(processor.ProcessorABC):
 
 			if (self.PU_bool): #Apply PU reweighting scheme
 				PU_Arr = np.array(np.rint(ak.flatten(PU_Info.puTrue,axis=-1)),dtype = np.int8)
-				PU_Corr = self.PUWeights[PU_Arr] #This may be causing problmes, though I'm not sure, do I need the golden JSON thing to correctly do PU reweighting??? 
+				PU_Corr = self.PUWeights[PU_Arr]  
 				event_level["event_weight"] = np.multiply(event_level.event_weight,PU_Corr) #Is this line screwing things up??
 				#Debugg/gest PU reweighting
 				#for i in range(len(event_level.event_weight)):
@@ -479,31 +480,6 @@ class FourTauPlotting(processor.ProcessorABC):
 			CrossSec_Weight = weight_calc(dataset,sumWEvents_Dict[dataset])
 		
 		#Fill histograms prior to trigger and all selections (excluding skimming) 
-		#Taus
-		h_tau_pT_NoTrigger.fill(tau.pt,weight=ak.broadcast_arrays(event_level.event_weight*CrossSec_Weight,ak.ones_like(tau.pt)[0]))
-		h_tau_eta_NoTrigger.fill(tau.eta,weight=ak.broadcast_arrays(event_level.event_weight*CrossSec_Weight,ak.ones_like(tau.eta)[0]))
-		h_tau_phi_NoTrigger.fill(tau.phi,weight=ak.broadcast_arrays(event_level.event_weight*CrossSec_Weight,ak.ones_like(tau.phi)[0]))
-		h_tau_raw_iso_NoTrigger.fill(tau.iso,weight=ak.broadcast_arrays(event_level.event_weight*CrossSec_Weight,ak.ones_like(tau.iso)[0]))
-
-		#Electrons
-		h_electron_pT_NoTrigger.fill(electron.pt,weight=ak.broadcast_arrays(event_level.event_weight*CrossSec_Weight,ak.ones_like(electron.pt)[0]))
-		h_electron_eta_NoTrigger.fill(electron.eta,weight=ak.broadcast_arrays(event_level.event_weight*CrossSec_Weight,ak.ones_like(electron.eta)[0]))
-		h_electron_phi_NoTrigger.fill(electron.phi,weight=ak.broadcast_arrays(event_level.event_weight*CrossSec_Weight,ak.ones_like(electron.phi)[0]))
-
-		#Muons
-		h_muon_pT_NoTrigger.fill(muon.pt,weight=ak.broadcast_arrays(event_level.event_weight*CrossSec_Weight,ak.ones_like(muon.pt)[0]))
-		h_muon_eta_NoTrigger.fill(muon.eta,weight=ak.broadcast_arrays(event_level.event_weight*CrossSec_Weight,ak.ones_like(muon.eta)[0]))
-		h_muon_phi_NoTrigger.fill(muon.phi,weight=ak.broadcast_arrays(event_level.event_weight*CrossSec_Weight,ak.ones_like(muon.phi)[0]))
-
-		#Jets 
-		h_Jet_pT_NoTrigger.fill(Jet.pt,weight=ak.broadcast_arrays(event_level.event_weight*CrossSec_Weight,ak.ones_like(Jet.pt)[0]))
-		h_Jet_eta_NoTrigger.fill(Jet.eta,weight=ak.broadcast_arrays(event_level.event_weight*CrossSec_Weight,ak.ones_like(Jet.eta)[0]))
-		h_Jet_phi_NoTrigger.fill(Jet.phi,weight=ak.broadcast_arrays(event_level.event_weight*CrossSec_Weight,ak.ones_like(Jet.phi)[0]))
-
-		#AK8/Fat Jets
-		h_AK8Jet_pT_NoTrigger.fill(AK8Jet.pt,weight=ak.broadcast_arrays(event_level.event_weight*CrossSec_Weight,ak.ones_like(AK8Jet.pt)[0]))
-		h_AK8Jet_eta_NoTrigger.fill(AK8Jet.eta,weight=ak.broadcast_arrays(event_level.event_weight*CrossSec_Weight,ak.ones_like(AK8Jet.eta)[0]))
-		h_AK8Jet_phi_NoTrigger.fill(AK8Jet.phi,weight=ak.broadcast_arrays(event_level.event_weight*CrossSec_Weight,ak.ones_like(AK8Jet.phi)[0]))
 		
 		print("Number of events before selection + Trigger: %d"%ak.num(tau,axis=0))
 
@@ -910,30 +886,30 @@ class FourTauPlotting(processor.ProcessorABC):
 		
 		#Fill histograms after to trigger and all selections
 		#Taus
-		h_tau_pT_Trigger.fill(tau.pt,weight=ak.broadcast_arrays(event_level.event_weight*CrossSec_Weight,ak.ones_like(tau.pt)[0]))
-		h_tau_eta_Trigger.fill(tau.eta,weight=ak.broadcast_arrays(event_level.event_weight*CrossSec_Weight,ak.ones_like(tau.eta)[0]))
-		h_tau_phi_Trigger.fill(tau.phi,weight=ak.broadcast_arrays(event_level.event_weight*CrossSec_Weight,ak.ones_like(tau.phi)[0]))
-		h_tau_raw_iso_Trigger.fill(tau.iso,weight=ak.broadcast_arrays(event_level.event_weight*CrossSec_Weight,ak.ones_like(tau.iso)[0]))
+		h_tau_pT_Trigger.fill(ak.ravel(tau.pt),weight=ak.ravel(ak.broadcast_arrays(ak.ravel(event_level.event_weight*CrossSec_Weight),ak.ones_like(tau.pt))[0]))
+		h_tau_eta_Trigger.fill(ak.ravel(tau.eta),weight=ak.ravel(ak.broadcast_arrays(ak.ravel(event_level.event_weight*CrossSec_Weight),ak.ones_like(tau.eta))[0]))
+		h_tau_phi_Trigger.fill(ak.ravel(tau.phi),weight=ak.ravel(ak.broadcast_arrays(ak.ravel(event_level.event_weight*CrossSec_Weight),ak.ones_like(tau.phi))[0]))
+		h_tau_raw_iso_Trigger.fill(ak.ravel(tau.iso),weight=ak.ravel(ak.broadcast_arrays(ak.ravel(event_level.event_weight*CrossSec_Weight),ak.ones_like(tau.iso))[0]))
 
 		#Electrons
-		h_electron_pT_Trigger.fill(electron.pt,weight=ak.broadcast_arrays(event_level.event_weight*CrossSec_Weight,ak.ones_like(electron.pt)[0]))
-		h_electron_eta_Trigger.fill(electron.eta,weight=ak.broadcast_arrays(event_level.event_weight*CrossSec_Weight,ak.ones_like(electron.eta)[0]))
-		h_electron_phi_Trigger.fill(electron.phi,weight=ak.broadcast_arrays(event_level.event_weight*CrossSec_Weight,ak.ones_like(electron.phi)[0]))
+		h_electron_pT_Trigger.fill(ak.ravel(electron.pt),weight=ak.ravel(ak.broadcast_arrays(ak.ravel(event_level.event_weight*CrossSec_Weight),ak.ones_like(electron.pt))[0]))
+		h_electron_eta_Trigger.fill(ak.ravel(electron.eta),weight=ak.ravel(ak.broadcast_arrays(ak.ravel(event_level.event_weight*CrossSec_Weight),ak.ones_like(electron.eta))[0]))
+		h_electron_phi_Trigger.fill(ak.ravel(electron.phi),weight=ak.ravel(ak.broadcast_arrays(ak.ravel(event_level.event_weight*CrossSec_Weight),ak.ones_like(electron.phi))[0]))
 
 		#Muons
-		h_muon_pT_Trigger.fill(muon.pt,weight=ak.broadcast_arrays(event_level.event_weight*CrossSec_Weight,ak.ones_like(muon.pt)[0]))
-		h_muon_eta_Trigger.fill(muon.eta,weight=ak.broadcast_arrays(event_level.event_weight*CrossSec_Weight,ak.ones_like(muon.eta)[0]))
-		h_muon_phi_Trigger.fill(muon.phi,weight=ak.broadcast_arrays(event_level.event_weight*CrossSec_Weight,ak.ones_like(muon.phi)[0]))
+		h_muon_pT_Trigger.fill(ak.ravel(muon.pt),weight=ak.ravel(ak.broadcast_arrays(ak.ravel(event_level.event_weight*CrossSec_Weight),ak.ones_like(muon.pt))[0]))
+		h_muon_eta_Trigger.fill(ak.ravel(muon.eta),weight=ak.ravel(ak.broadcast_arrays(ak.ravel(event_level.event_weight*CrossSec_Weight),ak.ones_like(muon.eta))[0]))
+		h_muon_phi_Trigger.fill(ak.ravel(muon.phi),weight=ak.ravel(ak.broadcast_arrays(ak.ravel(event_level.event_weight*CrossSec_Weight),ak.ones_like(muon.phi))[0]))
 
 		#Jets 
-		h_Jet_pT_Trigger.fill(Jet.pt,weight=ak.broadcast_arrays(event_level.event_weight*CrossSec_Weight,ak.ones_like(Jet.pt)[0]))
-		h_Jet_eta_Trigger.fill(Jet.eta,weight=ak.broadcast_arrays(event_level.event_weight*CrossSec_Weight,ak.ones_like(Jet.eta)[0]))
-		h_Jet_phi_Trigger.fill(Jet.phi,weight=ak.broadcast_arrays(event_level.event_weight*CrossSec_Weight,ak.ones_like(Jet.phi)[0]))
+		h_Jet_pT_Trigger.fill(ak.ravel(Jet.pt),weight=ak.ravel(ak.broadcast_arrays(ak.ravel(event_level.event_weight*CrossSec_Weight),ak.ones_like(Jet.pt))[0]))
+		h_Jet_eta_Trigger.fill(ak.ravel(Jet.eta),weight=ak.ravel(ak.broadcast_arrays(ak.ravel(event_level.event_weight*CrossSec_Weight),ak.ones_like(Jet.eta))[0]))
+		h_Jet_phi_Trigger.fill(ak.ravel(Jet.phi),weight=ak.ravel(ak.broadcast_arrays(ak.ravel(event_level.event_weight*CrossSec_Weight),ak.ones_like(Jet.phi))[0]))
 
 		#AK8/Fat Jets
-		h_AK8Jet_pT_Trigger.fill(AK8Jet.pt,weight=ak.broadcast_arrays(event_level.event_weight*CrossSec_Weight,ak.ones_like(AK8Jet.pt)[0]))
-		h_AK8Jet_eta_Trigger.fill(AK8Jet.eta,weight=ak.broadcast_arrays(event_level.event_weight*CrossSec_Weight,ak.ones_like(AK8Jet.eta)[0]))
-		h_AK8Jet_phi_Trigger.fill(AK8Jet.phi,weight=ak.broadcast_arrays(event_level.event_weight*CrossSec_Weight,ak.ones_like(AK8Jet.phi)[0]))
+		h_AK8Jet_pT_Trigger.fill(ak.ravel(AK8Jet.pt),weight=ak.ravel(ak.broadcast_arrays(ak.ravel(event_level.event_weight*CrossSec_Weight),ak.ones_like(AK8Jet.pt))[0]))
+		h_AK8Jet_eta_Trigger.fill(ak.ravel(AK8Jet.eta),weight=ak.ravel(ak.broadcast_arrays(ak.ravel(event_level.event_weight*CrossSec_Weight),ak.ones_like(AK8Jet.eta))[0]))
+		h_AK8Jet_phi_Trigger.fill(ak.ravel(AK8Jet.phi),weight=ak.ravel(ak.broadcast_arrays(ak.ravel(event_level.event_weight*CrossSec_Weight),ak.ones_like(AK8Jet.phi))[0]))
 		
 		print("Number of events (no selections post trigger): %d"%cutflow_dict["Trigger"])
 		print("Should also be Number of events (no selections post trigger): %d"%len(np.zeros(ak.num(tau,axis=0))))
@@ -2050,41 +2026,25 @@ class FourTauPlotting(processor.ProcessorABC):
 				"weight_Hist": h_weight,
 				"cutflow_dict": cutflow_dict,
 				#Tau kineamtic distirubtions
-				"tau_pt_NoTrigg": h_tau_pT_NoTrigger,
 				"tau_pt_Trigg": h_tau_pT_Trigger,
-				"tau_eta_NoTrigg": h_tau_eta_NoTrigger,
 				"tau_eta_Trigg": h_tau_eta_Trigger,
-				"tau_phi_NoTrigg": h_tau_phi_NoTrigger,
 				"tau_phi_Trigg": h_tau_phi_Trigger,
-				"tau_iso_NoTrigg": h_tau_raw_iso_NoTrigger,
 				"tau_iso_Trigg": h_tau_raw_iso_Trigger,
 				#Electron kineamtic distirubtions
-				"electron_pt_NoTrigg": h_electron_pT_NoTrigger,
 				"electron_pt_Trigg": h_electron_pT_Trigger,
-				"electron_eta_NoTrigg": h_electron_eta_NoTrigger,
 				"electron_eta_Trigg": h_electron_eta_Trigger,
-				"electron_phi_NoTrigg": h_electron_phi_NoTrigger,
 				"electron_phi_Trigg": h_electron_phi_Trigger,
 				#Muon kineamtic distirubtions
-				"muon_pt_NoTrigg": h_muon_pT_NoTrigger,
 				"muon_pt_Trigg": h_muon_pT_Trigger,
-				"muon_eta_NoTrigg": h_muon_eta_NoTrigger,
 				"muon_eta_Trigg": h_muon_eta_Trigger,
-				"muon_phi_NoTrigg": h_muon_phi_NoTrigger,
 				"muon_phi_Trigg": h_muon_phi_Trigger,
 				#Jet kineamtic distirubtions
-				"Jet_pt_NoTrigg": h_Jet_pT_NoTrigger,
 				"Jet_pt_Trigg": h_Jet_pT_Trigger,
-				"Jet_eta_NoTrigg": h_Jet_eta_NoTrigger,
 				"Jet_eta_Trigg": h_Jet_eta_Trigger,
-				"Jet_phi_NoTrigg": h_Jet_phi_NoTrigger,
 				"Jet_phi_Trigg": h_Jet_phi_Trigger,
 				#AK8Jet kineamtic distirubtions
-				"AK8Jet_pt_NoTrigg": h_AK8Jet_pT_NoTrigger,
 				"AK8Jet_pt_Trigg": h_AK8Jet_pT_Trigger,
-				"AK8Jet_eta_NoTrigg": h_AK8Jet_eta_NoTrigger,
 				"AK8Jet_eta_Trigg": h_AK8Jet_eta_Trigger,
-				"AK8Jet_phi_NoTrigg": h_AK8Jet_phi_NoTrigger,
 				"AK8Jet_phi_Trigg": h_AK8Jet_phi_Trigger,
 			}
 		}
@@ -2131,12 +2091,12 @@ if __name__ == "__main__":
 	#Trigger dictionaries
 	#trigger_dict = {"Mu50": (21,False), "PFMET120_PFMHT120_IDTight": (27,False), "EitherOr_Trigger": (41,True)}
 	#trigger_dict = {"Mu50": (21,False), "PFMET120_PFMHT120_IDTight": (27,False), "EitherOr_Trigger": (41,True)}
-	trigger_dict = {"EitherOr_Trigger": (41,True)}
+	#trigger_dict = {"EitherOr_Trigger": (41,True)}
 	#trigger_dict = {"Mu50": (21,False)}
 	#trigger_dict = {"PFHT500_PFMET100_PFMHT100_IDTight": (39,False)} #,"EitherOr_Trigger": (41,True)}
 	#trigger_dict = {"Mu50": (21,False), "EitherOr_Trigger": (41,True)}
 	#trigger_dict = {"Mu50": (21,False), "PFHT500_PFMET100_PFMHT100_IDTight": (39,False), "EitherOr_Trigger": (41,True)}
-	#trigger_dict = {"Mu50": (21,False), "PFHT500_PFMET100_PFMHT100_IDTight": (39,False)} #,"EitherOr_Trigger": (41,True)}
+	trigger_dict = {"Mu50": (21,False), "PFHT500_PFMET100_PFMHT100_IDTight": (39,False)} #,"EitherOr_Trigger": (41,True)}
 	#trigger_dict = {"No_Trigger": (0,False)}
 	#trigger_dict = {"PFHT500_PFMET100_PFMHT100_IDTight": (39,False), "AK8PFJet400_TrimMass30": (40,False), "EitherOr_Trigger": (41,True)}
 	
@@ -2211,11 +2171,11 @@ if __name__ == "__main__":
 			"ZMult_Arr", "BJet_Arr", "tau_lead_pt_Arr", "tau_sublead_pt_Arr", "tau_3rdlead_pt_Arr", "tau_4thlead_pt_Arr", "leading_dPhi_Arr", "subleading_dPhi_Arr", 
 			"radionMET_dPhi_Arr","leadingHiggs_Rad_dR_Arr","subleadingHiggs_Rad_dR_Arr","leadingHiggs_MET_dPhi_Arr","subleadingHiggs_MET_dPhi_Arr","Radion_eta_Arr", "Radion_Charge_Arr",
 			"LeadingHiggsSgn_Arr", "SubleadingHiggsSgn_Arr","Num_Electrons_Arr","Num_Muons_Arr","cutflow_table",
-			"tau_pt_NoTrigg","tau_pt_NoTrigg","tau_eta_NoTrigg","tau_eta_Trigg","tau_phi_NoTrigg","tau_phi_Trigg",
-			"electron_pt_NoTrigg","electron_pt_Trigg","electron_eta_NoTrigg","electron_eta_Trigg","electron_phi_NoTrigg","electron_phi_Trigg",
-			"muon_pt_NoTrigg","muon_pt_Trigg","muon_eta_NoTrigg","muon_eta_Trigg","muon_phi_NoTrigg","muon_phi_Trigg",
-			"Jet_pt_NoTrigg","Jet_pt_Trigg","Jet_eta_NoTrigg","Jet_eta_Trigg","Jet_phi_NoTrigg","Jet_phi_Trigg",
-			"AK8Jet_pt_NoTrigg","AK8Jet_pt_Trigg","AK8Jet_eta_NoTrigg","AK8Jet_eta_Trigg","AK8Jet_phi_NoTrigg","AK8Jet_phi_Trigg",
+			"tau_pt_Trigg","tau_eta_Trigg","tau_phi_Trigg",
+			"electron_pt_Trigg","electron_eta_Trigg","electron_phi_Trigg",
+			"muon_pt_Trigg","muon_eta_Trigg","muon_phi_Trigg",
+			"Jet_pt_Trigg","Jet_eta_Trigg","Jet_phi_Trigg",
+			"AK8Jet_pt_Trigg","AK8Jet_eta_Trigg","AK8Jet_phi_Trigg",
 			] #,"num_electron_tau_Arr","num_muon_tau_Arr"] #,"Electron_tau_dR_Arr","Muon_tau_dR_Arr"] (Removed num_electron_tau and num_muon_tau for now)
 	#four_tau_hist_list = ["Num_Electrons_Arr","Num_Muons_Arr","Electron_tau_dR_Arr","Muon_tau_dR_Arr"]
 	#four_tau_hist_list = ["ZMult_Arr"] #,"ZMult_ele_Arr","ZMult_mu_Arr", "ZMult_tau_Arr"]
