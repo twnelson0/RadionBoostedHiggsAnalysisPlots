@@ -136,20 +136,37 @@ def bit_or(data):
 #Dictionary of cross sections 
 xSection_Dictionary = {"Signal": 0.01, #Chosen to make plots readable
 						#TTBar Background
-						"TTTo2L2Nu": 831.76*TT_FullLep_BR, "TTToSemiLeptonic": 831.76*TT_SemiLep_BR, "TTToHadronic": 831.76*TT_Had_BR,
+						#"TTTo2L2Nu": 831.76*TT_FullLep_BR, "TTToSemiLeptonic": 831.76*TT_SemiLep_BR, "TTToHadronic": 831.76*TT_Had_BR,
+						"TTTo2L2Nu": 97.5595, "TTToSemiLeptonic": 381.0923, "TTToHadronic": 365.2482,
+						
 						#DiBoson Background
-						"ZZ2l2q": 3.22, "WZ3l1nu": 4.708, "WZ2l2q": 5.595, "WZ1l1nu2q": 10.71, "VV2l2nu": 11.95, "WZ1l3nu": 3.05, #"WZ3l1nu.root" : 27.57,
+						#"ZZ2l2q": 3.22, "WZ3l1nu": 4.708, "WZ2l2q": 5.595, "WZ1l1nu2q": 10.71, "VV2l2nu": 11.95, "WZ1l3nu": 3.05, #"WZ3l1nu.root" : 27.57,
+						"ZZ2l2q": 3.676, "WZ3l1nu": , "WZ2l2q": 6.565, "WZ1l1nu2q": 9.119, "WZ1l3nu": 3.414, "VV2l2nu": 11.09, #"WZ3l1nu.root" : 27.57,
+						
 						#ZZ->4l
-						"ZZ4l": 1.212,
+						"ZZ4l": 1.325,
 						#DiBoson continued
 						#"ZZTo2L2Nu_powheg": 0.564, "ZZTo2L2Q_amcNLO": 3.22, "ZZTo4L_powheg": 1.212, "WWTo2L2Nu_powheg": 12.178, "WWTo4Q_powheg": 51.723, "WWTo1LNuQQ_powheg": 49.997, 
 						#"WZTo1L3Nu_amcatnloFXFX": 3.033, "WZTo2L2Q_amcNLO": 5.595, "WZTo3LNu_amcNLO": 4.42965, "WZTo1L1Nu2Q_amcNLO": 10.71, "WW1l1nu2q": 49.997, "WZ1l3nu": 3.05,
 						#Single Top Background
-						"Tbar-tchan": 26.23, "T-tchan": 44.07, "Tbar-tW": 35.6, "T-tW": 35.6, 
+						#"Tbar-tchan": 26.23, "T-tchan": 44.07, "Tbar-tW": 35.6, "T-tW": 35.6, 
+						"Tbar-tchan": 80.8, "T-tchan": 134.2, "Tbar-tW": 39.65, "T-tW": 39.65, 
 						#Drell-Yan Jets
-						"DYJetsToLL_Pt-50To100": 387.130778, "DYJetsToLL_Pt-100To250": 89.395097,"DYJetsToLL_Pt-250To400": 3.435181, "DYJetsToLL_Pt-400To650": 0.464024, "DYJetsToLL_Pt-650ToInf": 0.043602,
+                        "DYJetsToLL_M-4to50_HT-70to100": 314.8,
+                        "DYJetsToLL_M-4to50_HT-100to200": 190.6,
+                        "DYJetsToLL_M-4to50_HT-200to400": 42.27,
+                        "DYJetsToLL_M-4to50_HT-400to600": 173.8,
+                        "DYJetsToLL_M-4to50_HT-600toInf": 1.216,
+                        "DYJetsToLL_M-50_HT-70to100": 140.0,
+                        "DYJetsToLL_M-50_HT-100to200": 139.2,
+                        "DYJetsToLL_M-50_HT-200to400": 38.4,
+                        "DYJetsToLL_M-50_HT-400to600": 5.174,
+                        "DYJetsToLL_M-50_HT-600to800": 1.258,
+                        "DYJetsToLL_M-50_HT-800to1200": 0.5598,
+                        "DYJetsToLL_M-50_HT-1200to2500": 0.1305,
+                        "DYJetsToLL_M-50_HT-2500toInf": 0.002997,
 						#WJets
-						"WJetsToLNu_HT-100To200" : 1345*WScaleFactor, "WJetsToLNu_HT-200To400": 359.7*WScaleFactor, "WJetsToLNu_HT-400To600": 48.91*WScaleFactor, "WJetsToLNu_HT-600To800": 12.05*WScaleFactor, "WJetsToLNu_HT-800To1200": 5.501*WScaleFactor, "WJetsToLNu_HT-1200To2500" : 1.329*WScaleFactor, "WJetsToLNu_HT-2500ToInf" : 0.03216*WScaleFactor, 
+						"WJetsToLNu_HT-100To200" : 1244.0, "WJetsToLNu_HT-200To400": 337.8, "WJetsToLNu_HT-400To600": 44.93, "WJetsToLNu_HT-600To800": 11.09, "WJetsToLNu_HT-800To1200": 4.926, "WJetsToLNu_HT-1200To2500" : 1.152, "WJetsToLNu_HT-2500ToInf" : 0.02646, 
 						#SM Higgs
 						"ZH125": 0.7544*0.0621, "ggZHLL125":0.1223 * 0.062 * 3 * 0.033658, "ggZHNuNu125": 0.1223*0.062*0.2,"ggZHQQ125": 0.1223*0.062*0.6991, "toptopH125": 0.5033*0.062, #"ggH125": 48.30* 0.0621, "qqH125": 3.770 * 0.0621, "WPlusH125": 
 						#QCD
@@ -2260,11 +2277,19 @@ if __name__ == "__main__":
 			"ZZ2l2q": [background_base + "ZZTo2Q2L_26August25_1034_skim_Newskim/ZZTo2Q2L.root"],
 			"WZ2l2q": [background_base + "WZTo2L2Q_26August25_0926_skim_Newskim/WZTo2L2Q.root"],
 			"WZ1l1nu2q" : [background_base + "WZTo1L1Nu2Q_26August25_0840_skim_Newskim/WZTo1L1Nu2Q.root"],
-			"DYJetsToLL_Pt-50To100": [background_base + "DYJetsToLL_LHEFilterPtZ-50To100_MatchEWPDG20_26August25_1018_skim_Newskim/DYJetsToLL_LHEFilterPtZ-50To100_MatchEWPDG20.root"],
-			"DYJetsToLL_Pt-100To250": [background_base + "DYJetsToLL_LHEFilterPtZ-100To250_MatchEWPDG20_26August25_0917_skim_Newskim/DYJetsToLL_LHEFilterPtZ-100To250_MatchEWPDG20.root"], 
-			"DYJetsToLL_Pt-250To400": [background_base + "DYJetsToLL_LHEFilterPtZ-250To400_MatchEWPDG20_26August25_0748_skim_Newskim/DYJetsToLL_LHEFilterPtZ-250To400_MatchEWPDG20.root"], 
-			"DYJetsToLL_Pt-400To650": [background_base + "DYJetsToLL_LHEFilterPtZ-400To650_MatchEWPDG20_26August25_1042_skim_Newskim/DYJetsToLL_LHEFilterPtZ-400To650_MatchEWPDG20.root"], 
-			"DYJetsToLL_Pt-650ToInf": [background_base + "DYJetsToLL_LHEFilterPtZ-650ToInf_MatchEWPDG20_26August25_0842_skim_Newskim/DYJetsToLL_LHEFilterPtZ-650ToInf_MatchEWPDG20.root"],
+            "DYJetsToLL_M-4to50_HT-70to100": [background_base + "DYJetsToLL_M-4to50_HT-70to100_12December25_0352_skim_Newskim/DYJetsToLL_M-4to50_HT-70to100.root"],
+            "DYJetsToLL_M-4to50_HT-100to200": [background_base + "DYJetsToLL_M-4to50_HT-100to200_12December25_0350_skim_Newskim/DYJetsToLL_M-4to50_HT-100to200.root"],
+            "DYJetsToLL_M-4to50_HT-200to400": [background_base + "DYJetsToLL_M-4to50_HT-200to400_12December25_0325_skim_Newskim/DYJetsToLL_M-4to50_HT-200to400.root"],
+            "DYJetsToLL_M-4to50_HT-400to600": [background_base + "DYJetsToLL_M-4to50_HT-400to600_12December25_0335_skim_Newskim/DYJetsToLL_M-4to50_HT-400to600.root"],
+            "DYJetsToLL_M-4to50_HT-600toInf": [background_base + "DYJetsToLL_M-4to50_HT-600toInf_12December25_0354_skim_Newskim/DYJetsToLL_M-4to50_HT-600toInf.root"],
+            "DYJetsToLL_M-50_HT-70to100": [background_base + "DYJetsToLL_M-50_HT-70to100_12December25_0340_skim_Newskim/DYJetsToLL_M-50_HT-70to100.root"],
+            "DYJetsToLL_M-50_HT-100to200": [background_base + "DYJetsToLL_M-50_HT-100to200_12December25_0330_skim_Newskim/DYJetsToLL_M-50_HT-100to200.root"],
+            "DYJetsToLL_M-50_HT-200to400": [background_base + "DYJetsToLL_M-50_HT-200to400_12December25_0344_skim_Newskim/DYJetsToLL_M-50_HT-200to400.root"],
+            "DYJetsToLL_M-50_HT-400to600": [background_base + "DYJetsToLL_M-50_HT-400to600_12December25_0327_skim_Newskim/DYJetsToLL_M-50_HT-400to600.root"],
+            "DYJetsToLL_M-50_HT-600to800": [background_base + "DYJetsToLL_M-50_HT-600to800_12December25_0339_skim_Newskim/DYJetsToLL_M-50_HT-600to800.root"],
+            "DYJetsToLL_M-50_HT-800to1200": [background_base + "DYJetsToLL_M-50_HT-800to1200_12December25_0348_skim_Newskim/DYJetsToLL_M-50_HT-800to1200.root"],
+            "DYJetsToLL_M-50_HT-1200to2500": [background_base + "DYJetsToLL_M-50_HT-1200to2500_12December25_0329_skim_Newskim/DYJetsToLL_M-50_HT-1200to2500.root"],
+            "DYJetsToLL_M-50_HT-2500toInf": [background_base + "DYJetsToLL_M-50_HT-2500toInf_12December25_0338_skim_Newskim/DYJetsToLL_M-50_HT-2500toInf.root"],
 			"T-tchan": [background_base + "ST_t-channel_top_4f_InclusiveDecays_26August25_0843_skim_Newskim/ST_t-channel_top_4f_InclusiveDecays.root"], 
 			"Tbar-tchan": [background_base + "ST_t-channel_antitop_4f_InclusiveDecays_26August25_0821_skim_Newskim/ST_t-channel_antitop_4f_InclusiveDecays.root"], 
 			"T-tW": [background_base + "ST_tW_top_5f_inclusiveDecays_26August25_0753_skim_Newskim/ST_tW_top_5f_inclusiveDecays.root"], 
@@ -2317,7 +2342,8 @@ if __name__ == "__main__":
 		background_plot_names = {r"$t\bar{t}$" : "_ttbar_", r"Drell-Yan+Jets": "_DYJets_", "Di-Bosons" : "_DiBosons_", "Single Top": "_SingleTop_", "QCD" : "_QCD_", "W+Jets" : "_WJets_", r"$ZZ \rightarrow 4l$" : "_ZZ4l_"} #For file names
 		
 		background_dict = {r"$t\bar{t}$" : ["TTToSemiLeptonic","TTTo2L2Nu","TTToHadronic"], 
-				r"Drell-Yan+Jets": ["DYJetsToLL_Pt-50To100","DYJetsToLL_Pt-100To250","DYJetsToLL_Pt-250To400","DYJetsToLL_Pt-400To650","DYJetsToLL_Pt-650ToInf"], 
+				r"Drell-Yan+Jets": ["DYJetsToLL_M-4to50_HT-70to100","DYJetsToLL_M-4to50_HT-100to200","DYJetsToLL_M-4to50_HT-200to400","DYJetsToLL_M-4to50_HT-400to600","DYJetsToLL_M-4to50_HT-600toInf","DYJetsToLL_M-50_HT-70to100","DYJetsToLL_M-50_HT-100to200","DYJetsToLL_M-50_HT-200to400","DYJetsToLL_M-50_HT-400to600","DYJetsToLL_M-50_HT-600to800","DYJetsToLL_M-50_HT-800to1200","DYJetsToLL_M-50_HT-1200to2500","DYJetsToLL_M-50_HT-2500toInf"], 
+
 				"Di-Bosons": ["WZ3l1nu","WZ2l2q","WZ1l1nu2q","ZZ2l2q", "WZ1l3nu", "VV2l2nu"], "Single Top": ["Tbar-tchan","T-tchan","Tbar-tW","T-tW"], 
 				"W+Jets": ["WJetsToLNu_HT-100To200","WJetsToLNu_HT-200To400","WJetsToLNu_HT-400To600","WJetsToLNu_HT-600To800","WJetsToLNu_HT-800To1200","WJetsToLNu_HT-1200To2500","WJetsToLNu_HT-2500ToInf"],
 				r"$ZZ \rightarrow 4l$" : ["ZZ4l"]
