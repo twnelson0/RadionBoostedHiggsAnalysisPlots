@@ -137,14 +137,16 @@ def bit_or(data):
 xSection_Dictionary = {"Signal": 0.01, #Chosen to make plots readable
 						#TTBar Background
 						#"TTTo2L2Nu": 831.76*TT_FullLep_BR, "TTToSemiLeptonic": 831.76*TT_SemiLep_BR, "TTToHadronic": 831.76*TT_Had_BR,
-						"TTTo2L2Nu": 97.5595, "TTToSemiLeptonic": 381.0923, "TTToHadronic": 365.2482,
+						"TTTo2L2Nu": 87.5595, "TTToSemiLeptonic": 365.2482, "TTToHadronic": 381.0923,
 						
 						#DiBoson Background
 						#"ZZ2l2q": 3.22, "WZ3l1nu": 4.708, "WZ2l2q": 5.595, "WZ1l1nu2q": 10.71, "VV2l2nu": 11.95, "WZ1l3nu": 3.05, #"WZ3l1nu.root" : 27.57,
-						"ZZ2l2q": 3.676, "WZ3l1nu": , "WZ2l2q": 6.565, "WZ1l1nu2q": 9.119, "WZ1l3nu": 3.414, "VV2l2nu": 11.09, #"WZ3l1nu.root" : 27.57,
+						"ZZ2l2q": 3.676, "WZ2l2q": 6.565, "WZ1l1nu2q": 9.119, "WZ1l3nu": 3.414, "VV2l2nu": 11.09, #"WZ3l1nu.root" : 27.57,
 						
 						#ZZ->4l
 						"ZZ4l": 1.325,
+						"ZZ4l_Control": 1.325,
+						"ZZ4l_Test": 1.325,
 						#DiBoson continued
 						#"ZZTo2L2Nu_powheg": 0.564, "ZZTo2L2Q_amcNLO": 3.22, "ZZTo4L_powheg": 1.212, "WWTo2L2Nu_powheg": 12.178, "WWTo4Q_powheg": 51.723, "WWTo1LNuQQ_powheg": 49.997, 
 						#"WZTo1L3Nu_amcatnloFXFX": 3.033, "WZTo2L2Q_amcNLO": 5.595, "WZTo3LNu_amcNLO": 4.42965, "WZTo1L1Nu2Q_amcNLO": 10.71, "WW1l1nu2q": 49.997, "WZ1l3nu": 3.05,
@@ -155,7 +157,7 @@ xSection_Dictionary = {"Signal": 0.01, #Chosen to make plots readable
                         "DYJetsToLL_M-4to50_HT-70to100": 314.8,
                         "DYJetsToLL_M-4to50_HT-100to200": 190.6,
                         "DYJetsToLL_M-4to50_HT-200to400": 42.27,
-                        "DYJetsToLL_M-4to50_HT-400to600": 173.8,
+                        "DYJetsToLL_M-4to50_HT-400to600": 4.05,
                         "DYJetsToLL_M-4to50_HT-600toInf": 1.216,
                         "DYJetsToLL_M-50_HT-70to100": 140.0,
                         "DYJetsToLL_M-50_HT-100to200": 139.2,
@@ -166,7 +168,7 @@ xSection_Dictionary = {"Signal": 0.01, #Chosen to make plots readable
                         "DYJetsToLL_M-50_HT-1200to2500": 0.1305,
                         "DYJetsToLL_M-50_HT-2500toInf": 0.002997,
 						#WJets
-						"WJetsToLNu_HT-100To200" : 1244.0, "WJetsToLNu_HT-200To400": 337.8, "WJetsToLNu_HT-400To600": 44.93, "WJetsToLNu_HT-600To800": 11.09, "WJetsToLNu_HT-800To1200": 4.926, "WJetsToLNu_HT-1200To2500" : 1.152, "WJetsToLNu_HT-2500ToInf" : 0.02646, 
+						"WJetsToLNu_HT-100To200" : 1244.0, "WJetsToLNu_HT-200To400": 337.8, "WJetsToLNu_HT-400To600": 44.93, "WJetsToLNu_HT-600To800": 11.19, "WJetsToLNu_HT-800To1200": 4.926, "WJetsToLNu_HT-1200To2500" : 1.152, "WJetsToLNu_HT-2500ToInf" : 0.02646, 
 						#SM Higgs
 						"ZH125": 0.7544*0.0621, "ggZHLL125":0.1223 * 0.062 * 3 * 0.033658, "ggZHNuNu125": 0.1223*0.062*0.2,"ggZHQQ125": 0.1223*0.062*0.6991, "toptopH125": 0.5033*0.062, #"ggH125": 48.30* 0.0621, "qqH125": 3.770 * 0.0621, "WPlusH125": 
 						#QCD
@@ -219,7 +221,7 @@ def find_Z_Candidates(event_leptons, builder):
 	
 
 class FourTauPlotting(processor.ProcessorABC):
-	def __init__(self, trigger_bit, trigger_cut = True, offline_cut = False, or_trigger = False, PUWeights = None, PU_weight_bool = False, signal_mass = ""):
+	def __init__(self, trigger_bit, trigger_cut = True, offline_cut = False, or_trigger = False, PUWeights = None, PU_weight_bool = False, signal_mass = "", verbose = 0):
 		self.trigger_bit = trigger_bit
 		self.offline_cut = offline_cut
 		self.trigger_cut = trigger_cut
@@ -228,6 +230,7 @@ class FourTauPlotting(processor.ProcessorABC):
 		self.PU_bool = PU_weight_bool
 		self.PUWeights = PUWeights
 		self.massVal = signal_mass
+		self.verbose = verbose
 		#pass
 
 	def process(self, events):
@@ -389,40 +392,6 @@ class FourTauPlotting(processor.ProcessorABC):
 			event_level["event_weight"] = events.genWeight #GenTau_Num 
 			#event_level["event_weight"] = events.genWeight #GenTau_Num #Apply weightings based on Gen Taus
 			dummy_weight = event_level["event_weight"]
-			#Debugg/test Gen Tau Weighting
-			#for i in range(len(GenTau_Num)):
-			#	if (GenTau_Num[i] != len(tau[i].pt)):
-			#		print("# of Gen Tau # of Reco Tau Mismatch")
-			#		print("# of Gen Taus:%d"%GenTau_Num[i])
-			#		print("# of Reco Taus:%d"%len(tau[i].pt))
-
-			    
-
-				#if (GenTau_Num[i] != len(tau[i].pt)):
-				#	print("Gen Tau Reco Tau MisMatch")
-				#	print("# of Gen Taus: %d"%GenTau_Num[i])
-				#	print("# of Reco Taus: %d"%len(tau[i].pt))
-
-			    #if (GenTau_Num[i] > len(tau[i].pt)):
-				#	print("!!More Gen Taus than Reco Taus!!")
-			    #if not(np.isclose([0.9**GenTau_Num[i]],[event_level.event_weight[i]])):
-				#	print("!!Event gen tau weighting mismatch!!")
-				#	print("Event weight: %f"%event_level.event_weight[i])
-				#	print("Expected weight: %f"%0.9**GenTau_Num[i])
-			#event_level["event_weight"] = event_level.event_weight**ak.zeros_like(GenTau_Num) #Force all weights to be 1
-			#event_level["event_weight"] = event_level.event_weight * events.genWeight
-			#Debugg/test genWeights
-			#genWeight = events.genWeight
-			#for i in range(len(event_level.event_weight)):
-			#	if (dummy_weight[i]*genWeight[i] != event_level.event_weight[i]):
-			#		print("!!Event gen weighting mistmatch!!")
-			#		print("Event weight: %f"%event_level.event_weight[i])
-			#		print("Expected weight: %f"%dummy_weight[i]*genWeight)
-			    	#print("!!Event gen weighting mistmatch!!")
-				#print("Event weight: %f"%event_leve.event_weight[i])
-				#print("Expected weight: %f"%dummy_weight[i]*events.genWeight[i])
-			#print(event_level.event_weight)
-			dummy_weight = event_level["event_weight"]
 			print("Applied gen weights")
 
 			if (self.PU_bool): #Apply PU reweighting scheme
@@ -436,14 +405,22 @@ class FourTauPlotting(processor.ProcessorABC):
 				#	    print("Event weight: %f"%event_level.event_weight[i])
 				#	    print("Expected weight: %f"%dummy_weight[i]*PU_Corr[i])
 				#print(event_level.event_weight)
-
-
-
 		
 		#tau = tau[ak.argsort(tau.pt,axis=1)] #Force tau pT Ordering
 		print("!!!=====Dataset=====!!!!")	
 		print(type(dataset))
 		print(dataset)
+
+		#Check that the genWeights are being applied correctly
+		if (self.verbose >= 1):
+			if (not(self.isData)):
+				print("====================Checking that the gen weights have been correctly applied====================")
+				if (self.PU_bool):
+					print("Need to implement")
+				else:
+					if (not(ak.all(event_level["event_weight"] == events.genWeight))):
+						print("event_weight not genWeight")
+
 
 		#Basic Kinematic histograms Boosted tau
 		h_tau_pT_NoTrigger = hist.Hist.new.Regular(50,0,1000,label = r"$\tau$ $p_T$ [GeV]").Double()
@@ -497,8 +474,8 @@ class FourTauPlotting(processor.ProcessorABC):
 			CrossSec_Weight = weight_calc(dataset,sumWEvents_Dict[dataset])
 		
 		#Fill histograms prior to trigger and all selections (excluding skimming) 
-		
-		print("Number of events before selection + Trigger: %d"%ak.num(tau,axis=0))
+		if (self.verbose >= 2):	
+			print("Number of events before selection + Trigger: %d"%ak.num(tau,axis=0))
 
 		#Look at the problem events before anything is applied
 		#Construct HT and MHT variables (and give them their own object)
@@ -533,7 +510,8 @@ class FourTauPlotting(processor.ProcessorABC):
 		trigger_mask = bit_mask([self.trigger_bit])
 		if (not(self.isData)):	#MC trigger logic
 			if (self.OrTrigger): # and np.pi == np.exp(1)): #Select for both triggers
-				print("Both Triggers")
+				if (self.verbose >= 2):	
+					print("Both Triggers")
 				#event_level_21 = event_level[np.bitwise_and(event_level.mu_trigger,bit_mask([21])) == bit_mask([21])]
 				#print(event_level.Mu_Trigger)
 				event_level_21 = event_level[event_level.Mu_Trigger]
@@ -565,8 +543,6 @@ class FourTauPlotting(processor.ProcessorABC):
 				if (not(self.isData)): # and self.isData):
 					Gen_Info_21 = Gen_Info[event_level.Mu_Trigger]
 					Gen_Info_fail = Gen_Info[np.bitwise_not(event_level.Mu_Trigger)]
-					
-				
 
 				#Apply offline Single Muon Cut
 				tau_21 = tau_21[ak.any(muon_21.nMu > 0, axis = 1)]
@@ -671,7 +647,8 @@ class FourTauPlotting(processor.ProcessorABC):
 				#print("Single Trigger (in theory)")
 				if (self.trigger_bit != None and self.OrTrigger == False):
 					if (self.trigger_bit == 21): #Single Mu
-						print("Single Trigger: Mu Trigger (21)")
+						if (self.verbose >= 2):	
+							print("Single Trigger: Mu Trigger (21)")
 						tau = tau[event_level.Mu_Trigger]
 						AK8Jet = AK8Jet[event_level.Mu_Trigger]
 						Jet = Jet[event_level.Mu_Trigger]
@@ -704,7 +681,8 @@ class FourTauPlotting(processor.ProcessorABC):
 						muon = muon[ak.any(muon.pt > 52, axis = 1)]
 					
 					if (self.trigger_bit == 27): #Jet HT
-						print("Single Trigger: Jet Trigger (27)")
+						if (self.verbose >= 2):	
+							print("Single Trigger: Jet Trigger (27)")
 					#	tau = tau[np.bitwise_and(event_level.jet_trigger,trigger_mask) == trigger_mask]
 					#	AK8Jet = AK8Jet[np.bitwise_and(event_level.jet_trigger,trigger_mask) == trigger_mask]
 					#	Jet = Jet[np.bitwise_and(event_level.jet_trigger,trigger_mask) == trigger_mask]
@@ -729,14 +707,16 @@ class FourTauPlotting(processor.ProcessorABC):
 					#	Jet = Jet[ak.any(Jet.PFLooseId, axis=1)]
 					
 					if (self.trigger_bit == 39): #Jet HT
-						print("Single Trigger: Jet Trigger (39)")
+						if (self.verbose >= 2):	
+							print("Single Trigger: Jet Trigger (39)")
 						tau = tau[event_level.METHTMHT_Trigger]
 						AK8Jet = AK8Jet[event_level.METHTMHT_Trigger]
 						Jet = Jet[event_level.METHTMHT_Trigger]
 						muon = muon[event_level.METHTMHT_Trigger]
 						electron = electron[event_level.METHTMHT_Trigger]
 						event_level = event_level[event_level.METHTMHT_Trigger]
-						print("Number of events after Online Trigger(dropping empty arrays): %d"%ak.num(tau[ak.num(tau,axis=1) > 0],axis=0))
+						if (self.verbose >= 2):	
+							print("Number of events after Online Trigger(dropping empty arrays): %d"%ak.num(tau[ak.num(tau,axis=1) > 0],axis=0))
 				
 						#Offline Cuts
 						#HT Cut
@@ -762,9 +742,10 @@ class FourTauPlotting(processor.ProcessorABC):
 						muon = muon[event_level.MHT > 110]
 						electron = electron[event_level.MHT > 110]
 						event_level = event_level[event_level.MHT > 110]
-
-			print("Number of events after selection + Trigger: %d"%ak.num(tau,axis=0))
-			print("Number of events after Trigger + Selection (dropping empty arrays): %d"%ak.num(tau[ak.num(tau,axis=1) > 0],axis=0))
+			
+			if (self.verbose >= 2):	
+				print("Number of events after selection + Trigger: %d"%ak.num(tau,axis=0))
+				print("Number of events after Trigger + Selection (dropping empty arrays): %d"%ak.num(tau[ak.num(tau,axis=1) > 0],axis=0))
 		else:
 			 #Skip the trigger (??)
 			if ("SingleMuon" in dataset):  #and np.exp(1) == np.pi): #Single Mu
@@ -777,7 +758,8 @@ class FourTauPlotting(processor.ProcessorABC):
 				muon = muon[good_muon_cond]
 
 
-				print("Single Muon Trigger")
+				if (self.verbose >= 2):	
+					print("Single Muon Trigger")
 				tau = tau[event_level.Mu_Trigger]	
 				AK8Jet = AK8Jet[event_level.Mu_Trigger]	
 				Jet = Jet[event_level.Mu_Trigger]	
@@ -810,14 +792,16 @@ class FourTauPlotting(processor.ProcessorABC):
 				muon = muon[ak.any(muon.pt > 52, axis = 1)]
 				
 			if ("JetHT" in dataset): # and np.exp(1) == np.pi): #HT 
-				print("Jet Trigger")
+				if (self.verbose >= 2):	
+					print("Jet Trigger")
 				tau = tau[event_level.METHTMHT_Trigger]	
 				AK8Jet = AK8Jet[event_level.METHTMHT_Trigger]	
 				Jet = Jet[event_level.METHTMHT_Trigger]	
 				muon = muon[event_level.METHTMHT_Trigger]	
 				electron = electron[event_level.METHTMHT_Trigger]	
 				event_level = event_level[event_level.METHTMHT_Trigger]
-				print("Number of events after Online Trigger(dropping empty arrays): %d"%ak.num(tau[ak.num(tau,axis=1) > 0],axis=0))
+				if (self.verbose >= 2):	
+					print("Number of events after Online Trigger(dropping empty arrays): %d"%ak.num(tau[ak.num(tau,axis=1) > 0],axis=0))
 
 				#Offline Cuts
 				#HT Cut
@@ -845,8 +829,9 @@ class FourTauPlotting(processor.ProcessorABC):
 				event_level = event_level[event_level.MHT > 110]
 				
 			
-			print("# of events after Trigger + Selection: %d"%ak.num(tau,axis=0))
-			print("# of events after Trigger + Selection (dropping empty arrays): %d"%ak.num(tau[ak.num(tau,axis=1) > 0],axis=0))
+			if (self.verbose >= 2):	
+				print("# of events after Trigger + Selection: %d"%ak.num(tau,axis=0))
+				print("# of events after Trigger + Selection (dropping empty arrays): %d"%ak.num(tau[ak.num(tau,axis=1) > 0],axis=0))
 				
 		#Get the number of electrons + muons after trigger
 		#Apply electron and muon selections first
@@ -928,8 +913,9 @@ class FourTauPlotting(processor.ProcessorABC):
 		h_AK8Jet_eta_Trigger.fill(ak.ravel(AK8Jet.eta),weight=ak.ravel(ak.broadcast_arrays(ak.ravel(event_level.event_weight*CrossSec_Weight),ak.ones_like(AK8Jet.eta))[0]))
 		h_AK8Jet_phi_Trigger.fill(ak.ravel(AK8Jet.phi),weight=ak.ravel(ak.broadcast_arrays(ak.ravel(event_level.event_weight*CrossSec_Weight),ak.ones_like(AK8Jet.phi))[0]))
 		
-		print("Number of events (no selections post trigger): %d"%cutflow_dict["Trigger"])
-		print("Should also be Number of events (no selections post trigger): %d"%len(np.zeros(ak.num(tau,axis=0))))
+		if (self.verbose >= 2):	
+			print("Number of events (no selections post trigger): %d"%cutflow_dict["Trigger"])
+			print("Should also be Number of events (no selections post trigger): %d"%len(np.zeros(ak.num(tau,axis=0))))
 		
 		#Apply selections
 		tau = tau[tau.pt > 30] #pT selection
@@ -948,7 +934,8 @@ class FourTauPlotting(processor.ProcessorABC):
 	
 		#if (self.isData or not(self.isData)):
 		if (not(self.isData)):
-			print("# of events after pT cut (dropping empty arrays): %d"%ak.num(tau[ak.num(tau,axis=1) > 0],axis=0))
+			if (self.verbose >= 2):	
+				print("# of events after pT cut (dropping empty arrays): %d"%ak.num(tau[ak.num(tau,axis=1) > 0],axis=0))
 		tau = tau[np.abs(tau.eta) < 2.3] #eta selection
 		
 		#Remove events with fewer than 4 taus	
@@ -964,7 +951,8 @@ class FourTauPlotting(processor.ProcessorABC):
 		cutflow_table.fill(2,weight=ak.num(tau,axis=0))
 		#if (self.isData or not(self.isData)):
 		if (not(self.isData)):
-			print("# of events after eta cut (dropping empty arrays): %d"%ak.num(tau[ak.num(tau,axis=1) > 0],axis=0))
+			if (self.verbose >= 2):	
+				print("# of events after eta cut (dropping empty arrays): %d"%ak.num(tau[ak.num(tau,axis=1) > 0],axis=0))
 		
 		
 		#Isolation and decay selections
@@ -1000,7 +988,8 @@ class FourTauPlotting(processor.ProcessorABC):
 		cutflow_table.fill(4,weight= ak.num(tau,axis=0))
 		#if (self.isData or not(self.isData)):
 		if (not(self.isData)):
-			print("# of events after isolation cut (dropping empty arrays): %d"%ak.num(tau[ak.num(tau,axis=1) > 0],axis=0))
+			if (self.verbose >= 2):	
+				print("# of events after isolation cut (dropping empty arrays): %d"%ak.num(tau[ak.num(tau,axis=1) > 0],axis=0))
 
 
 		#Delta R Cut on taus (identifiy and remove jets incorrectly reconstructed as taus)
@@ -1032,9 +1021,11 @@ class FourTauPlotting(processor.ProcessorABC):
 		muon = muon[ak.num(tau) >= 4] 
 		tau = tau[ak.num(tau) >= 4] #4 tau events
 		if (self.isData or not(self.isData)):
-			print("# of events after 4-tau cut (dropping empty arrays): %d"%ak.num(tau[ak.num(tau,axis=1) > 0],axis=0))
+			if (self.verbose >= 2):	
+				print("# of events after 4-tau cut (dropping empty arrays): %d"%ak.num(tau[ak.num(tau,axis=1) > 0],axis=0))
 	
-		print("tau length = %d\nevent_level length = %d"%(ak.num(tau,axis=0),ak.num(event_level,axis=0)))	
+		if (self.verbose >= 2):	
+			print("tau length = %d\nevent_level length = %d"%(ak.num(tau,axis=0),ak.num(event_level,axis=0)))	
 		tau = tau[ak.num(tau) > 0] #Handle empty arrays left over
 		
 		#Z Mutliplticity of taus
@@ -1314,7 +1305,8 @@ class FourTauPlotting(processor.ProcessorABC):
 		
 			#Awkward implementation
 			for i in range(4):
-				print("Tau %d"%i)
+				if (self.verbose >= 2):	
+					print("Tau %d"%i)
 				tau_fourVec = ak.zip({"t": tau[:,i].E,"x": tau[:,i].Px, "y": tau[:,i].Py,"z" : tau[:,i].Pz},with_name = "Momentum4D")
 				elec_dR = tau_fourVec.deltaR(electron_fourVec)
 				muon_dR = tau_fourVec.deltaR(muon_fourVec)
@@ -1371,15 +1363,17 @@ class FourTauPlotting(processor.ProcessorABC):
 				misId_ele = electron_fourVec[misId_ele_cond]
 				indxNum = 0
 				for x in ak.num(misId_ele.t,axis=1):
-				    if x > 1:
-					    print("!!Multiple electrons matched at event %d!!"%indxNum)
-				    indxNum +=1
+					if x > 1:
+						if (self.verbose >= 2):
+							print("!!Multiple electrons matched at event %d!!"%indxNum)
+						indxNum +=1
 				misId_mu = muon_fourVec[misId_mu_cond]
 				indxNum = 0
 				for x in ak.num(misId_mu.t,axis=1):
-				    if x > 1:
-					    print("!!Multiple muons matched at event %d!!"%indxNum)
-				    indxNum +=1
+					if x > 1:
+						if (self.verbose >= 2):	
+							print("!!Multiple muons matched at event %d!!"%indxNum)
+						indxNum +=1
 				
 				#not_prev_id_elec = np.bitwise_not(misId_ele_cond)
 				#not_prev_id_muon = np.bitwise_not(misId_ele_cond)
@@ -1428,9 +1422,10 @@ class FourTauPlotting(processor.ProcessorABC):
 						if (event_level[j].n_tau_muons + event_level[j].n_tau_electrons > 4):
 							n_wrong2 += 1
 					
-					print("%d events have more than 4 electrons"%n_wrong0)
-					print("%d events have more than 4 muons"%n_wrong1)
-					print("%d events in which electrons + muons > 4"%n_wrong2)
+					if (self.verbose >= 2):	
+						print("%d events have more than 4 electrons"%n_wrong0)
+						print("%d events have more than 4 muons"%n_wrong1)
+						print("%d events in which electrons + muons > 4"%n_wrong2)
 
 					#Check how many 3 hardonic tau + 1 leptonic tau events there are
 					num_3h1mu = 0
@@ -1446,9 +1441,10 @@ class FourTauPlotting(processor.ProcessorABC):
 								num_3h1mu += 1
 							if (event_level[j].n_tau_muons > 1 or event_level[j].n_tau_electrons > 1):
 								print("!!!!=======================Electron and/or muon miscount=======================!!!!")
-					print("Fraction of events with 3 hadronic taus and 1 muon: %.3f"%(num_3h1mu/len(event_level.n_tau_hadronic)))
-					print("Fraction of events with 4 hadronic taus: %.3f"%(num_4h/len(event_level.n_tau_hadronic)))
-					print("Fraction of events with 3 hadronic taus and 1 electron: %.3f"%(num_3h1e/len(event_level.n_tau_hadronic)))
+					if (self.verbose >= 2):	
+						print("Fraction of events with 3 hadronic taus and 1 muon: %.3f"%(num_3h1mu/len(event_level.n_tau_hadronic)))
+						print("Fraction of events with 4 hadronic taus: %.3f"%(num_4h/len(event_level.n_tau_hadronic)))
+						print("Fraction of events with 3 hadronic taus and 1 electron: %.3f"%(num_3h1e/len(event_level.n_tau_hadronic)))
 
 
 				#Store reco information of taus
@@ -1606,7 +1602,7 @@ class FourTauPlotting(processor.ProcessorABC):
 
 					cutflow_table.fill(5,weight = ak.num(tau,axis=0))
 					cutflow_dict["Mass_Cut"] = ak.num(tau,axis=0)
-					if (self.isData or not(self.isData)):
+					if (self.verbose >= 2):	
 						print("# of events after visible mass cut (dropping empty arrays): %d"%ak.num(tau[ak.num(tau,axis=1) > 0],axis=0))
 
 
@@ -1630,10 +1626,10 @@ class FourTauPlotting(processor.ProcessorABC):
 				cutflow_table.fill(6,weight = ak.num(tau,axis=0))
 				cutflow_dict["Higgs_dR"] = ak.num(tau,axis=0)
 				#tau_cond = tau_cond[higgs_cond]
-				if (self.isData or not(self.isData)):
+				if (self.verbose >= 2):	
 					print("# of events after Higgs cut (dropping empty arrays): %d"%ak.num(tau[ak.num(tau,axis=1) > 0],axis=0))
 		
-			if (self.isData or not(self.isData)):
+			if (self.verbose >= 2):	
 				print("# of events after topology cut (dropping empty arrays): %d"%ak.num(tau[ak.num(tau,axis=1) > 0],axis=0))
 
 
@@ -1804,8 +1800,9 @@ class FourTauPlotting(processor.ProcessorABC):
 		#Store data for NN as parquet file
 		#print(event_level.ZMult)
 		#print(radionPT_Arr)
-		print("Sum of Weights for " + dataset + ":")
-		print(ak.sum(event_level.event_weight*CrossSec_Weight))
+		if (self.verbose >= 2):	
+			print("Sum of Weights for " + dataset + ":")
+			print(ak.sum(event_level.event_weight*CrossSec_Weight))
 		var_nn = ak.zip( #Variables to be exported to .parquet file
 			{
 				"radion_pt": radionPT_Arr,
@@ -1841,19 +1838,23 @@ class FourTauPlotting(processor.ProcessorABC):
 					file_name = dataset  + "_MVA.parquet"
 					if (os.path.isfile(file_name)): #Append to existing parquet file
 						file_data = ak.from_parquet(file_name)
-						print("Size (file): " + str(ak.num(file_data,axis=0)))
-						print(file_data)
-						print("Size (var_nn): " + str(ak.num(var_nn,axis=0)))
-						print(var_nn)
+						if (self.verbose >= 3):	
+							print("Size (file): " + str(ak.num(file_data,axis=0)))
+							print(file_data)
+							print("Size (var_nn): " + str(ak.num(var_nn,axis=0)))
+							print(var_nn)
 						var_nn = ak.concatenate([file_data,var_nn])
 						ak.to_parquet(var_nn,file_name)
-						print("Appending parquet file (Background)")
+						if (self.verbose >= 3):	
+							print("Appending parquet file (Background)")
 					else:
 						if (ak.num(FourTau_Mass_Arr,axis=0) > 0):
 							ak.to_parquet(var_nn,file_name) #Create parquet file
-							print("Creating Parquet file (Background)")
+							if (self.verbose >= 3):	
+								print("Creating Parquet file (Background)")
 						else:
-							print("Nothing to put in parquet file")
+							if (self.verbose >= 3):	
+								print("Nothing to put in parquet file")
 					#print("Background")
 			else:
 				file_name = dataset + "_mass_" + self.massVal + "GeV.parquet"
@@ -1861,10 +1862,12 @@ class FourTauPlotting(processor.ProcessorABC):
 					file_data = ak.from_parquet(file_name)
 					var_nn = ak.concatenate([file_data,var_nn])
 					ak.to_parquet(var_nn,file_name)
-					print("Appending parquet file (Signal)")
+					if (self.verbose >= 3):	
+						print("Appending parquet file (Signal)")
 				else:
 					ak.to_parquet(var_nn,file_name) #Create parquet file
-					print("Creating Parquet file (Signal)")
+					if (self.verbose >= 3):	
+						print("Creating Parquet file (Signal)")
 				#print("Signal")
 				#ak.to_parquet(var_nn,file_name)
 				#print("Creating Parquet file (MC)")
@@ -1874,16 +1877,19 @@ class FourTauPlotting(processor.ProcessorABC):
 			if (mass == "2000"):
 				if (os.path.isfile(file_name)): #Append to existing parquet file
 					file_data = ak.from_parquet(file_name)
-					print("Size: " + str(ak.num(var_nn,axis=0)))
 					var_nn = ak.concatenate([file_data,var_nn])
 					ak.to_parquet(var_nn,file_name)
-					print("Appending parquet file (Data)")
+					if (self.verbose >= 3):	
+						print("Size: " + str(ak.num(var_nn,axis=0)))
+						print("Appending parquet file (Data)")
 				else:
 					if (ak.num(FourTau_Mass_Arr,axis=0)>0):
 						ak.to_parquet(var_nn,file_name) #Create parquet file
-						print("Creating Parquet file (Data)")
+						if (self.verbose >= 3):	
+							print("Creating Parquet file (Data)")
 					else:
-						print("Nothing to store in the parquet file")
+						if (self.verbose >= 3):	
+							print("Nothing to store in the parquet file")
 
 		#print(CrossSec_Weight)
 		#print(event_level.event_weight)
@@ -1983,13 +1989,15 @@ class FourTauPlotting(processor.ProcessorABC):
 		h_NMuonTauID.fill(ak.ravel(event_level.n_tau_muons),weight = event_level.event_weight*CrossSec_Weight)
 		h_weight.fill(ak.ravel(event_level.event_weight*CrossSec_Weight))
 
-		print("Histograms filled")
-		print(CrossSec_Weight)
-		print(ak.to_list(event_level.event_weight*CrossSec_Weight))
+		if (self.verbose >= 2):	
+			print("Histograms filled")
+			print(CrossSec_Weight)
+			print(ak.to_list(event_level.event_weight*CrossSec_Weight))
 		for key in cutflow_dict: #Looping remove nones from the cutflow dict
 			if (cutflow_dict[key] == None):
 				cutflow_dict[key] = 0
-		print(cutflow_dict)
+		if (self.verbose >= 2):	
+			print(cutflow_dict)
 	
 		#if (ak.num(event_level.event_weight,axis=0) > 0):
 		return{
@@ -2109,11 +2117,11 @@ if __name__ == "__main__":
 	#trigger_dict = {"Mu50": (21,False), "PFMET120_PFMHT120_IDTight": (27,False), "EitherOr_Trigger": (41,True)}
 	#trigger_dict = {"Mu50": (21,False), "PFMET120_PFMHT120_IDTight": (27,False), "EitherOr_Trigger": (41,True)}
 	#trigger_dict = {"EitherOr_Trigger": (41,True)}
-	#trigger_dict = {"Mu50": (21,False)}
+	trigger_dict = {"Mu50": (21,False)}
 	#trigger_dict = {"PFHT500_PFMET100_PFMHT100_IDTight": (39,False)} #,"EitherOr_Trigger": (41,True)}
 	#trigger_dict = {"Mu50": (21,False), "EitherOr_Trigger": (41,True)}
 	#trigger_dict = {"Mu50": (21,False), "PFHT500_PFMET100_PFMHT100_IDTight": (39,False), "EitherOr_Trigger": (41,True)}
-	trigger_dict = {"Mu50": (21,False), "PFHT500_PFMET100_PFMHT100_IDTight": (39,False)} #,"EitherOr_Trigger": (41,True)}
+	#trigger_dict = {"Mu50": (21,False), "PFHT500_PFMET100_PFMHT100_IDTight": (39,False)} #,"EitherOr_Trigger": (41,True)}
 	#trigger_dict = {"No_Trigger": (0,False)}
 	#trigger_dict = {"PFHT500_PFMET100_PFMHT100_IDTight": (39,False), "AK8PFJet400_TrimMass30": (40,False), "EitherOr_Trigger": (41,True)}
 	
@@ -2124,21 +2132,28 @@ if __name__ == "__main__":
 	data_loc = "/hdfs/store/user/twnelson/HH4Tau_EtAl/Skimmed_Files/2018/Data/"
 	data_base = "root://cmsxrootd.hep.wisc.edu//store/user/twnelson/HH4Tau_EtAl/Skimmed_Files/2018/Data/" 
 	MVA_base = "root://cmsxrootd.hep.wisc.edu//store/user/twnelson/HH4Tau_EtAl/Skimmed_Files/2018/" #ZZTo4L_25February25_0413_skim__skim_Feb25/ #NanoAOD files
+	
+    #For testing with Ganesh's skimming
+	Skimmed_2tau2b_base = "root://cmsxrootd.hep.wisc.edu//store/user/twnelson/HH4Tau_EtAl/Skimmed_Files/2018/2tau2b/" 
+	Skimmed_2tau2b_loc = "/hdfs/store/user/twnelson/HH4Tau_EtAl/Skimmed_Files/2018/2tau2b/" 
+    
+    #For testing with Ganesh's files
+	Skimmed_Ganesh_base = "root://cmsxrootd.hep.wisc.edu//store/user/gparida/HHbbtt/Hadded_Skimmed_Files/Full_Production_CMSSW_13_0_13_Nov24_23/LooseSelection_MET_gt_80_nFatJet_gt_0_Skim/2018/" 
 
+	#Condor related stuff
+	os.environ["CONDOR_CONFIG"] = "/etc/condor/condor_config"
 	#Xrootd crap
 	_x509_path = move_X509()
 	print(f"x509 path: {_x509_path}")
-	#Condor related stuff
-	os.environ["CONDOR_CONFIG"] = "/etc/condor/condor_config"
 	#htc_log_err_dir = "/scratch/twnelson/ControlPlot_HTC/Run_" + str(time.localtime()[0]) + "_" + str(time.localtime()[1]) + "_" + str(time.localtime()[2]) + "_" + str(time.localtime()[3]) + f".{time.localtime()[4]:02d}"
 	#os.makedirs(htc_log_err_dir)
 
     #DO NOT DELETE THESE LINES CONDOR BROKEN???
-	cluster = ""
+	#cluster = ""
 #	cluster = HTCondorCluster(
 #            cores=1,
-#			 memory="6 GB",
-#            disk="3 GB",
+#			 memory="5 GB",
+#            disk="1.5 GB",
 #            death_timeout = '60',
 #            job_extra_directives={
 #                "+JobFlavour": '"tomorrow"',
@@ -2147,8 +2162,6 @@ if __name__ == "__main__":
 #                "error": "dask_job_output.$(PROCESS).$(CLUSTER).err",
 #                "should_transfer_files": "yes",
 #                "when_to_transfer_ouput": "ON_EXIT_OR_EVICT",
-#                #"transfer_output_remaps": working_dir,
-#				#"transfer_output_files": os.getcwd(), #Dump parquet files in current directory
 #                "transfer_executable": "false",
 #                "+SingularityImage": '"/cvmfs/unpacked.cern.ch/registry.hub.docker.com/coffeateam/coffea-dask-cc7:latest-py3.10"',
 #                #"+SingularityImage": '"/cvmfs/unpacked.cern.ch/registry.hub.docker.com/coffeateam/coffea-base-almalinux9:0.7.25-py3.10"',
@@ -2159,7 +2172,7 @@ if __name__ == "__main__":
 #            },
 #            job_script_prologue = [
 #                "export XRD_RUNFORKHANDLER=1",
-#                f"export X509_USER_PROXY={_x509_path}"
+#                f"export X509_USER_PROXY={_x509_path}",
 #            ]
 #    )
 #	cluster.adapt(minimum=1, maximum=500)
@@ -2248,15 +2261,17 @@ if __name__ == "__main__":
 			#"ZZ4l": [MVA_base + "ZZTo4L_MVA_07November25_0943_skim_Newskim_Debugging/ZZTo4L_MVA.root"], # ZZ4L MVA
 			#"ZZ4l": [MVA_base + "ZZTo4L_p68_16November25_0916_skim_NewSkim_BTDp68/ZZTo4L.root"], # ZZ4L p68 
 			"ZZ4l": [MVA_base + "ZZTo4L_p70_17November25_0740_skim_NewSkim_BTDp70/ZZTo4L.root"], # ZZ4L p70
+			#"ZZ4l_Test": ["root://cmsxrootd.hep.wisc.edu//store/user/twnelson/HH4Tau_EtAl/Skimmed_Files/2018/ZZTo4L_10December25_0701_skim_Ganesh_Config/ZZTo4L.root"], # ZZ4L Test
+			#"ZZ4l_Control": ["root://cmsxrootd.hep.wisc.edu//store/user/gparida/HHbbtt/Hadded_Skimmed_Files/Full_Production_CMSSW_13_0_13_Nov24_23/LooseSelection_MET_gt_80_nFatJet_gt_0_Skim/2018/ZZTo4L.root"], # ZZ4L Control (Ganesh Produced)
 			#"ZZ4l_p6": ["/hdfs/store/user/twnelson/HH4Tau_EtAl/Skimmed_Files/2018/ZZTo4L_SingleMiniAOD_13November25_1101_skim_SingleZZ4lFile_DBT_p6/singleFileSkimForSubmission-NANO_NANO.root"],
 			#"ZZ4l_p7": ["/hdfs/store/user/twnelson/HH4Tau_EtAl/Skimmed_Files/2018/ZZTo4L_SingleMiniAOD_13November25_1116_skim_SingleZZ4lFile_DBT_p7/singleFileSkimForSubmission-NANO_NANO.root"],
 			#"TTToSemiLeptonic": [background_base + "TTToSemiLeptonic_35August25_0448_skim_Newskim/TTToSemiLeptonic" + str(j) + ".root" for j in range(10)], 
 			#"TTTo2L2Nu": [background_base + "TTTo2L2Nu_26August25_0719_skim_Newskim/TTTo2L2Nu.root"], 
 			#"TTToHadronic": [background_base + "TTToHadronic_25October25_0813_skim_Newskim/TTToHadronic" + str(j) + ".root" for j in range(10)],
-			#"Data_SingleMuon": [data_base + "SingleMu_Run2018A_27August25_0551_skim_Newskim/SingleMu_Run2018A.root", 
-			#	data_base + "SingleMu_Run2018B_27August25_0529_skim_Newskim/SingleMu_Run2018B.root", data_base + "SingleMu_Run2018C_27August25_0540_skim_Newskim/SingleMu_Run2018C.root", 
-			#	data_base + "SingleMu_Run2018D_27August25_0613_skim_Newskim/SingleMu_Run2018D.root"],
+		#		data_base + "SingleMu_Run2018D_27August25_0613_skim_Newskim/SingleMu_Run2018D.root"],
 			#"Data_JetHT": [data_base + "JetHT_2018_27August25_0655_skim_Newskim/JetHT_2018.root", data_base + "JetHT_Other_2018_27August25_0522_skim_Newskim/JetHT_Other_2018.root"]
+			"Data_SingleMuon": [data_base + "SingleMu_Run2018A_27August25_0551_skim_Newskim/SingleMu_Run2018A.root", data_base + "SingleMu_Run2018B_27August25_0529_skim_Newskim/SingleMu_Run2018B.root"]
+              #                  data_base + "SingleMu_Run2018C_27August25_0540_skim_Newskim/SingleMu_Run2018C.root", data_base + "SingleMu_Run2018D_27August25_0613_skim_Newskim/SingleMu_Run2018D.root"],
         }
 
 		file_dict_debug = {"WJetsToLNu_HT-1200To2500":[background_base + "WJetsToLNu_HT-1200To2500_OtherPart_28February25_1012_skim__skim_Feb25/singleFileSkimForSubmission-NANO_NANO_80.root"]}
@@ -2269,27 +2284,27 @@ if __name__ == "__main__":
 			"TTToSemiLeptonic": [background_base + "TTToSemiLeptonic_35August25_0448_skim_Newskim/TTToSemiLeptonic" + str(j) + ".root" for j in range(10)], 
 			"TTTo2L2Nu": [background_base + "TTTo2L2Nu_26August25_0719_skim_Newskim/TTTo2L2Nu.root"], 
 			"TTToHadronic": [background_base + "TTToHadronic_25October25_0813_skim_Newskim/TTToHadronic" + str(j) + ".root" for j in range(10)],
-			#"ZZ4l": [background_base + "ZZTo4L_26August25_0757_skim_Newskim/ZZTo4L.root"], 
-			"ZZ4l": [MVA_base + "ZZTo4L_p70_17November25_0740_skim_NewSkim_BTDp70/ZZTo4L.root"], 
+			"ZZ4l": [background_base + "ZZTo4L_26August25_0757_skim_Newskim/ZZTo4L.root"], 
+			#"ZZ4l": [MVA_base + "ZZTo4L_p70_17November25_0740_skim_NewSkim_BTDp70/ZZTo4L.root"], 
 			"VV2l2nu": [background_base + "WWTo2L2Nu_26August25_1040_skim_Newskim/WWTo2L2Nu.root"], 
 			"WZ1l3nu": [background_base + "WZTo1L3Nu_4f_26August25_1016_skim_Newskim/WZTo1L3Nu_4f.root"], 
-			"WZ3l1nu": [background_base + "WZTo3L1Nu_4f_26August25_1032_skim_Newskim/WZTo3L1Nu_4f.root"],  
+			#"WZ3l1nu": [background_base + "WZTo3L1Nu_4f_26August25_1032_skim_Newskim/WZTo3L1Nu_4f.root"],  
 			"ZZ2l2q": [background_base + "ZZTo2Q2L_26August25_1034_skim_Newskim/ZZTo2Q2L.root"],
 			"WZ2l2q": [background_base + "WZTo2L2Q_26August25_0926_skim_Newskim/WZTo2L2Q.root"],
 			"WZ1l1nu2q" : [background_base + "WZTo1L1Nu2Q_26August25_0840_skim_Newskim/WZTo1L1Nu2Q.root"],
-            "DYJetsToLL_M-4to50_HT-70to100": [background_base + "DYJetsToLL_M-4to50_HT-70to100_12December25_0352_skim_Newskim/DYJetsToLL_M-4to50_HT-70to100.root"],
-            "DYJetsToLL_M-4to50_HT-100to200": [background_base + "DYJetsToLL_M-4to50_HT-100to200_12December25_0350_skim_Newskim/DYJetsToLL_M-4to50_HT-100to200.root"],
-            "DYJetsToLL_M-4to50_HT-200to400": [background_base + "DYJetsToLL_M-4to50_HT-200to400_12December25_0325_skim_Newskim/DYJetsToLL_M-4to50_HT-200to400.root"],
-            "DYJetsToLL_M-4to50_HT-400to600": [background_base + "DYJetsToLL_M-4to50_HT-400to600_12December25_0335_skim_Newskim/DYJetsToLL_M-4to50_HT-400to600.root"],
-            "DYJetsToLL_M-4to50_HT-600toInf": [background_base + "DYJetsToLL_M-4to50_HT-600toInf_12December25_0354_skim_Newskim/DYJetsToLL_M-4to50_HT-600toInf.root"],
-            "DYJetsToLL_M-50_HT-70to100": [background_base + "DYJetsToLL_M-50_HT-70to100_12December25_0340_skim_Newskim/DYJetsToLL_M-50_HT-70to100.root"],
-            "DYJetsToLL_M-50_HT-100to200": [background_base + "DYJetsToLL_M-50_HT-100to200_12December25_0330_skim_Newskim/DYJetsToLL_M-50_HT-100to200.root"],
-            "DYJetsToLL_M-50_HT-200to400": [background_base + "DYJetsToLL_M-50_HT-200to400_12December25_0344_skim_Newskim/DYJetsToLL_M-50_HT-200to400.root"],
-            "DYJetsToLL_M-50_HT-400to600": [background_base + "DYJetsToLL_M-50_HT-400to600_12December25_0327_skim_Newskim/DYJetsToLL_M-50_HT-400to600.root"],
-            "DYJetsToLL_M-50_HT-600to800": [background_base + "DYJetsToLL_M-50_HT-600to800_12December25_0339_skim_Newskim/DYJetsToLL_M-50_HT-600to800.root"],
-            "DYJetsToLL_M-50_HT-800to1200": [background_base + "DYJetsToLL_M-50_HT-800to1200_12December25_0348_skim_Newskim/DYJetsToLL_M-50_HT-800to1200.root"],
-            "DYJetsToLL_M-50_HT-1200to2500": [background_base + "DYJetsToLL_M-50_HT-1200to2500_12December25_0329_skim_Newskim/DYJetsToLL_M-50_HT-1200to2500.root"],
-            "DYJetsToLL_M-50_HT-2500toInf": [background_base + "DYJetsToLL_M-50_HT-2500toInf_12December25_0338_skim_Newskim/DYJetsToLL_M-50_HT-2500toInf.root"],
+            "DYJetsToLL_M-4to50_HT-70to100": [background_base + "DYJetsToLL_M-4to50_HT-70to100_12December25_1606_skim_Oldskim/DYJetsToLL_M-4to50_HT-70to100.root"],
+            "DYJetsToLL_M-4to50_HT-100to200": [background_base + "DYJetsToLL_M-4to50_HT-100to200_12December25_1604_skim_Oldskim/DYJetsToLL_M-4to50_HT-100to200.root"],
+            "DYJetsToLL_M-4to50_HT-200to400": [background_base + "DYJetsToLL_M-4to50_HT-200to400_12December25_1544_skim_Oldskim/DYJetsToLL_M-4to50_HT-200to400.root"],
+            "DYJetsToLL_M-4to50_HT-400to600": [background_base + "DYJetsToLL_M-4to50_HT-400to600_12December25_1552_skim_Oldskim/DYJetsToLL_M-4to50_HT-400to600.root"],
+            "DYJetsToLL_M-4to50_HT-600toInf": [background_base + "DYJetsToLL_M-4to50_HT-600toInf_12December25_1608_skim_Oldskim/DYJetsToLL_M-4to50_HT-600toInf.root"],
+            "DYJetsToLL_M-50_HT-70to100": [background_base + "DYJetsToLL_M-50_HT-70to100_12December25_1556_skim_Oldskim/DYJetsToLL_M-50_HT-70to100.root"],
+            "DYJetsToLL_M-50_HT-100to200": [background_base + "DYJetsToLL_M-50_HT-100to200_12December25_1548_skim_Oldskim/DYJetsToLL_M-50_HT-100to200.root"],
+            "DYJetsToLL_M-50_HT-200to400": [background_base + "DYJetsToLL_M-50_HT-200to400_12December25_1559_skim_Oldskim/DYJetsToLL_M-50_HT-200to400.root"],
+            "DYJetsToLL_M-50_HT-400to600": [background_base + "DYJetsToLL_M-50_HT-400to600_12December25_1546_skim_Oldskim/DYJetsToLL_M-50_HT-400to600.root"],
+            "DYJetsToLL_M-50_HT-600to800": [background_base + "DYJetsToLL_M-50_HT-600to800_12December25_1555_skim_Oldskim/DYJetsToLL_M-50_HT-600to800.root"],
+            "DYJetsToLL_M-50_HT-800to1200": [background_base + "DYJetsToLL_M-50_HT-800to1200_12December25_1602_skim_Oldskim/DYJetsToLL_M-50_HT-800to1200.root"],
+            "DYJetsToLL_M-50_HT-1200to2500": [background_base + "DYJetsToLL_M-50_HT-1200to2500_12December25_1547_skim_Oldskim/DYJetsToLL_M-50_HT-1200to2500.root"],
+            "DYJetsToLL_M-50_HT-2500toInf": [background_base + "DYJetsToLL_M-50_HT-2500toInf_12December25_1554_skim_Oldskim/DYJetsToLL_M-50_HT-2500toInf.root"],
 			"T-tchan": [background_base + "ST_t-channel_top_4f_InclusiveDecays_26August25_0843_skim_Newskim/ST_t-channel_top_4f_InclusiveDecays.root"], 
 			"Tbar-tchan": [background_base + "ST_t-channel_antitop_4f_InclusiveDecays_26August25_0821_skim_Newskim/ST_t-channel_antitop_4f_InclusiveDecays.root"], 
 			"T-tW": [background_base + "ST_tW_top_5f_inclusiveDecays_26August25_0753_skim_Newskim/ST_tW_top_5f_inclusiveDecays.root"], 
@@ -2308,7 +2323,101 @@ if __name__ == "__main__":
 			#"Data_JetHT": [data_loc + "JetHT_Run2018A-17Sep2018-v1.root", data_loc + "JetHT_Run2018B-17Sep2018-v1.root", data_loc + "JetHT_Run2018C-17Sep2018-v1.root",data_loc + "JetHT_Run2018D-PromptReco-v2.root"]
 		}
 
-		#Generate dictionary of number of processed events This logic needs fixing
+		file_dict_2tau2b = {
+			"TTToSemiLeptonic": [Skimmed_2tau2b_base + "TTToSemiLeptonic_15December25_1704_skim_LikeGanesh/TTToSemiLeptonic" + str(j) + ".root" for j in range(10)], 
+			"TTTo2L2Nu": [Skimmed_2tau2b_base + "TTTo2L2Nu_15December25_1334_skim_LikeGanesh/TTTo2L2Nu.root"], 
+			"TTToHadronic": [Skimmed_2tau2b_base + "TTToHadronic_15December25_1228_skim_LikeGanesh/TTToHadronic" + str(j) + ".root" for j in range(10)],
+			"ZZ4l": [Skimmed_2tau2b_base + "ZZTo4L_15December25_1454_skim_LikeGanesh/ZZTo4L.root"], 
+			#"ZZ4l": [MVA_base + "ZZTo4L_p70_17November25_0740_skim_NewSkim_BTDp70/ZZTo4L.root"], 
+			"VV2l2nu": [Skimmed_2tau2b_base + "WWTo2L2Nu_15December25_1843_skim_LikeGanesh/WWTo2L2Nu.root"], 
+			"WZ1l3nu": [Skimmed_2tau2b_base + "WZTo1L3Nu_4f_15December25_1812_skim_LikeGanesh/WZTo1L3Nu_4f.root"], 
+			"ZZ2l2q": [Skimmed_2tau2b_base + "ZZTo2Q2L_15December25_1823_skim_LikeGanesh/ZZTo2Q2L.root"],
+			"WZ2l2q": [Skimmed_2tau2b_base + "WZTo2L2Q_15December25_1855_skim_LikeGanesh/WZTo2L2Q.root"],
+			"WZ1l1nu2q" : [Skimmed_2tau2b_base + "WZTo1L1Nu2Q_15December25_1612_skim_LikeGanesh/WZTo1L1Nu2Q.root"],
+            "DYJetsToLL_M-4to50_HT-70to100": [Skimmed_2tau2b_base + "DYJetsToLL_M-4to50_HT-70to100_15December25_1701_skim_LikeGanesh/DYJetsToLL_M-4to50_HT-70to100.root"],
+            "DYJetsToLL_M-4to50_HT-100to200": [Skimmed_2tau2b_base + "DYJetsToLL_M-4to50_HT-100to200_15December25_1418_skim_LikeGanesh/DYJetsToLL_M-4to50_HT-100to200.root"],
+            "DYJetsToLL_M-4to50_HT-200to400": [Skimmed_2tau2b_base + "DYJetsToLL_M-4to50_HT-200to400_15December25_1845_skim_LikeGanesh/DYJetsToLL_M-4to50_HT-200to400.root"],
+            "DYJetsToLL_M-4to50_HT-400to600": [Skimmed_2tau2b_base + "DYJetsToLL_M-4to50_HT-400to600_15December25_1421_skim_LikeGanesh/DYJetsToLL_M-4to50_HT-400to600.root"],
+            "DYJetsToLL_M-4to50_HT-600toInf": [Skimmed_2tau2b_base + "DYJetsToLL_M-4to50_HT-600toInf_15December25_1517_skim_LikeGanesh/DYJetsToLL_M-4to50_HT-600toInf.root"],
+            "DYJetsToLL_M-50_HT-70to100": [Skimmed_2tau2b_base + "DYJetsToLL_M-50_HT-70to100_15December25_1426_skim_LikeGanesh/DYJetsToLL_M-50_HT-70to100.root"],
+            "DYJetsToLL_M-50_HT-100to200": [Skimmed_2tau2b_base + "DYJetsToLL_M-50_HT-100to200_15December25_1831_skim_LikeGanesh/DYJetsToLL_M-50_HT-100to200.root"],
+            "DYJetsToLL_M-50_HT-200to400": [Skimmed_2tau2b_base + "DYJetsToLL_M-50_HT-200to400_15December25_1838_skim_LikeGanesh/DYJetsToLL_M-50_HT-200to400.root"],
+            "DYJetsToLL_M-50_HT-400to600": [Skimmed_2tau2b_base + "DYJetsToLL_M-50_HT-400to600_15December25_1609_skim_LikeGanesh/DYJetsToLL_M-50_HT-400to600.root"],
+            "DYJetsToLL_M-50_HT-600to800": [Skimmed_2tau2b_base + "DYJetsToLL_M-50_HT-600to800_15December25_1815_skim_LikeGanesh/DYJetsToLL_M-50_HT-600to800.root"],
+            "DYJetsToLL_M-50_HT-800to1200": [Skimmed_2tau2b_base + "DYJetsToLL_M-50_HT-800to1200_15December25_1659_skim_LikeGanesh/DYJetsToLL_M-50_HT-800to1200.root"],
+            "DYJetsToLL_M-50_HT-1200to2500": [Skimmed_2tau2b_base + "DYJetsToLL_M-50_HT-1200to2500_15December25_1328_skim_LikeGanesh/DYJetsToLL_M-50_HT-1200to2500.root"],
+            "DYJetsToLL_M-50_HT-2500toInf": [Skimmed_2tau2b_base + "DYJetsToLL_M-50_HT-2500toInf_15December25_1848_skim_LikeGanesh/DYJetsToLL_M-50_HT-2500toInf.root"],
+			"T-tchan": [Skimmed_2tau2b_base + "ST_t-channel_top_4f_InclusiveDecays_15December25_1614_skim_LikeGanesh/ST_t-channel_top_4f_InclusiveDecays.root"], 
+			"Tbar-tchan": [Skimmed_2tau2b_base + "ST_t-channel_antitop_4f_InclusiveDecays_15December25_1543_skim_LikeGanesh/ST_t-channel_antitop_4f_InclusiveDecays.root"], 
+			"T-tW": [Skimmed_2tau2b_base + "ST_tW_top_5f_inclusiveDecays_15December25_1433_skim_LikeGanesh/ST_tW_top_5f_inclusiveDecays.root"], 
+			"Tbar-tW": [Skimmed_2tau2b_base + "ST_tW_antitop_5f_inclusiveDecays_15December25_1523_skim_LikeGanesh/ST_tW_antitop_5f_inclusiveDecays.root"],
+			"WJetsToLNu_HT-100To200": [Skimmed_2tau2b_base + "WJetsToLNu_HT-100To200_15December25_1525_skim_LikeGanesh/WJetsToLNu_HT-100To200.root"],
+			"WJetsToLNu_HT-200To400": [Skimmed_2tau2b_base + "WJetsToLNu_HT-200To400_15December25_1436_skim_LikeGanesh/WJetsToLNu_HT-200To400.root"], 
+			"WJetsToLNu_HT-400To600": [Skimmed_2tau2b_base + "WJetsToLNu_HT-400To600_15December25_1809_skim_LikeGanesh/WJetsToLNu_HT-400To600.root", 
+				Skimmed_2tau2b_base +"WJetsToLNu_HT-400To600_OtherPart_15December25_1820_skim_LikeGanesh/WJetsToLNu_HT-400To600_OtherPart.root"], 
+			"WJetsToLNu_HT-600To800": [Skimmed_2tau2b_base + "WJetsToLNu_HT-600To800_15December25_1331_skim_LikeGanesh/WJetsToLNu_HT-600To800.root", 
+				Skimmed_2tau2b_base + "WJetsToLNu_HT-600To800_OtherPart_15December25_1431_skim_LikeGanesh/WJetsToLNu_HT-600To800_OtherPart.root"],
+			"WJetsToLNu_HT-800To1200": [Skimmed_2tau2b_base + "WJetsToLNu_HT-800To1200_15December25_1514_skim_LikeGanesh/WJetsToLNu_HT-800To1200.root", 
+				Skimmed_2tau2b_base + "WJetsToLNu_HT-800To1200_OtherPart_15December25_1818_skim_LikeGanesh/WJetsToLNu_HT-800To1200_OtherPart.root"],
+			"WJetsToLNu_HT-1200To2500": [Skimmed_2tau2b_base + "WJetsToLNu_HT-1200To2500_15December25_1813_skim_LikeGanesh/WJetsToLNu_HT-1200To2500.root", 
+				Skimmed_2tau2b_base + "WJetsToLNu_HT-1200To2500_OtherPart_15December25_1807_skim_LikeGanesh/WJetsToLNu_HT-1200To2500_OtherPart.root"],
+			"WJetsToLNu_HT-2500ToInf": [Skimmed_2tau2b_base + "WJetsToLNu_HT-2500ToInf_15December25_1853_skim_LikeGanesh/WJetsToLNu_HT-2500ToInf.root",
+				Skimmed_2tau2b_base + "WJetsToLNu_HT-2500ToInf_OtherPart_15December25_1849_skim_LikeGanesh/WJetsToLNu_HT-2500ToInf_OtherPart.root"],
+			"Data_SingleMuon": ak.to_list(ak.ravel([[Skimmed_2tau2b_base + "/SingleMu_Run2018A" + str(j) + ".root" for j in range(10)], 
+								[Skimmed_2tau2b_base + "/SingleMu_Run2018B" + str(j) + ".root" for j in range(10)], 
+                                [Skimmed_2tau2b_base + "/SingleMu_Run2018C" + str(j) + ".root" for j in range(10)], 
+								[Skimmed_2tau2b_base + "/SingleMu_Run2018D" + str(j) + ".root" for j in range(10)]]))
+		}
+		file_dict_Ganesh = {
+			"TTToSemiLeptonic": list(np.append([Skimmed_Ganesh_base + "TTToSemiLeptonic_" + str(j) + ".root" for j in range(2,5)], Skimmed_Ganesh_base + "TTToSemiLeptonic.root")), 
+			"TTTo2L2Nu": [Skimmed_Ganesh_base + "TTTo2L2Nu.root", Skimmed_Ganesh_base + "TTTo2L2Nu_2.root"], 
+			"TTToHadronic": [Skimmed_Ganesh_base + "TTToHadronic.root"],
+			"ZZ4l": [Skimmed_Ganesh_base + "ZZTo4L.root"], 
+			"VV2l2nu": [Skimmed_Ganesh_base + "WWTo2L2Nu.root"], 
+			"WZ1l3nu": [Skimmed_Ganesh_base + "WZTo1L3Nu_4f.root"], 
+			"ZZ2l2q": [Skimmed_Ganesh_base + "ZZTo2Q2L_mllmin4p0.root"],
+			"WZ2l2q": [Skimmed_Ganesh_base + "WZTo2Q2L_mllmin4p0.root"],
+			"WZ1l1nu2q" : [Skimmed_Ganesh_base + "WZTo1L1Nu2Q_4f.root"],
+            "DYJetsToLL_M-4to50_HT-70to100": [Skimmed_Ganesh_base + "DYJetsToLL_M-4to50_HT-70to100.root"],
+            "DYJetsToLL_M-4to50_HT-100to200": [Skimmed_Ganesh_base + "DYJetsToLL_M-4to50_HT-100to200.root"],
+            "DYJetsToLL_M-4to50_HT-200to400": [Skimmed_Ganesh_base + "DYJetsToLL_M-4to50_HT-200to400.root"],
+            "DYJetsToLL_M-4to50_HT-400to600": [Skimmed_Ganesh_base + "DYJetsToLL_M-4to50_HT-400to600.root"],
+            "DYJetsToLL_M-4to50_HT-600toInf": [Skimmed_Ganesh_base + "DYJetsToLL_M-4to50_HT-600toInf.root"],
+            "DYJetsToLL_M-50_HT-70to100": [Skimmed_Ganesh_base + "DYJetsToLL_M-50_HT-70to100.root"],
+            "DYJetsToLL_M-50_HT-100to200": [Skimmed_Ganesh_base + "DYJetsToLL_M-50_HT-100to200.root"],
+            "DYJetsToLL_M-50_HT-200to400": [Skimmed_Ganesh_base + "DYJetsToLL_M-50_HT-200to400.root"],
+            "DYJetsToLL_M-50_HT-400to600": [Skimmed_Ganesh_base + "DYJetsToLL_M-50_HT-400to600.root"],
+            "DYJetsToLL_M-50_HT-600to800": [Skimmed_Ganesh_base + "DYJetsToLL_M-50_HT-600to800.root"],
+            "DYJetsToLL_M-50_HT-800to1200": [Skimmed_Ganesh_base + "DYJetsToLL_M-50_HT-800to1200.root"],
+            "DYJetsToLL_M-50_HT-1200to2500": [Skimmed_Ganesh_base + "DYJetsToLL_M-50_HT-1200to2500.root"],
+            "DYJetsToLL_M-50_HT-2500toInf": [Skimmed_Ganesh_base + "DYJetsToLL_M-50_HT-2500toInf.root"],
+			"T-tchan": [Skimmed_Ganesh_base + "ST_t-channel_top_4f_InclusiveDecays.root"], 
+			"Tbar-tchan": [Skimmed_Ganesh_base + "ST_t-channel_antitop_4f_InclusiveDecays.root"], 
+			"T-tW": [Skimmed_Ganesh_base + "ST_tW_top_5f_inclusiveDecays.root"], 
+			"Tbar-tW": [Skimmed_Ganesh_base + "ST_tW_antitop_5f_inclusiveDecays.root"],
+			"WJetsToLNu_HT-100To200": [Skimmed_Ganesh_base + "WJetsToLNu_HT-100To200.root"],
+			"WJetsToLNu_HT-200To400": [Skimmed_Ganesh_base + "WJetsToLNu_HT-200To400.root"], 
+			"WJetsToLNu_HT-400To600": [Skimmed_Ganesh_base + "WJetsToLNu_HT-400To600.root", 
+				Skimmed_Ganesh_base +"WJetsToLNu_HT-400To600_2.root"], 
+			"WJetsToLNu_HT-600To800": [Skimmed_Ganesh_base + "WJetsToLNu_HT-600To800.root", 
+				Skimmed_Ganesh_base + "WJetsToLNu_HT-600To800_2.root"],
+			"WJetsToLNu_HT-800To1200": [Skimmed_Ganesh_base + "WJetsToLNu_HT-800To1200.root", 
+				Skimmed_Ganesh_base + "WJetsToLNu_HT-800To1200_2.root"],
+			"WJetsToLNu_HT-1200To2500": [Skimmed_Ganesh_base + "WJetsToLNu_HT-1200To2500.root", 
+				Skimmed_Ganesh_base + "WJetsToLNu_HT-1200To2500_2.root"],
+			"WJetsToLNu_HT-2500ToInf": [Skimmed_Ganesh_base + "WJetsToLNu_HT-2500ToInf.root",
+				Skimmed_Ganesh_base + "WJetsToLNu_HT-2500ToInf_2.root"],
+			"Data_SingleMuon": [Skimmed_Ganesh_base + "SingleMu/SingleMu_Run2018A.root",Skimmed_Ganesh_base + "SingleMu/SingleMu_Run2018B.root",
+                Skimmed_Ganesh_base + "SingleMu/SingleMu_Run2018C.root", Skimmed_Ganesh_base + "SingleMu/SingleMu_Run2018D.root", Skimmed_Ganesh_base + "SingleMu/SingleMu_Run2018D_2.root",
+                Skimmed_Ganesh_base + "SingleMu/SingleMu_Run2018D_3.root", Skimmed_Ganesh_base + "SingleMu/SingleMu_Run2018D_4.root",] 
+			#"Data_SingleMuon": list(ak.ravel([[Skimmed_Ganesh_base + "SingleMu/SingleMu_Run2018A.root"], 
+			#					[Skimmed_Ganesh_base + "SingleMu/SingleMu_Run2018B.root"], 
+            #                    [Skimmed_Ganesh_base + "SingleMu/SingleMu_Run2018C.root"], 
+			#					np.append([Skimmed_Ganesh_base + "SingleMu/SingleMu_Run2018D_" + str(j) + ".root" for j in range(2,5)],Skimmed_Ganesh_base + "SingleMu/SingleMu_Run2018D.root")]))
+		}
+		
+
+        #Generate dictionary of number of processed events
 		#print("About to obtain number of events being proscessed")
 		for key_name, file_array in file_dict.items(): 
 			print(key_name)
@@ -2321,32 +2430,50 @@ if __name__ == "__main__":
 				for file in file_array:
 					with uproot.open(file) as tempFile:
 						print(file)
-						#print("Current number of events: " + str(numEvents_Dict[key_name]))
-						#print("Number of events being added: " + str(tempFile['Runs/genEventCount'].array()[0]))
-						numEvents_Dict[key_name] += np.sum(tempFile['Runs/genEventCount'].array()) #Fixed for nanoAOD (!!This line may cause issues!!)
-						sumWEvents_Dict[key_name] += np.sum(tempFile['Runs/genEventSumw'].array()) #Fixed for nanoAOD (!!This line may cause issues!!)
-						#print(key_name + "sum: %f"%numEvents_Dict[key_name])
-					#numEvents_Dict[key_name] = tempFile['hEvents'].member('fEntries')/2
-					#numEvents_Dict[key_name] = tempFile['hcount'].member('fEntries')/2 #This is only good for miniAOD
+						numEvents_Dict[key_name] += np.sum(tempFile['Runs/genEventCount'].array()) #Fixed for nanoAOD 
+						sumWEvents_Dict[key_name] += np.sum(tempFile['Runs/genEventSumw'].array()) #Fixed for nanoAOD 
+						print(key_name + "sum: %f"%numEvents_Dict[key_name])
 
 			else: #Ignore data files
 				numEvents_Dict[key_name] = 1
 				sumWEvents_Dict[key_name] = 1
 
 		#break	
-		background_list = [r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"]
+		#Full background list
+		#background_list = [r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"]
+		
+		#Background splitting up the ttbar sample
+		background_list = [r"$t\bar{t}$ Hadronic",r"$t\bar{t}$ Semileptonic",r"$t\bar{t}$ 2L2Nu" , r"Drell-Yan+Jets", "Di-Bosons", "Single Top", "W+Jets", r"$ZZ \rightarrow 4l$"]
+		
+		#Split up the W+Jets sample
+		background_list = [r"$t\bar{t}$", r"Drell-Yan+Jets", "Di-Bosons", "Single Top", r"$ZZ \rightarrow 4l$","W+Jets HT 100-200 GeV","W+Jets HT 200-400 GeV",
+				"W+Jets HT 400-600 GeV","W+Jets HT 600-800 GeV","W+Jets HT 800-1200 GeV","W+Jets HT 1200-2500 GeV", "W+Jets HT 2500-Inf GeV"]
+		#background_list = [r"$ZZ \rightarrow 4l$ Test", r"$ZZ \rightarrow 4l$ Control"]
 		#background_list = [r"$ZZ \rightarrow 4l$"]
 		#background_list = [r"$t\bar{t}$"]
 		#background_list = [r"$t\bar{t}$", r"$ZZ \rightarrow 4l$"]
 		signal_list = [r"MC Sample $m_\phi$ = %s TeV"%mass[0]]
-		background_plot_names = {r"$t\bar{t}$" : "_ttbar_", r"Drell-Yan+Jets": "_DYJets_", "Di-Bosons" : "_DiBosons_", "Single Top": "_SingleTop_", "QCD" : "_QCD_", "W+Jets" : "_WJets_", r"$ZZ \rightarrow 4l$" : "_ZZ4l_"} #For file names
+		background_plot_names = {r"$t\bar{t}$" : "_ttbar_", r"$t\bar{t}$ Hadronic" : "_ttbarHadronic_", r"$t\bar{t}$ Semileptonic" : "_ttbarSemilepton_",
+				r"$t\bar{t}$ 2L2Nu" : "_ttbar2L2Nu_", r"Drell-Yan+Jets": "_DYJets_", "Di-Bosons" : "_DiBosons_", "Single Top": "_SingleTop_", "QCD" : "_QCD_", 
+				"W+Jets" : "_WJets_", r"$ZZ \rightarrow 4l$" : "_ZZ4l_", r"$ZZ \rightarrow 4l$ Test": "_ZZ4lTest_", r"$ZZ \rightarrow 4l$ Control": "_ZZ4lControl_",
+				"W+Jets HT 100-200 GeV" : "_WJetsHT100-200_","W+Jets HT 200-400 GeV" : "_WJetsHT200-400_","W+Jets HT 400-600 GeV" : "_WJetsHT400-600_",
+				"W+Jets HT 600-800 GeV" : "_WJetsHT600-800_","W+Jets HT 800-1200 GeV" : "_WJetsHT800-1200_","W+Jets HT 1200-2500 GeV" : "_WJetsHT1200-2500_",
+				"W+Jets HT 2500-Inf GeV" : "_WJetsHT2500-Inf_"} #For file names
 		
-		background_dict = {r"$t\bar{t}$" : ["TTToSemiLeptonic","TTTo2L2Nu","TTToHadronic"], 
-				r"Drell-Yan+Jets": ["DYJetsToLL_M-4to50_HT-70to100","DYJetsToLL_M-4to50_HT-100to200","DYJetsToLL_M-4to50_HT-200to400","DYJetsToLL_M-4to50_HT-400to600","DYJetsToLL_M-4to50_HT-600toInf","DYJetsToLL_M-50_HT-70to100","DYJetsToLL_M-50_HT-100to200","DYJetsToLL_M-50_HT-200to400","DYJetsToLL_M-50_HT-400to600","DYJetsToLL_M-50_HT-600to800","DYJetsToLL_M-50_HT-800to1200","DYJetsToLL_M-50_HT-1200to2500","DYJetsToLL_M-50_HT-2500toInf"], 
-
-				"Di-Bosons": ["WZ3l1nu","WZ2l2q","WZ1l1nu2q","ZZ2l2q", "WZ1l3nu", "VV2l2nu"], "Single Top": ["Tbar-tchan","T-tchan","Tbar-tW","T-tW"], 
+		background_dict = {r"$t\bar{t}$" : ["TTToSemiLeptonic","TTTo2L2Nu","TTToHadronic"], r"$t\bar{t}$ Hadronic" : ["TTToHadronic"], 
+				r"$t\bar{t}$ Semileptonic" : ["TTToSemiLeptonic"], r"$t\bar{t}$ 2L2Nu" : ["TTTo2L2Nu"],
+				r"Drell-Yan+Jets": ["DYJetsToLL_M-4to50_HT-70to100","DYJetsToLL_M-4to50_HT-100to200","DYJetsToLL_M-4to50_HT-200to400","DYJetsToLL_M-4to50_HT-400to600",
+				"DYJetsToLL_M-4to50_HT-600toInf","DYJetsToLL_M-50_HT-70to100","DYJetsToLL_M-50_HT-100to200","DYJetsToLL_M-50_HT-200to400",
+				"DYJetsToLL_M-50_HT-400to600","DYJetsToLL_M-50_HT-600to800","DYJetsToLL_M-50_HT-800to1200","DYJetsToLL_M-50_HT-1200to2500","DYJetsToLL_M-50_HT-2500toInf"], 
+				#"Di-Bosons": ["WZ3l1nu","WZ2l2q","WZ1l1nu2q","ZZ2l2q", "WZ1l3nu", "VV2l2nu"], "Single Top": ["Tbar-tchan","T-tchan","Tbar-tW","T-tW"], 
+				"Di-Bosons": ["WZ2l2q","WZ1l1nu2q","ZZ2l2q", "WZ1l3nu", "VV2l2nu"], "Single Top": ["Tbar-tchan","T-tchan","Tbar-tW","T-tW"], 
 				"W+Jets": ["WJetsToLNu_HT-100To200","WJetsToLNu_HT-200To400","WJetsToLNu_HT-400To600","WJetsToLNu_HT-600To800","WJetsToLNu_HT-800To1200","WJetsToLNu_HT-1200To2500","WJetsToLNu_HT-2500ToInf"],
-				r"$ZZ \rightarrow 4l$" : ["ZZ4l"]
+				"W+Jets HT 100-200 GeV": ["WJetsToLNu_HT-100To200"],"W+Jets HT 200-400 GeV": ["WJetsToLNu_HT-200To400"],"W+Jets HT 400-600 GeV": ["WJetsToLNu_HT-400To600"],
+				"W+Jets HT 600-800 GeV": ["WJetsToLNu_HT-600To800"],"W+Jets HT 800-1200 GeV": ["WJetsToLNu_HT-800To1200"],
+				"W+Jets HT 1200-2500 GeV": ["WJetsToLNu_HT-1200To2500"], "W+Jets HT 2500-Inf GeV": ["WJetsToLNu_HT-2500ToInf"],
+				r"$ZZ \rightarrow 4l$" : ["ZZ4l"],
+				#r"$ZZ \rightarrow 4l$ Test": ["ZZ4l_Test"],
+				#r"$ZZ \rightarrow 4l$ Control": ["ZZ4l_Control"],
 		}
 		
 
@@ -2417,7 +2544,10 @@ if __name__ == "__main__":
 			
 			#fourtau_out = iterative_runner(file_dict, treename="Events", processor_instance=FourTauPlotting(trigger_bit=trigger_pair[0], or_trigger=trigger_pair[1],PUWeights = PUWeight, PU_weight_bool =True, signal_mass = mass)) #Modified for NanoAOD (changd treename)
 			print("About to run iterative runner")
-			fourtau_out = iterative_runner(file_dict, treename="Events", processor_instance=FourTauPlotting(trigger_bit=trigger_pair[0], or_trigger=trigger_pair[1],PUWeights = PUWeight, PU_weight_bool = True, signal_mass = mass)) #Modified for NanoAOD (changd treename)
+			
+			#Run coffea processor
+			fourtau_out = iterative_runner(file_dict, treename="Events", processor_instance=FourTauPlotting(trigger_bit=trigger_pair[0], or_trigger=trigger_pair[1],PUWeights = PUWeight, PU_weight_bool = False, signal_mass = mass,verbose=1)) #Modified for NanoAOD (changd treename)
+
 			print("Ran iterative runner")
 			timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
 			outfile = os.path.join(os.getcwd(), f"output_2018_run{timestamp}.coffea")
@@ -2439,14 +2569,14 @@ if __name__ == "__main__":
 				#if (hist_name != "Pair_DeltaPhi_Hist" and hist_name != "RadionPTComp_Hist"):
 				temp_hist_dict = dict.fromkeys(background_list) # create dictionary of histograms for each background type
 						
-				if (hist_name == "cutflow_table"): #Get the weight distributions from data
-					fig_data, ax_data = plt.subplots()
-					data_hist = fourtau_out["Data_SingleMuon"]["cutflow_table"]
-					data_hist += fourtau_out["Data_JetHT"]["cutflow_table"]
-					data_hist.plot1d(ax = ax_data)
-					plt.title("Data Weights")
-					plt.savefig("SingleBackground_Data_WeightTable")
-					plt.close()
+			#	if (hist_name == "cutflow_table"): #Get the weight distributions from data
+			#		fig_data, ax_data = plt.subplots()
+			#		data_hist = fourtau_out["Data_SingleMuon"]["cutflow_table"]
+			#		data_hist += fourtau_out["Data_JetHT"]["cutflow_table"]
+			#		data_hist.plot1d(ax = ax_data)
+			#		plt.title("Data Weights")
+			#		plt.savefig("SingleBackground_Data_WeightTable")
+			#		plt.close()
 				
 				for background_type in background_list:
 					print("Background type %s"%background_type)
@@ -2603,14 +2733,14 @@ if __name__ == "__main__":
 					#print("Number of Jet HT entries: %d"%len(fourtau_out["Data_JetHT"][hist_name]))
 								
 				#Plot the weights for the data
-				figweight_data, axweight_data = plt.subplots()
-				weight_hist_data = fourtau_out["Data_SingleMuon"]["weight_Hist"]
-				weight_hist_data += fourtau_out["Data_JetHT"]["weight_Hist"]
+				#figweight_data, axweight_data = plt.subplots()
+				#weight_hist_data = fourtau_out["Data_SingleMuon"]["weight_Hist"]
+				#weight_hist_data += fourtau_out["Data_JetHT"]["weight_Hist"]
 
-				weight_hist_data.plot1d(ax=axweight_data)
-				plt.title("Data Weight Histogram")
-				plt.savefig("SingleBackground_Data_Weight")
-				plt.close()
+				#weight_hist_data.plot1d(ax=axweight_data)
+				#plt.title("Data Weight Histogram")
+				#plt.savefig("SingleBackground_Data_Weight")
+				#plt.close()
 			
 				#Put histograms into stacks and arrays for plotting purposes (is the issue arising here??) (This logic may be outdated the .stack(name) may not be needed anymore)
 				background_stack = hist_dict_background[hist_name] #hist_dict_background[hist_name].stack("background")
